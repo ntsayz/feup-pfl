@@ -21,12 +21,12 @@ game_loop(Board, CurrentPlayer) :-
     ;
 
 
-    % update board.
+    % TODO: update board.
 
     % display board.
     display_board(Board),
 
-    % Win condition.
+    % TODO: Win condition.
 
     % Switch to the next player turn
     game_loop(Board, NextPlayer).
