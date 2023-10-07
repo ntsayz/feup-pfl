@@ -6,5 +6,6 @@ main_menu_op :-
 
 rules :-
     write('RULES'), nl,
-    write('Rule nr1'),
+    write('Rule'), nl,
+    write('Any key to exit!'),
     nl.

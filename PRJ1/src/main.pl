@@ -4,6 +4,6 @@
 :- consult('game.pl').
 :- consult('assets.pl').
 
-% predicate to run the application
-start :- main_menu.
+% predicate to run the game
+start :- clear_screen, main_menu.
 

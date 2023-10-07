@@ -19,20 +19,20 @@ game_loop(Board, CurrentPlayer) :-
     (Choice = 'q' ; Choice = 'Q') ->
         nl
     ;
-    % Continue with the game logic.
 
-    % Update board.
 
-    % Display board.
+    % update board.
+
+    % display board.
     display_board(Board),
 
     % Win condition.
 
-    % Switch to the next player turn.
+    % Switch to the next player turn
     game_loop(Board, NextPlayer).
 
 
 
-% Utility predicate to switch players
+% predicate to switch players
 switch_turn(p1, p2).
 switch_turn(p2, p1).
