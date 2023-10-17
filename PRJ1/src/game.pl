@@ -1,6 +1,4 @@
-initial_board([[empty, empty, empty],
-               [empty, p1, empty],
-               [empty, p2, empty]]).
+
 
 display_board(Board) :-
     initial_board(Board). %  TODO : remove this
@@ -18,9 +16,7 @@ game_loop(Board, CurrentPlayer) :-
     get_single_char(Choice),
     (Choice = 'q' ; Choice = 'Q') ->
         nl
-    ;
-
-
+    ; 
     % TODO: update board.
 
     % display board.
@@ -29,7 +25,7 @@ game_loop(Board, CurrentPlayer) :-
     % TODO: Win condition.
 
     % Switch to the next player turn
-    game_loop(Board, NextPlayer).
+    game_loop(Board, CurrentPlayer).
 
 
 

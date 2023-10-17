@@ -9,7 +9,7 @@ menu_choice(0) :- % exit loop
     write(''), nl.
 
 menu_choice(1) :-
-    write('Starting game'), 
+    clear_screen,
     start_game,nl,
     main_menu.
 
