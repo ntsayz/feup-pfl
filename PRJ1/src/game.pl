@@ -1,5 +1,4 @@
 
-
 display_board(Board) :-
     initial_board(Board). %  TODO : remove this
     % TODO : display rows and wtv
@@ -16,7 +15,7 @@ game_loop(Board, CurrentPlayer) :-
     get_single_char(Choice),
     (Choice = 'q' ; Choice = 'Q') ->
         nl
-    ; 
+    ;
     % TODO: update board.
 
     % display board.
