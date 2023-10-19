@@ -1,6 +1,11 @@
-initial_board([[empty, empty, empty],
-               [empty, p1, empty],
-               [empty, p2, empty]]).
+initial_board([
+                [out,out,sr,sr,sr,sr,sr,out,out],
+                [out,out,out,b_square,b_square,b_square,b_round,b_round,out],
+                [out,empty, empty, empty,empty,empty,empty,empty,empty,out],
+                [out,empty, empty, empty,empty,empty,empty,empty,empty,out],
+                [out, w_square,w_square,w_square,w_round,w_round,out,out],
+                [v,sr,sr,sr,sr,sr,v,v]]).
+               
 
 display_board(Board) :-
     initial_board(Board). %  TODO : remove this
