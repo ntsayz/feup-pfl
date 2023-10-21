@@ -1,3 +1,5 @@
+
+
 initial_board([
                 [out,out,out,sr,sr,sr,sr,sr,out,out],
                 [out,out,out,b_square,b_square,b_square,b_round,b_round,out,out],
