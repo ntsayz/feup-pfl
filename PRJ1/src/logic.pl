@@ -64,7 +64,6 @@ board_element(Board,Row-Col,Element):-
     nth0(Row,Board,BoardRow),
     nth0(Col,BoardRow,Element).
 
-
 %empty_cell(+Cell,+Board)
 %Verifica se célula Cell:Row-Col no Board está ou não vazia.
 empty_cell(_Board,Row-Col):-
