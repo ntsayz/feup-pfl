@@ -17,7 +17,7 @@ board_logic_test(standard_intial_positions, [
     [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
     [out,out,out,empty,w_square,w_round,empty,empty,out,out],
     [out,out,sr,sr,sr,sr,sr,out,out,out] ]
-)
+).
 
 % Lida com caso em que negamos resultado de predicados que "falham para determinados casos corretamente"
 run_test(\+ NegatedCall) :-
@@ -78,10 +78,10 @@ test_player_move_predicates:-
 
 
     %Testing the 4 possible moves from a given cell to another cell, moving only one cell 
-    run_test(move(1-3,2-3)), % down
-    run_test(move(1-3,1-4)), % right
-    run_test(move(1-4,1-3)), % left
-    run_test(move(2-3,1-3)), % up
+    run_test(possible_move(1-3,2-3)), % down
+    run_test(possible_move(1-3,1-4)), % right
+    run_test(possible_move(1-4,1-3)), % left
+    run_test(possible_move(2-3,1-3)), % up
     %Testing if a move from CurrentPos to DestPosition, using more then one cell is valid
     run_test(\+valid_move(Board, player2, 1-3, 1-3)), %we assume move 0 number of cells is not a valid_move
     run_test(\+valid_move(Board, player2, 1-3, 4-3)), % 4-3 have a piece of player1 (w_square)
@@ -91,6 +91,7 @@ test_player_move_predicates:-
     run_test(valid_move(Board, player1, 4-6, 3-3)), % left-up move
     run_test(\+valid_move(Board, player2, 3-3, 1-5)). % no piece to move in 3-3 and 1-5 have a piece
 run_all_tests :-
+
     test_board_basic_predicates,
 
     test_board_player_predicates,
