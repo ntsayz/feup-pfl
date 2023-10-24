@@ -32,7 +32,7 @@ display_cell(Cell) :-
     % the cell value to its matching character.
     cell_char(Cell, Char),
     write(Char),
-    write(' ').
+    write(' | ').
 
 
 cell_char('1', '1 ').
@@ -64,20 +64,31 @@ cell_char(b_round, 'BR').
 cell_char(empty, '  ').
 cell_char(corner, '  ').
 cell_char(np, '  ').
+cell_char(horizontal_bar, '  ').
 
 cell_char(sr, '--').
 cell_char(out, '::').
 
 initial_board([
                 [corner, 'A', 'B', 'C', 'D', 'E', 'F','G','H','I','J', corner],
-                ['1', np, np, np, sr, sr, sr, sr, sr, np, np],
-                ['2', np, out, out,empty,empty,empty,empty,empty, out],
+                ['1', out, out, out, sr, sr, sr, sr, sr, np, np],
+                ['2', out, out, out,empty,empty,empty,empty,empty, out],
                 ['3', out, empty, b_square, b_square, b_square, b_round, b_round, empty,empty, out],
                 ['4', out, empty, empty, empty, empty, empty, empty, empty,empty, out],
-                ['5', np, out, w_square,w_square, w_square, w_round, w_round, out, out, np],
-                ['6', np,np, sr, sr, sr, sr, sr, np, np, np]]).
+                ['5', out, out, w_square,w_square, w_square, w_round, w_round, out, out, np],
+                ['6', out,out, sr, sr, sr, sr, sr, np, np, np]]).
 
 
+
+test_board([
+                [corner, 'A', 'B', 'C', 'D', 'E', 'F','G','H','I','J', corner],
+                [horizontal_bar, horizontal-bar, horizontal-bar, horizontal-bar, horizontal-bar, horizontal-bar, horizontal-bar,horizontal-bar,horizontal-bar,horizontal-bar,horizontal-bar, corner],
+                ['1', out, out, out, sr, sr, sr, sr, sr, np, np],
+                ['2', out, out, out,empty,empty,empty,empty,empty, out],
+                ['3', out, empty, b_square, b_square, b_square, b_round, b_round, empty,empty, out],
+                ['4', out, empty, empty, empty, empty, empty, empty, empty,empty, out],
+                ['5', out, out, w_square,w_square, w_square, w_round, w_round, out, out, np],
+                ['6', out,out, sr, sr, sr, sr, sr, np, np, np]]).
 
 
 
