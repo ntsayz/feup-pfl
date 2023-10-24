@@ -64,7 +64,6 @@ board_element(Board,Row-Col,Element):-
     nth0(Row,Board,BoardRow),
     nth0(Col,BoardRow,Element).
 
-
 %empty_cell(+Cell,+Board)
 %Verifica se célula Cell:Row-Col no Board está ou não vazia.
 empty_cell(_Board,Row-Col):-
@@ -98,21 +97,40 @@ player_round_piece(Board,Player,Row-Col):-
 
 %before
 
-%valid_move(+Board,+CurrentPosition,+DestPosition)
+%possible_move(+Board,+CurrentPosition,+NewPosition)
+%Determina possíveis posições partindo de CurrentPosition para NewPosition tendo em conta os movimentos possíveis do Push-Fight ( up,down,left,Right from a given cell to other cell)
+possible_move(CurrRow-CurrCol,NewRow-NewCol):- %up move
+
+    NewRow is CurrRow-1, NewCol is CurrCol.
+
+possible_move(CurrRow-CurrCol,NewRow-NewCol):- %down move
+
+    NewRow is CurrRow+1, NewCol is CurrCol.
+
+possible_move(CurrRow-CurrCol,NewRow-NewCol):- %left move
+
+    NewRow is CurrRow, NewCol is CurrCol-1.
+
+possible_move(CurrRow-CurrCol,NewRow-NewCol):- %right move
+
+    NewRow is CurrRow, NewCol is CurrCol+1.
+%valid_move(+Board,+CurrentPosition,+DestPosition,?Visited)
 %Verifica se mover uma possível peça em CurrentPosition para DestPosition(destination position) é um movimento válido
 
 %base case Current Position = DestPosition
+
 valid_move(_Board, _Player, CurrRow-CurrCol, CurrRow-CurrCol, _Visited).
 
 valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, Visited):-
-    move(CurrRow-CurrCol, NewRow-NewCol),
+    possible_move(CurrRow-CurrCol, NewRow-NewCol),
     % Every recursive call, we Verify if the move is valid to a new possible empty cell destination
     empty_cell(Board, NewRow-NewCol),
     \+ member(NewRow-NewCol, Visited),  % Ensure the current cell hasn't been visited
     valid_move(Board, Player, NewRow-NewCol, DestRow-DestCol, [CurrRow-CurrCol|Visited]).
 
 
-% Entry point without the accumulator
+% valid_move(+Board,+CurrentPosition,+DestPosition)
+% Ponto de entrada sem acumulador, para verificar se movimento é válido
 valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol) :-
     empty_cell(Board, DestRow-DestCol), %DestinationPosition needs to be an empty cell
     cell_has_player_piece(Board, Player,CurrRow-CurrCol,_Piece), %célula de onde movimento parte, tem de ter uma peça de um Player
@@ -120,31 +138,16 @@ valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol) :-
     %Chamada recursiva utilizando acumulador, para evitar recursão infinita / evitar voltar a tentar células já tentadas anteriormente
     valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, []).
 
-
-%move(+Board,+CurrentPosition,+NewPosition)
-%Determina possíveis posições partindo de CurrentPosition para NewPosition tendo em conta os movimentos possíveis do Push-Fight ( up,down,left,Right from a given cell to other cell)
-move(CurrRow-CurrCol,NewRow-NewCol):- %up move
-
-    NewRow is CurrRow-1, NewCol is CurrCol.
-
-move(CurrRow-CurrCol,NewRow-NewCol):- %down move
-
-    NewRow is CurrRow+1, NewCol is CurrCol.
-
-move(CurrRow-CurrCol,NewRow-NewCol):- %left move
-
-    NewRow is CurrRow, NewCol is CurrCol-1.
-
-move(CurrRow-CurrCol,NewRow-NewCol):- %right move
-
-    NewRow is CurrRow, NewCol is CurrCol+1.
-
+%Efetuar movimento, mudando peça de lugar e atualizando o Board
+%move(Player, CurrRow-CurrCol, DestRow-DestCol,?Board)
 
 
 
 %valid_push(+Board, +Orig, +Dest)
 %Verifica se peça na célula Orig:Row1-Coll2 pode efetuar um movimento push a peça/peças que estão horizontal/vertical com peça em Orig no Board
-
+%Em push vertical temos de ver se push não empurra alguma peça nessa coluna contra um side rail (sr)
+% Push horizontal, não existem side rails
+% Em todos, temos de verificar se não estamos empurrar linha/coluna de peças onde uma das peça tem âncora
 
 
 %verify_anchor(+Cell,+Board)
