@@ -9,6 +9,9 @@ player_pieces(player1, w_round).
 player_pieces(player2, b_square).
 player_pieces(player2, b_round).
 
+change_player(player1,player2).
+change_player(player2,player1).
+
 
 %anchor_piece(+Player,+Board,+CellPiece)/3
 %Determinar que peça do Player no Board em CellPiece:Row-Col fica com âncora
@@ -18,6 +21,9 @@ player_pieces(player2, b_round).
 %size of the board maybe can change by options ?
 :- dynamic size_row/1.
 :- dynamic size_col/1.
+:- dynamic anchor_piece/2 .
+
+anchor_piece(4-2, player1).
 
 size_row(6).
 size_col(10).
@@ -80,40 +86,52 @@ cell_has_player_piece(Board,Player,Row-Col,Piece):-
 
 %player_square_piece(+Board,+Player,+CellPiece)
 %Verifica se peça em Cell:Row-Col é uma square piece do Player
-player_square_piece(Board,Player,Row-Col):-
-    cell_has_player_piece(Board,Player,Row-Col,Piece),
+player_square_piece(Board,player1,Row-Col):-
+    cell_has_player_piece(Board,player1,Row-Col,w_square).
 
-    player_pieces(Player,Piece),
-    (Piece = b_square ; Piece = w_square ) .
+player_square_piece(Board,player2,Row-Col):-
+    cell_has_player_piece(Board,player2,Row-Col,b_square).
+
 
 %player_round_piece(+Board,+Player,+CellPiece)
 %Verifica se peça em Cell:Row-Col é uma square piece do Player
-player_round_piece(Board,Player,Row-Col):-
-    cell_has_player_piece(Board,Player,Row-Col,Piece),
+player_round_piece(Board,player1,Row-Col):-
+    cell_has_player_piece(Board,player1,Row-Col,w_round).
 
-    player_pieces(Player,Piece),
-    (Piece = b_round ; Piece = w_round ) .
+player_round_piece(Board, player2, Row-Col):-
+    cell_has_player_piece(Board,player2,Row-Col,b_round).
+
+
+
+piece_is_anchored(Board, Player, PieceRow-PieceCol):-
+    player_square_piece(Board,Player,PieceRow-PieceCol),
+    anchor_piece(PieceRow-PieceCol, Player).
+
+
 
 
 %before
 
-%possible_move(+Board,+CurrentPosition,+NewPosition)
+%possible_move(+Board,+CurrentPosition,+NewPosition,-MoveType)
 %Determina possíveis posições partindo de CurrentPosition para NewPosition tendo em conta os movimentos possíveis do Push-Fight ( up,down,left,Right from a given cell to other cell)
-possible_move(CurrRow-CurrCol,NewRow-NewCol):- %up move
+possible_move(Board, CurrRow-CurrCol,NewRow-NewCol, up):-
 
-    NewRow is CurrRow-1, NewCol is CurrCol.
+    NewRow is CurrRow-1, NewCol is CurrCol, %up move
+    cell_belongs_board(Board,NewRow-NewCol).
+possible_move(Board, CurrRow-CurrCol,NewRow-NewCol, down):- %down move
 
-possible_move(CurrRow-CurrCol,NewRow-NewCol):- %down move
+    NewRow is CurrRow+1, NewCol is CurrCol,
+    cell_belongs_board(Board,NewRow-NewCol).
 
-    NewRow is CurrRow+1, NewCol is CurrCol.
+possible_move(Board, CurrRow-CurrCol,NewRow-NewCol, left):- %left move
 
-possible_move(CurrRow-CurrCol,NewRow-NewCol):- %left move
+    NewRow is CurrRow, NewCol is CurrCol-1,
+    cell_belongs_board(Board,NewRow-NewCol).
 
-    NewRow is CurrRow, NewCol is CurrCol-1.
+possible_move(Board, CurrRow-CurrCol,NewRow-NewCol, right):- %right move
 
-possible_move(CurrRow-CurrCol,NewRow-NewCol):- %right move
-
-    NewRow is CurrRow, NewCol is CurrCol+1.
+    NewRow is CurrRow, NewCol is CurrCol+1,
+    cell_belongs_board(Board,NewRow-NewCol).
 %valid_move(+Board,+CurrentPosition,+DestPosition,?Visited)
 %Verifica se mover uma possível peça em CurrentPosition para DestPosition(destination position) é um movimento válido
 
@@ -122,7 +140,7 @@ possible_move(CurrRow-CurrCol,NewRow-NewCol):- %right move
 valid_move(_Board, _Player, CurrRow-CurrCol, CurrRow-CurrCol, _Visited).
 
 valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, Visited):-
-    possible_move(CurrRow-CurrCol, NewRow-NewCol),
+    possible_move(Board, CurrRow-CurrCol, NewRow-NewCol,_MoveType),
     % Every recursive call, we Verify if the move is valid to a new possible empty cell destination
     empty_cell(Board, NewRow-NewCol),
     \+ member(NewRow-NewCol, Visited),  % Ensure the current cell hasn't been visited
@@ -139,16 +157,52 @@ valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol) :-
     valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, []).
 
 %Efetuar movimento, mudando peça de lugar e atualizando o Board
-%move(Player, CurrRow-CurrCol, DestRow-DestCol,?Board)
+%move(Player, CurrentPosition, FinalCell,?Board)
 
+check_win(Board, Player, CurrRow-CurrCol, FinalRow-FinalCol, win):-
+    board_element(Board, FinalRow-FinalCol, Element),
+    Element == out,
+    change_player(Player,Opponent),
+    cell_has_player_piece(Board, Opponent, CurrRow-CurrCol, _Piece).
 
+check_win(Board, _Player, _CurrRow-_CurrCol, FinalRow-FinalCol, no_win):-
+    board_element(Board, FinalRow-FinalCol, Element),
+    Element \== out.
 
+%check_push_row_col(+Board, +CurrentPosition, FinalPosition, +MoveType, ?Visited )
+%predicate to check if was row or col that changed in the possible vertical/horizontal move above
+%base case
+check_push_row_col(Board, _Player, CurrRow-CurrCol, FinalRow-FinalCol, _MoveType, _Visited):-
+     board_element(Board, CurrRow-CurrCol, Element),
+     (Element == empty ; Element == out),
+
+    FinalRow = CurrRow, FinalCol = CurrCol.
+   
+%Versão do predicado com chamada recursive, para valores de sr, ao tentar continuar recursão possible_move falha ( vai além-do board após algum sr)
+check_push_row_col(Board, Player, CurrRow-CurrCol, _FinalRow-_FinalCol, MoveType, Visited):-
+    possible_move(Board, CurrRow-CurrCol, NextRow-NextCol, MoveType), %
+    change_player(Player, Opponent),
+    \+ piece_is_anchored(Board, NextRow-NextCol, Opponent),
+    \+ member(NextRow-NextCol, Visited),  % Ensure the cell hasn't been visited
+   
+    check_push_row_col(Board, Player, NextRow-NextCol, NextRow-NextCol, MoveType, [NextRow-NextCol|Visited]).
+
+valid_push(Board, Player, CurrRow-CurrCol, PushRow-PushCol, FinalRow-FinalCol):-
+    possible_move(Board, CurrRow-CurrCol, PushRow-PushCol, MoveType),
+    player_square_piece(Board, Player, CurrRow-CurrCol),
+    cell_has_player_piece(Board, _AnyPlayer, PushRow-PushCol, _Piece),
+    change_player(Player, Opponent),
+    \+ piece_is_anchored(Board, PushRow-PushCol, Opponent),
+    check_push_row_col(Board, Player, PushRow-PushCol, FinalRow-FinalCol, MoveType, [PushRow-PushCol]).
+    %check sr cells that stop the push movement,
+    %check piece with anchor that stop the push movement,
 %valid_push(+Board, +Orig, +Dest)
 %Verifica se peça na célula Orig:Row1-Coll2 pode efetuar um movimento push a peça/peças que estão horizontal/vertical com peça em Orig no Board
 %Em push vertical temos de ver se push não empurra alguma peça nessa coluna contra um side rail (sr)
 % Push horizontal, não existem side rails
 % Em todos, temos de verificar se não estamos empurrar linha/coluna de peças onde uma das peça tem âncora
-
+% valid_push(Board,Player ,CurrRow-CurrCol, DestRow-DestCol):-
+%     possible_push(Board,Player ,CurrRow-CurrCol, DestRow-DestCol),
 
 %verify_anchor(+Cell,+Board)
 %Verifica se peça na célula Cell:Row-Col do Board tem âncora ou não
