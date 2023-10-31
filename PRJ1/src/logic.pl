@@ -29,19 +29,6 @@ size_row(6).
 size_col(10).
 
 
-%collumn(+Letter,-Number)
-%Traduz letras utilizadas para identificar colunas no board graficamente em Number de Colunas para trabalhar com matrizes e listas
-collumn('a',0).
-collumn('b',1).
-collumn('c',2).
-collumn('d',3).
-collumn('e',4).
-collumn('f',5).
-collumn('g',6).
-collumn('h',7).
-collumn('i',8).
-collumn('j',9).
-
 %set_anchor(+Cell,+Player,+Board)
 %Determina que peça de um Player no Board localizada em Cell:Row-Coll é marcada com a âncora 
 %Aqui teremos de usar assert/assertz?
@@ -59,8 +46,11 @@ cell_belongs_board(Board,Row-Col):-
     Row < SizeRows, 
     Col >=0, 
     Col < SizeCols.
-
-
+%cell_belongs_to_playable_board(+Board, +Position:Row-Col)
+%Verifica se Position pertence ao Board representado pela matriz, mas também se Position é uma posição do Board que fica dentro da área do Board onde as peças se podem movimentar
+cell_belongs_to_playable_board(Board, Row-Col):-
+    cell_belongs_board(Board, Row-Col),
+   ( empty_cell(Board,Row-Col) ); (cell_has_player_piece(Board,_Player,Row-Col,_Piece)).
 
 %board_element(+Board,+Cell,-Element)
 %Obter a Piece no Board numa determinada posição: Row-Col
@@ -156,8 +146,6 @@ valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol) :-
     %Chamada recursiva utilizando acumulador, para evitar recursão infinita / evitar voltar a tentar células já tentadas anteriormente
     valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, []).
 
-%Efetuar movimento, mudando peça de lugar e atualizando o Board
-%move(Player, CurrentPosition, FinalCell,?Board)
 
 check_win(Board, Player, CurrRow-CurrCol, FinalRow-FinalCol, win):-
     board_element(Board, FinalRow-FinalCol, Element),
@@ -173,12 +161,12 @@ check_win(Board, _Player, _CurrRow-_CurrCol, FinalRow-FinalCol, no_win):-
 %predicate to check if was row or col that changed in the possible vertical/horizontal move above
 %base case
 check_push_row_col(Board, _Player, CurrRow-CurrCol, FinalRow-FinalCol, _MoveType, _Visited):-
-     board_element(Board, CurrRow-CurrCol, Element),
-     (Element == empty ; Element == out),
+    board_element(Board, CurrRow-CurrCol, Element),
+    (Element == empty ; Element == out),
 
     FinalRow = CurrRow, FinalCol = CurrCol.
    
-%Versão do predicado com chamada recursive, para valores de sr, ao tentar continuar recursão possible_move falha ( vai além-do board após algum sr)
+%Versão do predicado com chamada recursiva, para valores de sr, ao tentar continuar recursão possible_move falha ( vai além-do board após algum sr)
 check_push_row_col(Board, Player, CurrRow-CurrCol, _FinalRow-_FinalCol, MoveType, Visited):-
     possible_move(Board, CurrRow-CurrCol, NextRow-NextCol, MoveType), %
     change_player(Player, Opponent),
@@ -196,16 +184,40 @@ valid_push(Board, Player, CurrRow-CurrCol, PushRow-PushCol, FinalRow-FinalCol):-
     check_push_row_col(Board, Player, PushRow-PushCol, FinalRow-FinalCol, MoveType, [PushRow-PushCol]).
     %check sr cells that stop the push movement,
     %check piece with anchor that stop the push movement,
-%valid_push(+Board, +Orig, +Dest)
-%Verifica se peça na célula Orig:Row1-Coll2 pode efetuar um movimento push a peça/peças que estão horizontal/vertical com peça em Orig no Board
-%Em push vertical temos de ver se push não empurra alguma peça nessa coluna contra um side rail (sr)
-% Push horizontal, não existem side rails
-% Em todos, temos de verificar se não estamos empurrar linha/coluna de peças onde uma das peça tem âncora
-% valid_push(Board,Player ,CurrRow-CurrCol, DestRow-DestCol):-
-%     possible_push(Board,Player ,CurrRow-CurrCol, DestRow-DestCol),
 
 %verify_anchor(+Cell,+Board)
 %Verifica se peça na célula Cell:Row-Col do Board tem âncora ou não
+
+% change_board_value(+Board, +Player,+CurrentPosition, +Value, -NewBoard)
+% Predicado para alterar valor de uma célula do board
+change_board_value(Board,CurrRow-CurrCol,Value, NewBoard):-
+    %get Row From the board and get new Row with replaced Value
+    nth0(CurrRow, Board, BoardRow),
+    nth0(CurrCol, BoardRow, _Elem1, Rest1),
+    nth0(CurrCol, ResultRow1, Value, Rest1),
+    %Change the row on the board, with the new ResultRow1 already with the replaced Value and get the NewGameState
+    nth0(CurrRow, Board, _Elem2, Rest2),
+    nth0(CurrRow, NewBoard, ResultRow1, Rest2).
+    
+
+% make_move(+Board, +Player, +PiecePosition, +DestinationPosition, -NewGameState)/5
+% Predicado para obter NewGameState em relação a um movimento de deslocamento de uma peça do Player pelo Board
+make_move(Board, Player, PieceRow-PieceCol, DestRow-DestCol, NewGameState):-
+    cell_belongs_to_playable_board(Board, PieceRow-PieceCol ),
+    cell_belongs_to_playable_board(Board, DestRow-DestCol),
+    valid_move(Board, Player, PieceRow-PieceCol, DestRow-DestCol),
+    cell_has_player_piece(Board,Player,PieceRow-PieceCol,Piece), %save the piece to use later
+    change_board_value(Board, PieceRow-PieceCol, empty, NewBoard),
+    change_board_value(NewBoard, DestRow-DestCol, Piece, NewGameState).
+    
+
+
+    
+
+
+% make_push(+Board, +Player, +PiecePosition, +DestinationPosition, -NewBoard):-
+% Predicado para obter NewGameState em relação a um movimento de push de uma peça do Player no Board
+make_push(Board, Player, PieceRow-PieceCol, DestRow-DestCol, NewGameState):-
 
 
 %push(Board?, +Orig,+Dest)
