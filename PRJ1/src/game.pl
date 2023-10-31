@@ -40,7 +40,16 @@ parse_input([X1, Y1, X2, Y2], Move, ListOfMoves) :-
     char_code(X1, X1Code),
     char_code(Y1, Y1Code),
     char_code(X2, X2Code),
-    char_code(Y2, Y2Code).
+    char_code(Y2, Y2Code),
+    X1Code >= 97,
+    X1Code =< 104,
+    Y1Code >= 49,
+    Y1Code =< 56,
+    X2Code >= 97,
+    X2Code =< 104,
+    Y2Code >= 49,
+    Y2Code =< 56.
+    %Move = [X1Code, Y1Code, X2Code, Y2Code],
     %Move = valid_move(), If valid move returns true ; update board 
     %ListOfMoves = [Move]
     
