@@ -1,6 +1,5 @@
 :-use_module(library(lists)).
 :-use_module(library(random)).
-
 start_game :-
     initial_board(Board),
     display_board(Board),
@@ -44,3 +43,6 @@ parse_input([X1, Y1, X2, Y2], Move, ListOfMoves) :-
     %Move = valid_move(), If valid move returns true ; update board 
     %ListOfMoves = [Move]
     
+
+% update_board(+Board, +Player, +MoveType, -UpdatedBoard)/4
+

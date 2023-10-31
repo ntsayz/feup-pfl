@@ -12,12 +12,35 @@ board_logic_test(logic1,
     [out,out,sr,sr,sr,sr,sr,out,out,out]]).
 board_logic_test(standard_intial_positions, [
     [out,out,out,sr,sr,sr,sr,sr,out,out],
-    [out,out,out,empty,b_square,b_round,empty,empty,out,out],
-    [out,empty,empty,b_round,b_square,empty,empty,empty,empty,out],
+    [out,out,out,w_round,b_round,b_square,empty,empty,out,out],
+    [out,b_round,b_square,b_round,b_square,w_square,empty,empty,empty,out],
     [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
     [out,out,out,empty,w_square,w_round,empty,empty,out,out],
     [out,out,sr,sr,sr,sr,sr,out,out,out] ]
-)
+).
+%newstate after move on test board logic1: 1-3 -> 2-3
+board_logic_test(make_move_state1,[[out,out,out,sr,sr,sr,sr,sr,out,out],
+    [out,out,out,empty,b_square,b_square,b_round,b_round,out,out],
+    [out,empty, empty, empty,empty,empty,empty,empty,empty,out],
+    [out,empty, empty, empty,empty,empty,empty,empty,empty,out],
+    [out, out, w_square,w_square,w_square,w_round,w_round,out,out,out],
+    [out,out,sr,sr,sr,sr,sr,out,out,out]]
+).
+
+board_logic_test(make_move_state2,[[out,out,out,sr,sr,sr,sr,sr,out,out],
+    [out,out,out,b_square,b_square,b_square,b_round,b_round,out,out],
+    [out,empty, empty, b_square,empty,empty,empty,empty,empty,out],
+    [out,empty, empty, empty,empty,empty,empty,empty,empty,out],
+    [out, out, w_square,w_square,w_square,w_round,w_round,out,out,out],
+    [out,out,sr,sr,sr,sr,sr,out,out,out]]
+).
+board_logic_test(make_move_final_state,[[out,out,out,sr,sr,sr,sr,sr,out,out],
+    [out,out,out,empty,b_square,b_square,b_round,b_round,out,out],
+    [out,empty, empty, b_square,empty,empty,empty,empty,empty,out],
+    [out,empty, empty, empty,empty,empty,empty,empty,empty,out],
+    [out, out, w_square,w_square,w_square,w_round,w_round,out,out,out],
+    [out,out,sr,sr,sr,sr,sr,out,out,out]]
+).
 
 % Lida com caso em que negamos resultado de predicados que "falham para determinados casos corretamente"
 run_test(\+ NegatedCall) :-
@@ -75,13 +98,20 @@ test_board_player_predicates :-
 
 test_player_move_predicates:- 
     board_logic_test(logic1,Board),
+    board_logic_test(standard_intial_positions,Board2),
+
+    run_test(valid_push(Board,player2,1-5, 1-6, _FinalRow-_FinalCol )),
+    run_test(\+ valid_push(Board2,player1,3-4, 4-4, _FinalRow-_Final)), %push fails with sr
+    run_test(\+ valid_push(Board2,player1,2-4, 1-4, _FinalRow-_Final)) , %push fails with sr
+
+    run_test(valid_push(Board2,player1,2-5, 2-4, _FinalRow-_Final)) , %push multiple different pieces
 
 
     %Testing the 4 possible moves from a given cell to another cell, moving only one cell 
-    run_test(move(1-3,2-3)), % down
-    run_test(move(1-3,1-4)), % right
-    run_test(move(1-4,1-3)), % left
-    run_test(move(2-3,1-3)), % up
+    run_test(possible_move(Board,1-3, 2-3, down)), % down
+    run_test(possible_move(Board,1-3, 1-4, right)), % right
+    run_test(possible_move(Board, 1-4, 1-3, left)), % left
+    run_test(possible_move(Board, 2-3, 1-3, up)), % up
     %Testing if a move from CurrentPos to DestPosition, using more then one cell is valid
     run_test(\+valid_move(Board, player2, 1-3, 1-3)), %we assume move 0 number of cells is not a valid_move
     run_test(\+valid_move(Board, player2, 1-3, 4-3)), % 4-3 have a piece of player1 (w_square)
@@ -90,10 +120,27 @@ test_player_move_predicates:-
     run_test(valid_move(Board, player1, 4-3, 3-5)), % right-up move
     run_test(valid_move(Board, player1, 4-6, 3-3)), % left-up move
     run_test(\+valid_move(Board, player2, 3-3, 1-5)). % no piece to move in 3-3 and 1-5 have a piece
+
+test_player_complete_moves_predicates:-
+
+    board_logic_test(logic1,Board), 
+    board_logic_test(make_move_state1,Board2),
+    board_logic_test(make_move_state2,Board3),
+    board_logic_test(make_move_final_state,FinalBoardState),
+
+    run_test(change_board_value(Board, 1-3, empty, Board2)),
+    run_test(change_board_value(Board, 2-3, b_square, Board3)),
+    run_test(make_move(Board, player2, 1-3, 2-3, FinalBoardState)).
+    
+    
+
+
 run_all_tests :-
+
     test_board_basic_predicates,
 
     test_board_player_predicates,
-    test_player_move_predicates.
+    test_player_move_predicates,
+    test_player_complete_moves_predicates.
 
 
