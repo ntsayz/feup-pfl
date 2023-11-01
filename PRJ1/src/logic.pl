@@ -243,7 +243,5 @@ make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState)
 
 
 
-
-
-%push(Board?, +Orig,+Dest)
-%Efetua o movimento push da peça Orig:Row-Col para Dest:Row-Col no Board
+% TODO
+%predicate to check if a player can do any push_move, if not he looses, if or either players cant push after any move, is a draw and game finish
