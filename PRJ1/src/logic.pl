@@ -160,33 +160,30 @@ check_win(Board, _Player, _CurrRow-_CurrCol, FinalRow-FinalCol, no_win):-
 %check_push_row_col(+Board, +CurrentPosition, FinalPosition, +MoveType, ?Visited )
 %predicate to check if was row or col that changed in the possible vertical/horizontal move above
 %base case
-check_push_row_col(Board, _Player, CurrRow-CurrCol, FinalRow-FinalCol, _MoveType, _Visited):-
+check_push_row_col(Board, _Player, CurrRow-CurrCol, _MoveType, Visited, Visited):-
     board_element(Board, CurrRow-CurrCol, Element),
-    (Element == empty ; Element == out),
+    (Element == out ; Element == empty), ! . % to only check for the first empty or out that is checked to finish check_push_row_col
 
-    FinalRow = CurrRow, FinalCol = CurrCol.
+
    
 %Versão do predicado com chamada recursiva, para valores de sr, ao tentar continuar recursão possible_move falha ( vai além-do board após algum sr)
-check_push_row_col(Board, Player, CurrRow-CurrCol, _FinalRow-_FinalCol, MoveType, Visited):-
+check_push_row_col(Board, Player, CurrRow-CurrCol, MoveType, Visited, ResultCells):-
     possible_move(Board, CurrRow-CurrCol, NextRow-NextCol, MoveType), %
     change_player(Player, Opponent),
     \+ piece_is_anchored(Board, NextRow-NextCol, Opponent),
     \+ member(NextRow-NextCol, Visited),  % Ensure the cell hasn't been visited
    
-    check_push_row_col(Board, Player, NextRow-NextCol, NextRow-NextCol, MoveType, [NextRow-NextCol|Visited]).
+    check_push_row_col(Board, Player, NextRow-NextCol, MoveType, [NextRow-NextCol|Visited], ResultCells).
 
-valid_push(Board, Player, CurrRow-CurrCol, PushRow-PushCol, FinalRow-FinalCol):-
+valid_push(Board, Player, CurrRow-CurrCol, PushRow-PushCol, ResultCells):-
     possible_move(Board, CurrRow-CurrCol, PushRow-PushCol, MoveType),
     player_square_piece(Board, Player, CurrRow-CurrCol),
     cell_has_player_piece(Board, _AnyPlayer, PushRow-PushCol, _Piece),
     change_player(Player, Opponent),
     \+ piece_is_anchored(Board, PushRow-PushCol, Opponent),
-    check_push_row_col(Board, Player, PushRow-PushCol, FinalRow-FinalCol, MoveType, [PushRow-PushCol]).
-    %check sr cells that stop the push movement,
-    %check piece with anchor that stop the push movement,
-
-%verify_anchor(+Cell,+Board)
-%Verifica se peça na célula Cell:Row-Col do Board tem âncora ou não
+    check_push_row_col(Board, Player, PushRow-PushCol, MoveType, [PushRow-PushCol], ResultList),
+    reverse(ResultList, ResultCells).
+    
 
 % change_board_value(+Board, +Player,+CurrentPosition, +Value, -NewBoard)
 % Predicado para alterar valor de uma célula do board
@@ -200,6 +197,7 @@ change_board_value(Board,CurrRow-CurrCol,Value, NewBoard):-
     nth0(CurrRow, NewBoard, ResultRow1, Rest2).
     
 
+
 % make_move(+Board, +Player, +PiecePosition, +DestinationPosition, -NewGameState)/5
 % Predicado para obter NewGameState em relação a um movimento de deslocamento de uma peça do Player pelo Board
 make_move(Board, Player, PieceRow-PieceCol, DestRow-DestCol, NewGameState):-
@@ -212,12 +210,39 @@ make_move(Board, Player, PieceRow-PieceCol, DestRow-DestCol, NewGameState):-
     
 
 
+replace_push_move(Board, Piece, [LastElement | []], FinalPushGameState):-
+    board_element(Board,LastElement,Element ),
     
+    (Element == empty ; Element == out ),
+    change_board_value(Board, LastElement, Piece, FinalPushGameState ) .
+    
+
+
+
+replace_push_move(Board, Piece, [H1 | CellsToReplace], FinalPushGameState):-
+    
+    cell_has_player_piece(Board,_AnyPlayer,H1,NextPiece),
+
+    change_board_value(Board, H1, Piece, NewGameState),
+    replace_push_move(NewGameState, NextPiece, CellsToReplace, FinalPushGameState).
+    
+
 
 
 % make_push(+Board, +Player, +PiecePosition, +DestinationPosition, -NewBoard):-
 % Predicado para obter NewGameState em relação a um movimento de push de uma peça do Player no Board
-make_push(Board, Player, PieceRow-PieceCol, DestRow-DestCol, NewGameState):-
+make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState):-
+    cell_belongs_to_playable_board(Board, PieceRow-PieceCol ),
+    cell_belongs_to_playable_board(Board, PushRow-PushCol), 
+    valid_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, ResultPushCells),
+    cell_has_player_piece(Board,Player,PieceRow-PieceCol,Piece),
+    change_board_value(Board, PieceRow-PieceCol, empty, NewGameState),
+    
+    replace_push_move(NewGameState, Piece, ResultPushCells, FinalPushGameState ).
+    
+
+
+
 
 
 %push(Board?, +Orig,+Dest)
