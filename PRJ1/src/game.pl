@@ -18,17 +18,18 @@ player_moves(Board, Player, MoveNum, UpdatedBoard) :-
     write('Move number: '), write(MoveNum), nl,
     (MoveNum < 3 ->
         read_user_input(Move),
-        (Move = xxxx ->
+        (Move = xxxx -> % SINCE MOVES ARE NOT OBLIGATORY, IF THE USER INPUTS xxxx, THE MOVE IS SKIPPED
             NextMoveNum is MoveNum + 1,
             player_moves(Board, Player, NextMoveNum, UpdatedBoard);
-        valid_move(Board, Player, Move, TempBoard) ->
-            display_board(TempBoard),
-            NextMoveNum is MoveNum + 1,
+            convert_to_index(Board, Move, [CurrRow,CurrCol, DestRow,DestCol], Pieces),
+        valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, Visited) -> % determine if move is valid
+            move_piece(Board, Indexes, TempBoard),
+            display_board(TempBoard), % if valid, display board
+            NextMoveNum is MoveNum + 1, % increment move number
             player_moves(TempBoard, Player, NextMoveNum, UpdatedBoard);
-        write('Invalid move! Try again.'), nl,
+        write('Invalid move! Try again.'), nl, % if invalid, display error message
         player_moves(Board, Player, MoveNum, UpdatedBoard));
-    mandatory_push(Board, Player, UpdatedBoard)).
-
+    make_push(Board, Player, UpdatedBoard)).  
 
 
 
@@ -36,6 +37,8 @@ player_moves(Board, Player, MoveNum, UpdatedBoard) :-
 switch_turn(p1, p2).
 switch_turn(p2, p1).
 
+%valid_move1(Board, Player, Move, TempBoard):-
+%    true.
 
 
 read_user_input(Move):-
@@ -43,7 +46,7 @@ read_user_input(Move):-
     atom_chars(Input, InputList),
     parse_input(InputList, Move, ListOfMoves).
 
-% predicate to parse user input sictus
+
 parse_input([X1, Y1, X2, Y2], Move, ListOfMoves) :-
     (   [X1, Y1, X2, Y2] = ['x', 'x', 'x', 'x'] ->
         Move = xxxx
@@ -62,19 +65,51 @@ parse_input([X1, Y1, X2, Y2], Move, ListOfMoves) :-
         Move = [X1Code, Y1Code, X2Code, Y2Code]
     ).
 
-    %Move = [X1Code, Y1Code, X2Code, Y2Code],
-    %Move = valid_move(), If valid move returns true ; update board 
-    %ListOfMoves = [Move]
+convert_to_index(Board, Move, Indexes, Pieces) :-
+    Move = [X1, Y1, X2, Y2],
+    
+    % debugging
+    write('Move: '), write(Move), nl,
+    
+    % converting char to index with adjustments
+    X1Index is X1 - 97 + 1, 
+    Y1Index is Y1 - 48,
+    X2Index is X2 - 97 + 1, 
+    Y2Index is Y2 - 48, 
+    
+    % debugging
+    write('Indexes: '), write([X1Index, Y1Index, X2Index, Y2Index]), nl,
+    
+    % getting pieces
+    nth0(Y1Index, Board, Row1),
+    nth0(X1Index, Row1, Piece1),
+    nth0(Y2Index, Board, Row2),
+    nth0(X2Index, Row2, Piece2),
+    
+    % debugging
+    write('Pieces: '), write([Piece1, Piece2]), nl,
     
 
-% update_board(+Board, +Player, +MoveType, -UpdatedBoard)/4
-% ==============================================================================
-replace_nth0(Index, NewElem, List, UpdatedList) :-
+    Indexes = [X1Index, Y1Index, X2Index, Y2Index],
+    Pieces = [Piece1, Piece2].
+
+
+move_piece(Board, [X1, Y1, X2, Y2], UpdatedBoard) :-
+    nth0(Y1, Board, Row1),
+    nth0(X1, Row1, Piece),
+    update_board(Board, X1, Y1, empty, TempBoard),
+    update_board(TempBoard, X2, Y2, Piece, UpdatedBoard).
+
+update_board(Board, X, Y, Value, UpdatedBoard) :-
+    nth0(Y, Board, Row),
+    replace_element(Row, X, Value, UpdatedRow),
+    replace_element(Board, Y, UpdatedRow, UpdatedBoard).
+
+replace_element(List, Index, Value, UpdatedList) :-
     nth0(Index, List, _, Rest),
-    nth0(Index, NewElem, UpdatedList, Rest).
+    nth0(Index, UpdatedList, Value, Rest).
 
-
-mandatory_push(Board, Player, UpdatedBoard) :-
+push(Board, Player, UpdatedBoard) :-
     write('Mandatory push!'), nl,
     read_user_input(Move),
     (valid_push(Board, Player, Move, TempBoard) ->
@@ -83,70 +118,11 @@ mandatory_push(Board, Player, UpdatedBoard) :-
     write('Invalid push! Try again.'), nl,
     mandatory_push(Board, Player, UpdatedBoard)).
 
-
-valid_move(Board, Player, Move, UpdatedBoard) :-
-    % Extracting the coordinates of the move
-    Move = [X1, Y1, X2, Y2],
-    
-    % Print Move for debugging
-    write('Move: '), write(Move), nl,
-    
-    % Converting char to index with adjustments
-    X1Index is X1 - 97 + 1, 
-    Y1Index is Y1 - 48,
-    X2Index is X2 - 97 + 1, 
-    Y2Index is Y2 - 48, 
-    
-    % Print indexes for debugging
-    write('Indexes: '), write([X1Index, Y1Index, X2Index, Y2Index]), nl,
-    
-    % Accessing the pieces from the board
-    nth0(Y1Index, Board, Row1),
-    nth0(X1Index, Row1, Piece1),
-    nth0(Y2Index, Board, Row2),
-    nth0(X2Index, Row2, Piece2),
-    
-    % Print pieces for debugging
-    write('Pieces: '), write([Piece1, Piece2]), nl,
-    
-    % Checking if the move is valid
-    valid_piece_move(Player, Piece1, X1Index, Y1Index, X2Index, Y2Index, Board),
-    
-    % Print after valid_piece_move
-    write('After valid_piece_move'), nl,
-    
-    % Updating the board
-    update_board(Board, X1Index, Y1Index, X2Index, Y2Index, UpdatedBoard).
-
-
-
-
-valid_piece_move(Player, Piece, X1, Y1, X2, Y2, Board) :-
-    % Check if the piece belongs to the player
-    piece_owner(Player, Piece),
-    % Check if the destination cell is empty
-    nth0(Y2, Board, Row2),
-    nth0(X2, Row2, empty),
-    % Additional rules for specific piece types can be added here
-    true.
+% update_board(+Board, +Player, +MoveType, -UpdatedBoard)/4
+% ==============================================================================
 
 
 piece_owner(p1, w_square).
 piece_owner(p1, w_round).
 piece_owner(p2, b_square).
 piece_owner(p2, b_round).
-
-update_board(Board, X1, Y1, X2, Y2, UpdatedBoard) :-
-    % Accessing the piece
-    nth0(Y1, Board, Row1),
-    nth0(X1, Row1, Piece),
-    % Updating the destination cell
-    replace(Board, Y2, X2, Piece, TempBoard),
-    % Clearing the source cell
-    replace(TempBoard, Y1, X1, empty, UpdatedBoard).
-
-replace(Board, RowIndex, ColIndex, NewElement, UpdatedBoard) :-
-    nth0(RowIndex, Board, Row),
-    replace_nth0(ColIndex, NewElement, Row, UpdatedRow),
-    replace_nth0(RowIndex, UpdatedRow, Board, UpdatedBoard).
-
