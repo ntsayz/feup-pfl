@@ -42,6 +42,25 @@ board_logic_test(make_move_final_state,[[out,out,out,sr,sr,sr,sr,sr,out,out],
     [out,out,sr,sr,sr,sr,sr,out,out,out]]
 ).
 
+board_logic_test(possible_push_positions, [
+    [out,out,out,sr,sr,sr,sr,sr,out,out],
+    [out,out,out,w_round,b_round,b_square,empty,empty,out,out],
+    [out,b_round,b_square,b_round,b_square,w_square,empty,empty,empty,out],
+    [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
+    [out,out,out,empty,w_square,w_round,empty,empty,out,out],
+    [out,out,sr,sr,sr,sr,sr,out,out,out] ]
+).
+board_logic_test(possible_push_positionsNewStatePush, [
+    [out,out,out,sr,sr,sr,sr,sr,out,out],
+    [out,out,w_round,b_round,b_square,empty,empty,empty,out,out],
+    [out,b_round,b_square,b_round,b_square,w_square,empty,empty,empty,out],
+    [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
+    [out,out,out,empty,w_square,w_round,empty,empty,out,out],
+    [out,out,sr,sr,sr,sr,sr,out,out,out] ]
+).
+
+
+
 % Lida com caso em que negamos resultado de predicados que "falham para determinados casos corretamente"
 run_test(\+ NegatedCall) :-
     NegatedCall =.. [Functor|Args],
@@ -96,16 +115,8 @@ test_board_player_predicates :-
     run_test(player_round_piece(Board,player2, 1-6)),
     run_test(\+ player_round_piece(Board,player1, 3-7)).
 
-test_player_move_predicates:- 
+test_player_moves_predicates:- 
     board_logic_test(logic1,Board),
-    board_logic_test(standard_intial_positions,Board2),
-
-    run_test(valid_push(Board,player2,1-5, 1-6, _FinalRow-_FinalCol )),
-    run_test(\+ valid_push(Board2,player1,3-4, 4-4, _FinalRow-_Final)), %push fails with sr
-    run_test(\+ valid_push(Board2,player1,2-4, 1-4, _FinalRow-_Final)) , %push fails with sr
-
-    run_test(valid_push(Board2,player1,2-5, 2-4, _FinalRow-_Final)) , %push multiple different pieces
-
 
     %Testing the 4 possible moves from a given cell to another cell, moving only one cell 
     run_test(possible_move(Board,1-3, 2-3, down)), % down
@@ -132,7 +143,24 @@ test_player_complete_moves_predicates:-
     run_test(change_board_value(Board, 2-3, b_square, Board3)),
     run_test(make_move(Board, player2, 1-3, 2-3, FinalBoardState)).
     
-    
+test_player_make_push_predicates:-
+    board_logic_test(logic1,Board), 
+    board_logic_test(standard_intial_positions,Board2),
+    board_logic_test(possible_push_positions, BoardPush), 
+    board_logic_test(possible_push_positionsNewStatePush, BoardNewStatePush),
+
+    run_test(valid_push(Board,player2,1-5, 1-6, _ResultCells1 ) ),
+    run_test(\+ valid_push(Board2,player1,3-4, 4-4,  _ResultCells2)), %push fails with sr
+    run_test(\+ valid_push(Board2,player1,2-4, 1-4 ,_ResultCells3)) , %push fails with sr
+
+    run_test(valid_push(Board2,player1,2-5, 2-4, _ResultCells4)) , %push multiple different pieces
+
+
+    run_test(valid_push(BoardPush,player2,1-5, 1-4, _ResultCells5) ) ,
+
+    run_test(make_push(BoardPush, player2, 1-5, 1-4, BoardNewStatePush)),
+    run_test(make_push(BoardPush, player2, 1-5, 1-4, BoardNewStatePush)),
+    run_test(\+make_push(BoardPush, player2, 2-4, 1-4, _NewBoardState)). %this is impossible : in 0-4 we have a side rail (sr)
 
 
 run_all_tests :-
@@ -140,7 +168,8 @@ run_all_tests :-
     test_board_basic_predicates,
 
     test_board_player_predicates,
-    test_player_move_predicates,
-    test_player_complete_moves_predicates.
+    test_player_moves_predicates,
+    test_player_complete_moves_predicates,
+    test_player_make_push_predicates.
 
 
