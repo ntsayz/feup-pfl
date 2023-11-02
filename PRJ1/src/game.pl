@@ -21,7 +21,7 @@ player_moves(Board, Player, MoveNum, UpdatedBoard) :-
         (Move = xxxx -> % SINCE MOVES ARE NOT OBLIGATORY, IF THE USER INPUTS xxxx, THE MOVE IS SKIPPED
             NextMoveNum is MoveNum + 1,
             player_moves(Board, Player, NextMoveNum, UpdatedBoard);
-            convert_to_index(Board, Move, [CurrRow,CurrCol, DestRow,DestCol], Pieces),
+            convert_to_index(Board, Move, [CurrCol,CurrRow, DestCol,DestRow], Pieces),
         valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, Visited) -> % determine if move is valid
             move_piece(Board, Indexes, TempBoard),
             display_board(TempBoard), % if valid, display board
