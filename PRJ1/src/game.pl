@@ -29,6 +29,51 @@ player_moves(Board, Player, MoveNum, UpdatedBoard) :-
         player_moves(Board, Player, MoveNum, UpdatedBoard));
     mandatory_push(Board, Player, UpdatedBoard)).
 
+
+
+
+% predicate to switch players
+switch_turn(p1, p2).
+switch_turn(p2, p1).
+
+
+
+read_user_input(Move):-
+    read(Input),    %d4d5.
+    atom_chars(Input, InputList),
+    parse_input(InputList, Move, ListOfMoves).
+
+% predicate to parse user input sictus
+parse_input([X1, Y1, X2, Y2], Move, ListOfMoves) :-
+    (   [X1, Y1, X2, Y2] = ['x', 'x', 'x', 'x'] ->
+        Move = xxxx
+    ;   char_code(X1, X1Code),
+        char_code(Y1, Y1Code),
+        char_code(X2, X2Code),
+        char_code(Y2, Y2Code),
+        X1Code >= 97,
+        X1Code =< 104,
+        Y1Code >= 49,
+        Y1Code =< 56,
+        X2Code >= 97,
+        X2Code =< 104,
+        Y2Code >= 49,
+        Y2Code =< 56,
+        Move = [X1Code, Y1Code, X2Code, Y2Code]
+    ).
+
+    %Move = [X1Code, Y1Code, X2Code, Y2Code],
+    %Move = valid_move(), If valid move returns true ; update board 
+    %ListOfMoves = [Move]
+    
+
+% update_board(+Board, +Player, +MoveType, -UpdatedBoard)/4
+% ==============================================================================
+replace_nth0(Index, NewElem, List, UpdatedList) :-
+    nth0(Index, List, _, Rest),
+    nth0(Index, NewElem, UpdatedList, Rest).
+
+
 mandatory_push(Board, Player, UpdatedBoard) :-
     write('Mandatory push!'), nl,
     read_user_input(Move),
@@ -105,46 +150,3 @@ replace(Board, RowIndex, ColIndex, NewElement, UpdatedBoard) :-
     replace_nth0(ColIndex, NewElement, Row, UpdatedRow),
     replace_nth0(RowIndex, UpdatedRow, Board, UpdatedBoard).
 
-
-
-
-% predicate to switch players
-switch_turn(p1, p2).
-switch_turn(p2, p1).
-
-
-
-read_user_input(Move):-
-    read(Input),    %d4d5.
-    atom_chars(Input, InputList),
-    parse_input(InputList, Move, ListOfMoves).
-
-% predicate to parse user input sictus
-parse_input([X1, Y1, X2, Y2], Move, ListOfMoves) :-
-    (   [X1, Y1, X2, Y2] = ['x', 'x', 'x', 'x'] ->
-        Move = xxxx
-    ;   char_code(X1, X1Code),
-        char_code(Y1, Y1Code),
-        char_code(X2, X2Code),
-        char_code(Y2, Y2Code),
-        X1Code >= 97,
-        X1Code =< 104,
-        Y1Code >= 49,
-        Y1Code =< 56,
-        X2Code >= 97,
-        X2Code =< 104,
-        Y2Code >= 49,
-        Y2Code =< 56,
-        Move = [X1Code, Y1Code, X2Code, Y2Code]
-    ).
-
-    %Move = [X1Code, Y1Code, X2Code, Y2Code],
-    %Move = valid_move(), If valid move returns true ; update board 
-    %ListOfMoves = [Move]
-    
-
-% update_board(+Board, +Player, +MoveType, -UpdatedBoard)/4
-
-replace_nth0(Index, NewElem, List, UpdatedList) :-
-    nth0(Index, List, _, Rest),
-    nth0(Index, NewElem, UpdatedList, Rest).
