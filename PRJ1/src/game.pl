@@ -13,6 +13,7 @@ game_loop(Board, CurrentPlayer) :-
     switch_turn(CurrentPlayer, NextPlayer),
     game_loop(UpdatedBoard, NextPlayer).
 
+%  deals with player movement
 player_moves(Board, Player, MoveNum, UpdatedBoard) :-
     MoveNum =< 3,
     write('Move number: '), write(MoveNum), nl,
@@ -54,6 +55,7 @@ parse_input([X1, Y1, X2, Y2], Move, ListOfMoves) :-
         char_code(Y1, Y1Code),
         char_code(X2, X2Code),
         char_code(Y2, Y2Code),
+        % verifica se o input é válido. se a char for um número ou uma letra dependendo da posição
         X1Code >= 97,
         X1Code =< 104,
         Y1Code >= 49,
@@ -71,7 +73,7 @@ convert_to_index(Board, Move, Indexes, Pieces) :-
     % debugging
     write('Move: '), write(Move), nl,
     
-    % converting char to index with adjustments
+    % converting char to index para account pelo offset do header
     X1Index is X1 - 97 + 1, 
     Y1Index is Y1 - 48,
     X2Index is X2 - 97 + 1, 
@@ -93,7 +95,7 @@ convert_to_index(Board, Move, Indexes, Pieces) :-
     Indexes = [X1Index, Y1Index, X2Index, Y2Index],
     Pieces = [Piece1, Piece2].
 
-
+% temporario para testar
 move_piece(Board, [X1, Y1, X2, Y2], UpdatedBoard) :-
     nth0(Y1, Board, Row1),
     nth0(X1, Row1, Piece),
