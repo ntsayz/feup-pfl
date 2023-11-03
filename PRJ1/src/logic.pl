@@ -245,3 +245,25 @@ make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState)
 
 % TODO
 %predicate to check if a player can do any push_move, if not he looses, if or either players cant push after any move, is a draw and game finish
+
+
+% predicate to do an arbitrary move from a set of "good moves"
+
+%Heuristic because, we are given assumptions of "better" moves/strategies, so we dont need to evaluate every possible turn : moves and responses . We "cut" complexity
+/* Explanation to simplify
+    We prove that the game is:
+        PSPACE-hard to decide who will win from a given position, even for simple (almost rectangular)
+        hole-free boards. We also analyze the mate-in-1 problem: can the player win in a single turn?
+        One turn in Push Fight consists of up to two “moves” followed by a mandatory “push”. With
+        these rules, or generalizing the number of allowed moves to any constant, we show mate-in-1 can
+        be solved in polynomial time. If, however, the number of moves per turn is part of the input, the
+        problem becomes NP-complete. On the other hand, without any limit on the number of moves
+        per turn, the problem becomes polynomially solvable again.
+*/
+
+%predicate/heuristics to evaluate values of moves, gameStates etc. 
+% predicate to evaluate the Value of a given gameState w.r.t. a given Player1/2 . For GameStates with same value, use real random choose algorithm to avoid Players detect any pattern on the choosen moves
+%Heuristic algorithm: predicate to do an AI that chooses the "best" 0, 1 or 2 moves + push move from a set of possible moves
+
+% Heuristic algorithm predicate to do an AI that simulates n (We chooses this) "Optimal" GameStates for a given Player(Him)
+% where he also simulate the responses for every simulated "Optimal " GameState from 1... n
