@@ -78,6 +78,13 @@ initial_board([
                 ['5', out, out, w_square,w_square, w_square, w_round, w_round, out, out, np],
                 ['6', out,out, sr, sr, sr, sr, sr, np, np, np]]).
 
+initial_board2([
+    [out,out,out,sr,sr,sr,sr,sr,out,out],
+    [out,out,out,w_round,b_round,b_square,empty,empty,out,out],
+    [out,b_round,b_square,b_round,b_square,w_square,empty,empty,empty,out],
+    [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
+    [out,out,out,empty,w_square,w_round,empty,empty,out,out],
+    [out,out,sr,sr,sr,sr,sr,out,out,out] ] ).
 
 
 test_board([

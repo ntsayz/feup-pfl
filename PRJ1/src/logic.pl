@@ -1,7 +1,7 @@
 
 :- use_module(library(lists)).
 :- use_module(library(between)).
-
+:- use_module(library(aggregate)).
 
 
 player_pieces(player1, w_square).
@@ -23,7 +23,10 @@ change_player(player2,player1).
 :- dynamic size_col/1.
 :- dynamic anchor_piece/2 .
 
-anchor_piece(4-2, player1).
+anchor_piece(null-null, noplayer).
+change_anchor_piece(NewRow-NewCol, Player):-
+    retractall(anchor_piece(_,_)),
+    assertz(anchor_piece(NewRow-NewCol, Player)).
 
 size_row(6).
 size_col(10).
@@ -147,15 +150,41 @@ valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol) :-
     valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, []).
 
 
-check_win(Board, Player, CurrRow-CurrCol, FinalRow-FinalCol, win):-
-    board_element(Board, FinalRow-FinalCol, Element),
-    Element == out,
-    change_player(Player,Opponent),
-    cell_has_player_piece(Board, Opponent, CurrRow-CurrCol, _Piece).
 
-check_win(Board, _Player, _CurrRow-_CurrCol, FinalRow-FinalCol, no_win):-
-    board_element(Board, FinalRow-FinalCol, Element),
-    Element \== out.
+
+count_pieces(_, _, [], Count, Count).
+%Predicate to count pieces from a list of positions of possible Player pieces
+count_pieces(Board, Player, [Row-Col | RestCells], CurrentCount, FinalCount):-
+    (cell_has_player_piece(Board, Player, Row-Col,_Piece) ->
+        NewCount is CurrentCount +1;
+        NewCount is CurrentCount
+    ),
+    count_pieces(Board, Player, RestCells, NewCount, FinalCount).
+    
+
+count_player_pieces(Board, Player,  Count):-
+
+    findall(Row-Col, cell_belongs_to_playable_board(Board, Row-Col), PlayablePositions),
+    count_pieces(Board, Player, PlayablePositions, 0, Count).
+
+
+
+
+check_win(Board, CurrentPlayer):-
+    change_player(CurrentPlayer, Opponent),
+    count_player_pieces(Board, Opponent, NumbPieces), NumbPieces < 6.
+    
+
+check_trapped(Board, Player):-
+    \+cant_push(Board, Player).
+
+
+% Check that none of the cells in ResultCells are anchor pieces for Opponent
+check_no_anchor_pieces(ResultCells, Opponent) :-
+  
+    forall(member(Cell, ResultCells), \+ anchor_piece(Cell, Opponent)).
+   
+
 
 %check_push_row_col(+Board, +CurrentPosition, FinalPosition, +MoveType, ?Visited )
 %predicate to check if was row or col that changed in the possible vertical/horizontal move above
@@ -169,8 +198,7 @@ check_push_row_col(Board, _Player, CurrRow-CurrCol, _MoveType, Visited, Visited)
 %Versão do predicado com chamada recursiva, para valores de sr, ao tentar continuar recursão possible_move falha ( vai além-do board após algum sr)
 check_push_row_col(Board, Player, CurrRow-CurrCol, MoveType, Visited, ResultCells):-
     possible_move(Board, CurrRow-CurrCol, NextRow-NextCol, MoveType), %
-    change_player(Player, Opponent),
-    \+ piece_is_anchored(Board, NextRow-NextCol, Opponent),
+    
     \+ member(NextRow-NextCol, Visited),  % Ensure the cell hasn't been visited
    
     check_push_row_col(Board, Player, NextRow-NextCol, MoveType, [NextRow-NextCol|Visited], ResultCells).
@@ -180,9 +208,11 @@ valid_push(Board, Player, CurrRow-CurrCol, PushRow-PushCol, ResultCells):-
     player_square_piece(Board, Player, CurrRow-CurrCol),
     cell_has_player_piece(Board, _AnyPlayer, PushRow-PushCol, _Piece),
     change_player(Player, Opponent),
-    \+ piece_is_anchored(Board, PushRow-PushCol, Opponent),
     check_push_row_col(Board, Player, PushRow-PushCol, MoveType, [PushRow-PushCol], ResultList),
-    reverse(ResultList, ResultCells).
+    reverse(ResultList, ResultCells),
+    
+    check_no_anchor_pieces(ResultCells, Opponent).
+
     
 
 % change_board_value(+Board, +Player,+CurrentPosition, +Value, -NewBoard)
@@ -213,8 +243,11 @@ make_move(Board, Player, PieceRow-PieceCol, DestRow-DestCol, NewGameState):-
 replace_push_move(Board, Piece, [LastElement | []], FinalPushGameState):-
     board_element(Board,LastElement,Element ),
     
-    (Element == empty ; Element == out ),
-    change_board_value(Board, LastElement, Piece, FinalPushGameState ) .
+    (Element == empty -> 
+        change_board_value(Board, LastElement, Piece, FinalPushGameState ); 
+        Element == out , FinalPushGameState = Board %  Element==Piece goes out of Board, so it disappeared and the Board is already in the final state
+        ).
+    
     
 
 
@@ -228,7 +261,6 @@ replace_push_move(Board, Piece, [H1 | CellsToReplace], FinalPushGameState):-
     
 
 
-
 % make_push(+Board, +Player, +PiecePosition, +DestinationPosition, -NewBoard):-
 % Predicado para obter NewGameState em relação a um movimento de push de uma peça do Player no Board
 make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState):-
@@ -237,8 +269,9 @@ make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState)
     valid_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, ResultPushCells),
     cell_has_player_piece(Board,Player,PieceRow-PieceCol,Piece),
     change_board_value(Board, PieceRow-PieceCol, empty, NewGameState),
-    
-    replace_push_move(NewGameState, Piece, ResultPushCells, FinalPushGameState ).
+   
+    replace_push_move(NewGameState, Piece, ResultPushCells, FinalPushGameState ),
+    change_anchor_piece(PushRow-PushCol, Player). %change the anchor to the new piece-Player that push on PushRow-PushCol position/Opponent piece
     
 
 

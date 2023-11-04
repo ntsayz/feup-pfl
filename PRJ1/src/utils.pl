@@ -11,7 +11,7 @@ get_single_char(Char) :-
 
 
 % Read a line of input from the user
-read_line(Line) :-
+read_line_input(Line) :-
     read_line_to_codes(user_input, Codes),
     atom_codes(Line, Codes).
 
