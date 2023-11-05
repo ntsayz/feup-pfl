@@ -20,7 +20,7 @@ game_loop(Board, CurrentPlayer) :-
 %  deals with player movement
 player_turn(Board, Player, MoveNum, FinalTurnBoard) :-
     MoveNum =< 3,
-    display_boardv2(Board),
+    display_board(Board),
     (MoveNum ==3 -> 
         write('Player Turn: '), write(Player), nl, 
         write('Push Phase: '), nl,nl
@@ -128,7 +128,7 @@ replace_element(List, Index, Value, UpdatedList) :-
     nth0(Index, UpdatedList, Value, Rest).
 
 push(Board, Player, FinalPushGameState):-
-    display_boardv2(Board),
+    display_board(Board),
     write('Player Turn: '), write(Player), nl,
     write('Push-Move number: '), write(3), nl,
     write('Mandatory push!'), nl,nl,

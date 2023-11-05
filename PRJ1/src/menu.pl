@@ -21,3 +21,5 @@ menu_choice(2) :-
 menu_choice(_Other) :-
     write('Invalid choice. Please select a valid option.'), nl,
     main_menu.
+
+%Draw game banner
