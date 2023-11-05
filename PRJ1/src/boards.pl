@@ -1,82 +1,6 @@
 
-% ============================= BOARD MANIPULATION ============================
+% ============================= BOARD States to use ============================
 
-
-
-
-
-
-
-
-%  ============================= BOARD DISPLAY =================================
-display_board([]).
-% predicate to display each row of the board
-display_board([Row|Rows]) :-
-    % current row.
-    display_row(Row),
-    %  remaining rows.
-    display_board(Rows).
-
-
-display_row([]) :-
-    nl.
-
-display_row([Cell|Cells]) :-
-    % current cell.
-    display_cell(Cell),
-    % remaining cells in the row.
-    display_row(Cells).
-
-
-display_cell(Cell) :-
-    % the cell value to its matching character.
-    cell_char(Cell, Char),
-    write(Char),
-    write(' | ').
-
-
-cell_char('1', '1 ').
-cell_char('2', '2 ').
-cell_char('3', '3 ').
-cell_char('4', '4 ').
-cell_char('5', '5 ').
-cell_char('6', '6 ').
-cell_char('7', '7 ').
-cell_char('8', '8 ').
-cell_char('A', 'A ').
-cell_char('B', 'B ').
-cell_char('C', 'C ').
-cell_char('D', 'D ').
-cell_char('E', 'E ').
-cell_char('F', 'F ').
-cell_char('G', 'G ').
-cell_char('H', 'H ').
-cell_char('I', 'I ').
-cell_char('J', 'J ').
-cell_char('K', 'K ').
-cell_char('L', 'L ').
-cell_char('M', 'M ').
-cell_char('N', 'N ').
-cell_char(w_round, 'WR').
-cell_char(w_square, 'WS').
-cell_char(b_square, 'BA').
-cell_char(b_round, 'BR').
-cell_char(empty, '  ').
-cell_char(corner, '  ').
-cell_char(np, '  ').
-cell_char(horizontal_bar, '  ').
-
-cell_char(sr, '--').
-cell_char(out, '::').
-
-initial_board([
-                [corner, 'A', 'B', 'C', 'D', 'E', 'F','G','H','I','J', corner],
-                ['1', out, out, out, sr, sr, sr, sr, sr, np, np],
-                ['2', out, out, out,empty,empty,empty,empty,empty, out],
-                ['3', out, empty, b_square, b_square, b_square, b_round, b_round, empty,empty, out],
-                ['4', out, empty, empty, empty, empty, empty, empty, empty,empty, out],
-                ['5', out, out, w_square,w_square, w_square, w_round, w_round, out, out, np],
-                ['6', out,out, sr, sr, sr, sr, sr, np, np, np]]).
 
 initial_board2([
     [out,out,out,sr,sr,sr,sr,sr,out,out],
@@ -87,15 +11,75 @@ initial_board2([
     [out,out,sr,sr,sr,sr,sr,out,out,out] ] ).
 
 
-test_board([
-                [corner, 'A', 'B', 'C', 'D', 'E', 'F','G','H','I','J', corner],
-                [horizontal_bar, horizontal-bar, horizontal-bar, horizontal-bar, horizontal-bar, horizontal-bar, horizontal-bar,horizontal-bar,horizontal-bar,horizontal-bar,horizontal-bar, corner],
-                ['1', out, out, out, sr, sr, sr, sr, sr, np, np],
-                ['2', out, out, out,empty,empty,empty,empty,empty, out],
-                ['3', out, empty, b_square, b_square, b_square, b_round, b_round, empty,empty, out],
-                ['4', out, empty, empty, empty, empty, empty, empty, empty,empty, out],
-                ['5', out, out, w_square,w_square, w_square, w_round, w_round, out, out, np],
-                ['6', out,out, sr, sr, sr, sr, sr, np, np, np]]).
+
+%  ============================= BOARD DISPLAY =================================
+
+% cell_code(?CellValue, ?Code)
+% Tradução do valor de uma célula para o código ASCII decimal da sua representação no ecrã.
+cell_code(w_round, 119).
+cell_code(w_square, 87).
+cell_code(b_square, 66).
+cell_code(b_round, 98).
+cell_code(empty,32 ).
+cell_code(sr, 45).
+cell_code(out, 58).
 
 
 
+
+% display_board(+Board)
+% Predicado para vizualizar o Board tendo em conta tamanho de linhas e colunas escolhidas do mesmo e display da Âncora
+display_boardv([H| BoardTail]) :-
+  length(H, SizeCollumns),
+  display_board_header(SizeCollumns), nl,
+  S is SizeCollumns*4 + 4,
+  write('   '), format('~`-t~*|~n', [S]),
+  display_board_lines([H| BoardTail], 1), nl, nl.
+
+% display_board_header(+Size)
+% Visualização do cabeçalho do tabuleiro (numeração das colunas).
+display_board_header(Size) :-
+  write('     '),
+  display_columns(Size, 65). %65
+
+
+
+%second version
+
+% display_board_lines(+Board, +LineNumber)
+% Visualização das linhas que compõe o tabuleiro.
+display_board_lines([], _).
+display_board_lines([Line | T], N) :-
+    RowDisplay is N,
+    write(' '), write(RowDisplay), write(' |'), display_line(Line,RowDisplay), nl,
+    length(Line, Size), S is Size*4 + 4,
+    write('   '), format('~`-t~*|~n', [S]),
+    N1 is N + 1,
+    display_board_lines(T, N1).
+
+
+
+  % display_line(+BoardLine, +RowNumber)
+% Visualização de uma linha do tabuleiro com informação da linha atual.
+display_line(BoardLine, RowNumber) :-
+    display_line(BoardLine, RowNumber, 0).
+
+% display_line(+BoardLine, +RowNumber, +ColNumber)
+% Visualização de uma linha do tabuleiro com informação da linha e coluna atual.
+%Caso em que é para fazer display da peça especial âncora
+display_line([], _, _).
+display_line([_Cell | T], RowNumber, ColNumber) :-
+    AnchorRow is RowNumber -1,
+    anchor_piece(AnchorRow-ColNumber,_AnyPlayer),
+
+    write(' '), 
+    put_code(64), write(' |'), 
+    NextColNumber is ColNumber + 1,
+    display_line(T, RowNumber, NextColNumber).
+%Caso geral para fazer display do board e peças no mesmo
+display_line([Cell | T], RowNumber, ColNumber) :-
+
+    write(' '), cell_code(Cell, Code),
+    put_code(Code), write(' |'), 
+    NextColNumber is ColNumber + 1,
+    display_line(T, RowNumber, NextColNumber).

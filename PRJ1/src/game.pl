@@ -31,7 +31,7 @@ player_turn(Board, Player, MoveNum, FinalTurnBoard) :-
        ),
 
     (MoveNum < 3 ->
-        read_user_input(Move),
+        read_user_input(Move), nl,
         (Move = xxxx -> % SINCE MOVES ARE NOT OBLIGATORY, IF THE USER INPUTS xxxx, THE MOVE IS SKIPPED
             NextMoveNum is MoveNum + 1,
             player_turn(Board, Player, NextMoveNum, FinalTurnBoard);
@@ -104,8 +104,8 @@ convert_to_index(Board, Move, Indexes, Pieces) :-
     nth0(Y2Index, Board, Row2),
     nth0(X2Index, Row2, Piece2),
     
-    % debugging
-    write('Elements/Pieces: Piece -> Piece|Element'), write([Piece1, Piece2]), nl, nl,
+    % Info for Start Position: Element/Piece to Final Position: Element/Piece
+    write('Elements/Pieces: Piece -> Piece|Element : '), write(Piece1),write(' -> '), write(Piece2), nl, nl,
     
 
     Indexes = [X1Index, Y1Index, X2Index, Y2Index],
@@ -133,7 +133,7 @@ push(Board, Player, FinalPushGameState):-
     write('Push-Move number: '), write(3), nl,
     write('Mandatory push!'), nl,nl,
    
-    read_user_input(Move),
+    read_user_input(Move), nl,
     convert_to_index(Board, Move, [PieceCol,PieceRow, PushCol,PushRow], _Pieces),
    
     (make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState) ->

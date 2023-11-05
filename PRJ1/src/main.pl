@@ -5,7 +5,6 @@
 :- consult('assets.pl').
 :- consult('boards.pl').
 :- consult('logic.pl').
-:- consult('input_output.pl').
 
 % predicate to run the game
 start :- clear_screen, main_menu.
