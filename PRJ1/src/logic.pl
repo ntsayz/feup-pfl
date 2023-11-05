@@ -24,14 +24,33 @@ change_player(player2,player1).
 :- dynamic size_row/1.
 :- dynamic size_col/1.
 :- dynamic anchor_piece/2 .
+:- dynamic number_pieces/1 .
 
 anchor_piece(null-null, noplayer).
 change_anchor_piece(NewRow-NewCol, Player):-
     retractall(anchor_piece(_,_)),
     assertz(anchor_piece(NewRow-NewCol, Player)).
 
+%Default size Row and Col of a normal Push-Fight Game
 size_row(6).
 size_col(10).
+
+%change_size_board(+SizeRows, +SizeCols)
+%Change the size of the board to SizeRows x SizeCols
+change_size_board(SizeRow, SizeCol):-
+    retract(size_row(_)),
+    assertz(size_row(SizeRow)),
+    retract(size_col(_)),
+    assertz(size_col(SizeCol)).
+
+number_pieces_player(6). % default game number of Pieces a Player need to have to continue playing
+
+%change_number_pieces(+NumberOfPieces)
+%Change the Number Of pieces that player must have in order to play again
+change_number_pieces(NumberOfPieces):-
+    retractall(number_pieces_player(_)),
+    assertz(number_pieces_player(NumberOfPieces)).
+
 
 
 %set_anchor(+Cell,+Player,+Board)
@@ -61,6 +80,7 @@ cell_belongs_to_playable_board(Board, Row-Col):-
 %Obter a Piece no Board numa determinada posição: Row-Col
 board_element(Board,Row-Col,Element):-
     cell_belongs_board(Board,Row-Col),
+
 
     nth0(Row,Board,BoardRow),
     nth0(Col,BoardRow,Element).
@@ -144,10 +164,11 @@ valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, Visited):-
 % valid_move(+Board,+CurrentPosition,+DestPosition)
 % Ponto de entrada sem acumulador, para verificar se movimento é válido
 valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol) :-
-    empty_cell(Board, DestRow-DestCol), %DestinationPosition needs to be an empty cell
+    cell_belongs_to_playable_board(Board, CurrRow-CurrCol ),
+    cell_belongs_to_playable_board(Board, DestRow-DestCol),
     cell_has_player_piece(Board, Player,CurrRow-CurrCol,_Piece), %célula de onde movimento parte, tem de ter uma peça de um Player
-
     %Chamada recursiva utilizando acumulador, para evitar recursão infinita / evitar voltar a tentar células já tentadas anteriormente
+    empty_cell(Board, DestRow-DestCol), %DestinationPosition needs to be an empty cell
     valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, []).
 
 
@@ -187,6 +208,19 @@ check_no_anchor_pieces(ResultCells, Opponent) :-
    
 
 
+
+   
+    
+
+
+% make_move(+Board, +Player, +PiecePosition, +DestinationPosition, -NewGameState)/5
+% Predicado para obter NewGameState em relação a um movimento de deslocamento de uma peça do Player pelo Board
+make_move(Board, Player, PieceRow-PieceCol, DestRow-DestCol, NewGameState):-
+    valid_move(Board, Player, PieceRow-PieceCol, DestRow-DestCol),
+    cell_has_player_piece(Board,Player,PieceRow-PieceCol,Piece), %save the piece to use later
+    change_board_value(Board, PieceRow-PieceCol, empty, NewBoard),
+    change_board_value(NewBoard, DestRow-DestCol, Piece, NewGameState).
+    
 %check_push_row_col(+Board, +CurrentPosition, FinalPosition, +MoveType, ?Visited )
 %predicate to check if was row or col that changed in the possible vertical/horizontal move above
 %base case
@@ -194,8 +228,6 @@ check_push_row_col(Board, _Player, CurrRow-CurrCol, _MoveType, Visited, Visited)
     board_element(Board, CurrRow-CurrCol, Element),
     (Element == out ; Element == empty), ! . % to only check for the first empty or out that is checked to finish check_push_row_col
 
-
-   
 %Versão do predicado com chamada recursiva, para valores de sr, ao tentar continuar recursão possible_move falha ( vai além-do board após algum sr)
 check_push_row_col(Board, Player, CurrRow-CurrCol, MoveType, Visited, ResultCells):-
     possible_move(Board, CurrRow-CurrCol, NextRow-NextCol, MoveType), %
@@ -206,6 +238,8 @@ check_push_row_col(Board, Player, CurrRow-CurrCol, MoveType, Visited, ResultCell
 
 valid_push(Board, Player, CurrRow-CurrCol, PushRow-PushCol, ResultCells):-
     possible_move(Board, CurrRow-CurrCol, PushRow-PushCol, MoveType),
+    cell_belongs_to_playable_board(Board, CurrRow-CurrCol ),
+    cell_belongs_to_playable_board(Board, PushRow-PushCol), 
     player_square_piece(Board, Player, CurrRow-CurrCol),
     cell_has_player_piece(Board, _AnyPlayer, PushRow-PushCol, _Piece),
     change_player(Player, Opponent),
@@ -226,19 +260,6 @@ change_board_value(Board,CurrRow-CurrCol,Value, NewBoard):-
     %Change the row on the board, with the new ResultRow1 already with the replaced Value and get the NewGameState
     nth0(CurrRow, Board, _Elem2, Rest2),
     nth0(CurrRow, NewBoard, ResultRow1, Rest2).
-    
-
-
-% make_move(+Board, +Player, +PiecePosition, +DestinationPosition, -NewGameState)/5
-% Predicado para obter NewGameState em relação a um movimento de deslocamento de uma peça do Player pelo Board
-make_move(Board, Player, PieceRow-PieceCol, DestRow-DestCol, NewGameState):-
-    cell_belongs_to_playable_board(Board, PieceRow-PieceCol ),
-    cell_belongs_to_playable_board(Board, DestRow-DestCol),
-    valid_move(Board, Player, PieceRow-PieceCol, DestRow-DestCol),
-    cell_has_player_piece(Board,Player,PieceRow-PieceCol,Piece), %save the piece to use later
-    change_board_value(Board, PieceRow-PieceCol, empty, NewBoard),
-    change_board_value(NewBoard, DestRow-DestCol, Piece, NewGameState).
-    
 
 
 replace_push_move(Board, Piece, [LastElement | []], FinalPushGameState):-
@@ -254,9 +275,7 @@ replace_push_move(Board, Piece, [LastElement | []], FinalPushGameState):-
 
 
 replace_push_move(Board, Piece, [H1 | CellsToReplace], FinalPushGameState):-
-    
     cell_has_player_piece(Board,_AnyPlayer,H1,NextPiece),
-
     change_board_value(Board, H1, Piece, NewGameState),
     replace_push_move(NewGameState, NextPiece, CellsToReplace, FinalPushGameState).
     
@@ -265,15 +284,72 @@ replace_push_move(Board, Piece, [H1 | CellsToReplace], FinalPushGameState):-
 % make_push(+Board, +Player, +PiecePosition, +DestinationPosition, -NewBoard):-
 % Predicado para obter NewGameState em relação a um movimento de push de uma peça do Player no Board
 make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState):-
-    cell_belongs_to_playable_board(Board, PieceRow-PieceCol ),
-    cell_belongs_to_playable_board(Board, PushRow-PushCol), 
     valid_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, ResultPushCells),
-    cell_has_player_piece(Board,Player,PieceRow-PieceCol,Piece),
+    cell_has_player_piece(Board,Player,PieceRow-PieceCol,Piece), % to get piece to use later
     change_board_value(Board, PieceRow-PieceCol, empty, NewGameState),
-   
     replace_push_move(NewGameState, Piece, ResultPushCells,FinalPushGameState ),
     change_anchor_piece(PushRow-PushCol, Player). %change the anchor to the new piece-Player that push on PushRow-PushCol position/Opponent piece
     
+
+
+% Iterate over each row and column of the board
+iterate_over_board(Board, Row, Col) :-
+    length(Board, NumRows),
+    between(1, NumRows, Row),
+    nth1(Row, Board, CurrentRow),
+    length(CurrentRow, NumCols),
+    between(1, NumCols, Col).
+
+
+
+% get_player_pieces_lists(+Board, +Player, -ListOfPlayerSquares, -ListOfPlayerRounds)
+% This predicate will return all square and round pieces for a given player on a given board.
+
+get_player_pieces_lists(Board, Player, ListOfPlayerSquares, ListOfPlayersRounds):-
+    findall(Row-Col, (iterate_over_board(Board, Row, Col), player_square_piece(Board, Player, Row-Col)), ListOfPlayerSquares),
+    findall(Row-Col, (iterate_over_board(Board, Row, Col), player_round_piece(Board, Player, Row-Col)), ListOfPlayersRounds).
+
+%player_loose(+Board, +Player)
+%Predicate to check if Player have lost the game
+player_lost_game(Board, Player):-
+    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, ListOfPlayerRounds),
+    length(ListOfPlayerSquares, L1), length(ListOfPlayerRounds, L2), Count is L1 + L2 , \+ number_pieces_player(Count).
+
+
+
+find_valid_push_moves(Board, Player, ValidPushMoves) :-
+    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, _ListOfPlayerRounds),
+    findall(
+        [CurrRow-CurrCol, PushRow-PushCol, ResultPushCells],
+        (
+            member(CurrRow-CurrCol, ListOfPlayerSquares),
+            valid_push(Board, Player, CurrRow-CurrCol, PushRow-PushCol, ResultPushCells)
+        ),
+        ValidPushMoves
+    ).
+
+find_valid_moves(Board, Player, ValidMoves):-
+
+    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, ListOfPlayerRounds),
+    append(ListOfPlayerSquares, ListOfPlayerRounds, ListOfPlayerPieces),
+
+    findall(CurrRow-CurrCol-DestRow-DestCol,
+    (   
+        iterate_over_board(Board, DestRow, DestCol),
+        member(CurrRow-CurrCol, ListOfPlayerPieces),
+        valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol)
+
+
+    ), ValidMoves
+    ) .
+
+
+find_new_game_states(Board, Player, ListOfNewGameStates):-
+    
+%player_trapped(Board,Player) 
+%Predicate that checks if a player is trapped and has no way out for every piece
+% players_trapped(Board,Player):-
+%     get_player_pieces_lists(Board, Player, ListOfPlayerSquares, ListOfPlayerRounds),
 
 
 
@@ -298,6 +374,14 @@ make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState)
 %predicate/heuristics to evaluate values of moves, gameStates etc. 
 % predicate to evaluate the Value of a given gameState w.r.t. a given Player1/2 . For GameStates with same value, use real random choose algorithm to avoid Players detect any pattern on the choosen moves
 %Heuristic algorithm: predicate to do an AI that chooses the "best" 0, 1 or 2 moves + push move from a set of possible moves
+
+% give different weights for different heuristic evaluation above ?
+%number of possible push moves: less possible push moves for the opponent, less value The GameState has, better for Player
+%Write more from: https://www.abstractgames.org/pushfight.html
+% For a given, GameState, if opponent squares have less possible push_moves, Val is less
+%For given GameState, if opponent round_pieces, have less valid_moves, this gives less pontuation to this GameState then others
+%Rounde_pieces cant push, so they are more vulnerable to be pushing out
+%More Round_pieces next to edge locations, GameState has less points
 
 % Heuristic algorithm predicate to do an AI that simulates n (We chooses this) "Optimal" GameStates for a given Player(Him)
 % where he also simulate the responses for every simulated "Optimal " GameState from 1... n
