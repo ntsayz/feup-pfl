@@ -46,9 +46,7 @@ player_turn(Board, Player, MoveNum, FinalTurnBoard) :-
             player_turn(Board, Player, MoveNum, FinalTurnBoard))
             ; FinalTurnBoard= Board 
         ).
-            %check if Player can Push any Piece, if not he looses the game
-
-        % push(Board, Player, FinalTurnBoard)).  
+            
         
 
 
