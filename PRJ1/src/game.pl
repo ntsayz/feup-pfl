@@ -9,7 +9,7 @@ start_game(1) :-
 % PvC
 start_game(2) :-
     initial_board3(Board),
-    game_loop_pvc(Board, player1).
+    game_loop_pvc_random(Board, player1).
 
 % CvC
 start_game(3) :-
@@ -66,14 +66,14 @@ player_turn(Board, Player, MoveNum, FinalTurnBoard) :-
 
 
 
-game_loop_pvc(Board, CurrentPlayer) :-
+game_loop_pvc_random(Board, CurrentPlayer) :-
     (CurrentPlayer == player1 -> 
         player_turn(Board, CurrentPlayer, 1, NewBoard);  % Player's turn
         ai_turn(Board, CurrentPlayer, NewBoard)  % AI's turn
     ),
     push(NewBoard, CurrentPlayer, FinalTurnBoard),  % Handle the push phase
     switch_turn(CurrentPlayer, NextPlayer),
-    game_loop_pvc(FinalTurnBoard, NextPlayer).
+    game_loop_pvc_random(FinalTurnBoard, NextPlayer).
 
 game_loop_cvc(Board, CurrentPlayer) :-
     ai_turn(Board, CurrentPlayer, NewBoard),  % AI's turn
