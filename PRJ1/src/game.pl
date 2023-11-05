@@ -1,13 +1,26 @@
 :-use_module(library(lists)).
 :-use_module(library(random)).
-start_game :-
+
+% PvP
+start_game(1) :-
     initial_board2(Board),
     game_loop(Board, player1).
+
+% PvC
+start_game(2) :-
+    initial_board3(Board),
+    game_loop_pvc(Board, player1).
+
+% CvC
+start_game(3) :-
+    initial_board2(Board),
+    game_loop_cvc(Board, ai1).
 
 
 % predicate to switch players
 switch_turn(CurrentPlayer, NextPlayer):-
     change_player(CurrentPlayer, NextPlayer).
+
 
 game_loop(Board, CurrentPlayer) :-
     player_turn(Board, CurrentPlayer, 1, BoardAfterMoves),
@@ -49,67 +62,43 @@ player_turn(Board, Player, MoveNum, FinalTurnBoard) :-
             %check if Player can Push any Piece, if not he looses the game
 
         % push(Board, Player, FinalTurnBoard)).  
-        
 
 
 
 
-%valid_move1(Board, Player, Move, TempBoard):-
-%    true.
+game_loop_pvc(Board, CurrentPlayer) :-
+    (CurrentPlayer == player1 -> 
+        player_turn(Board, CurrentPlayer, 1, NewBoard);  % Player's turn
+        ai_turn(Board, CurrentPlayer, NewBoard)  % AI's turn
+    ),
+    push(NewBoard, CurrentPlayer, FinalTurnBoard),  % Handle the push phase
+    switch_turn(CurrentPlayer, NextPlayer),
+    game_loop_pvc(FinalTurnBoard, NextPlayer).
+
+game_loop_cvc(Board, CurrentPlayer) :-
+    ai_turn(Board, CurrentPlayer, NewBoard),  % AI's turn
+    push(NewBoard, CurrentPlayer, FinalTurnBoard),  % Handle the push phase
+    switch_turn(CurrentPlayer, NextPlayer),
+    game_loop_cvc(FinalTurnBoard, NextPlayer).
 
 
-read_user_input(Move):-
-    read(Input),    %d4d5.
-    atom_chars(Input, InputList),
-    parse_input(InputList, Move, _ListOfMoves).
+%  handle the AI's turn
+ai_turn(Board, AIPlayer, NewBoard) :-
+    display_board(Board),
+    generate_possible_moves(Board, AIPlayer, PossibleMoves),
+    filter_valid_moves(Board, AIPlayer, PossibleMoves, ValidMoves),
+    random_move(ValidMoves, SelectedMove),
+
+    convert_to_format(SelectedMove, FormattedMove),
+    print_chosen_move(FormattedMove),
+
+    apply_move(Board, AIPlayer, SelectedMove, NewBoard).
 
 
-parse_input([X1, Y1, X2, Y2], Move, _ListOfMoves) :-
-    (   [X1, Y1, X2, Y2] = ['x', 'x', 'x', 'x'] ->
-        Move = xxxx
-    ;   char_code(X1, X1Code),
-        char_code(Y1, Y1Code),
-        char_code(X2, X2Code),
-        char_code(Y2, Y2Code),
-        % verifica se o input é válido. se a char for um número ou uma letra dependendo da posição
-        X1Code >= 97,
-        X1Code =< 104,
-        Y1Code >= 49,
-        Y1Code =< 56,
-        X2Code >= 97,
-        X2Code =< 104,
-        Y2Code >= 49,
-        Y2Code =< 56,
-        Move = [X1Code, Y1Code, X2Code, Y2Code]
-    ).
 
-convert_to_index(Board, Move, Indexes, Pieces) :-
-    Move = [X1, Y1, X2, Y2],
-    
-    % % debugging
-    % write('Move: '), write(Move), nl,
-    
-    % converting char to index para account pelo offset do header
-    X1Index is X1 - 97 , 
-    Y1Index is Y1 - 48 - 1,
-    X2Index is X2 - 97 , 
-    Y2Index is Y2 - 48 - 1, 
-    
-    % % debugging
-    % write('Real Indexes Row-Col: '), write([Y1Index, X1Index, Y2Index, X2Index]), nl,
-    
-    % getting pieces
-    nth0(Y1Index, Board, Row1),
-    nth0(X1Index, Row1, Piece1),
-    nth0(Y2Index, Board, Row2),
-    nth0(X2Index, Row2, Piece2),
-    
-    % Info for Start Position: Element/Piece to Final Position: Element/Piece
-    write('Elements/Pieces: Piece -> Piece|Element : '), write(Piece1),write(' -> '), write(Piece2), nl, nl,
-    
 
-    Indexes = [X1Index, Y1Index, X2Index, Y2Index],
-    Pieces = [Piece1, Piece2].
+
+
 
 % temporario para testar
 move_piece(Board, [X1, Y1, X2, Y2], UpdatedBoard) :-
@@ -128,22 +117,28 @@ replace_element(List, Index, Value, UpdatedList) :-
     nth0(Index, UpdatedList, Value, Rest).
 
 push(Board, Player, FinalPushGameState):-
-    display_board(Board),
-    write('Player Turn: '), write(Player), nl,
-    write('Push-Move number: '), write(3), nl,
-    write('Mandatory push!'), nl,nl,
-   
-    read_user_input(Move), nl,
-    convert_to_index(Board, Move, [PieceCol,PieceRow, PushCol,PushRow], _Pieces),
-   
-    (make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState) ->
-        !
+    ( Player == ai -> 
+        % If the player is AI, skip the push phase for now
+        write('AI push phase skipped for now.'), nl,
+        FinalPushGameState = Board  % Assuming you just want to keep the board state unchanged for now
         ;
-        
-        write('Invalid push! Try again.'), nl,nl,
-        
-        push(Board, Player, FinalPushGameState)
-        ).
+        % If the player is not AI, proceed with the push phase as usual
+        display_board(Board),
+        write('Player Turn: '), write(Player), nl,
+        write('Push-Move number: '), write(3), nl,
+        write('Mandatory push!'), nl,nl,
+
+        read_user_input(Move), nl,
+        convert_to_index(Board, Move, [PieceCol,PieceRow, PushCol,PushRow], _Pieces),
+
+        (make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState) ->
+            !
+            ;
+            write('Invalid push! Try again.'), nl,nl,
+            push(Board, Player, FinalPushGameState)
+        )
+    ).
+
 
 % update_board(+Board, +Player, +MoveType, -UpdatedBoard)/4
 % ==============================================================================

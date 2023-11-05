@@ -9,6 +9,14 @@ initial_board2([
     [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
     [out,out,out,empty,w_square,w_round,empty,empty,out,out],
     [out,out,sr,sr,sr,sr,sr,out,out,out] ] ).
+initial_board3([
+    [out, out, out, sr, sr, sr, sr, sr, out, out],
+    [out, out, out, empty, empty, empty, empty, empty, out, out],
+    [out, b_round, empty, b_round, b_square, w_square, empty, empty, empty, out],
+    [out, empty, empty, empty, empty, empty, empty, empty, empty, out],
+    [out, out, out, empty, b_square, empty, w_round, empty, out, out],
+    [out, out, sr, sr, sr, sr, sr, out, out, out] 
+]).
 
 
 
@@ -42,6 +50,13 @@ display_board_header(Size) :-
   write('     '),
   display_columns(Size, 65). %65
 
+% display_columns(+Size, +Code)
+% Computação e visualização das colunas do tabuleiro de acordo com o seu tamanho.
+display_columns(0, _):-!.
+display_columns(Size, Code) :- Size > 0,
+  put_code(Code), write('   '),
+  S is Size-1, C is Code+1,
+  display_columns(S, C).
 
 
 %second version

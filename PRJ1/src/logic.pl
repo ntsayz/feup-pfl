@@ -3,14 +3,35 @@
 :- use_module(library(between)).
 :- use_module(library(aggregate)).
 
+%      PIECE OWNERSHIP
 
+% PVP
 player_pieces(player1, w_square).
 player_pieces(player1, w_round).
 player_pieces(player2, b_square).
 player_pieces(player2, b_round).
 
+% PVC
+player_pieces(player1, w_square).
+player_pieces(player1, w_round).
+player_pieces(ai, b_square).
+player_pieces(ai, b_round).
+
+% CVC
+player_pieces(ai1, b_square).
+player_pieces(ai1, b_round).
+player_pieces(ai2, w_square).
+player_pieces(ai2, w_round).
+
+
 change_player(player1,player2).
 change_player(player2,player1).
+
+change_player(player1, ai).
+change_player(ai, player1).
+
+change_player(ai1, ai2).
+change_player(ai2, ai1).
 
 
 

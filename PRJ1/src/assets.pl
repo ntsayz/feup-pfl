@@ -9,3 +9,11 @@ rules :-
     write('Rule'), nl,
     write('Any key to exit!'),
     nl.
+
+game_mode_menu :-
+    write('GAME MODE'), nl,
+    write('1. Player vs Player'), nl,
+    write('2. Player vs Computer'), nl,
+    write('3. Computer vs Computer'), nl,
+    write('0. Back'), nl.
+
