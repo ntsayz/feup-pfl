@@ -318,7 +318,7 @@ player_lost_game(Board, Player):-
 
 
 find_valid_push_moves(Board, Player, ValidPushMoves) :-
-    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, _ListOfPlayersRounds),
+    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, _ListOfPlayerRounds),
     findall(
         [CurrRow-CurrCol, PushRow-PushCol, ResultPushCells],
         (
@@ -328,7 +328,24 @@ find_valid_push_moves(Board, Player, ValidPushMoves) :-
         ValidPushMoves
     ).
 
+find_valid_moves(Board, Player, ValidMoves):-
 
+    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, ListOfPlayerRounds),
+    append(ListOfPlayerSquares, ListOfPlayerRounds, ListOfPlayerPieces),
+
+    findall(CurrRow-CurrCol-DestRow-DestCol,
+    (   
+        iterate_over_board(Board, DestRow, DestCol),
+        member(CurrRow-CurrCol, ListOfPlayerPieces),
+        valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol)
+
+
+    ), ValidMoves
+    ) .
+
+
+find_new_game_states(Board, Player, ListOfNewGameStates):-
+    
 %player_trapped(Board,Player) 
 %Predicate that checks if a player is trapped and has no way out for every piece
 % players_trapped(Board,Player):-
@@ -362,7 +379,9 @@ find_valid_push_moves(Board, Player, ValidPushMoves) :-
 %number of possible push moves: less possible push moves for the opponent, less value The GameState has, better for Player
 %Write more from: https://www.abstractgames.org/pushfight.html
 % For a given, GameState, if opponent squares have less possible push_moves, Val is less
-
+%For given GameState, if opponent round_pieces, have less valid_moves, this gives less pontuation to this GameState then others
+%Rounde_pieces cant push, so they are more vulnerable to be pushing out
+%More Round_pieces next to edge locations, GameState has less points
 
 % Heuristic algorithm predicate to do an AI that simulates n (We chooses this) "Optimal" GameStates for a given Player(Him)
 % where he also simulate the responses for every simulated "Optimal " GameState from 1... n
