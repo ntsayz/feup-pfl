@@ -15,7 +15,7 @@ menu_choice(1) :-
 
 menu_choice(2) :-
     rules,
-    read(Choice),
+    read(_Choice),
     main_menu.
 
 menu_choice(_Other) :-

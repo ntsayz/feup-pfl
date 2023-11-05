@@ -8,3 +8,11 @@ get_single_char(Char) :-
 
     % Convert the character code to a character
     char_code(Char, Code).
+
+
+% Read a line of input from the user
+read_line_input(Line) :-
+    read_line_to_codes(user_input, Codes),
+    atom_codes(Line, Codes).
+
+
