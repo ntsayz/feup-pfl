@@ -10,10 +10,9 @@ switch_turn(CurrentPlayer, NextPlayer):-
     change_player(CurrentPlayer, NextPlayer).
 
 game_loop(Board, CurrentPlayer) :-
-    write('Player: '), write(CurrentPlayer), nl,
-    player_turn(Board, CurrentPlayer, 1, FinalTurnBoard),
+    player_turn(Board, CurrentPlayer, 1, BoardAfterMoves),
    
-    % push(BoardAfterMoves, CurrentPlayer, FinalTurnBoard),
+    push(BoardAfterMoves, CurrentPlayer, FinalTurnBoard),
  
     switch_turn(CurrentPlayer, NextPlayer),
     game_loop(FinalTurnBoard, NextPlayer).
@@ -22,7 +21,15 @@ game_loop(Board, CurrentPlayer) :-
 player_turn(Board, Player, MoveNum, FinalTurnBoard) :-
     MoveNum =< 3,
     display_boardv2(Board),
-    write('Move number: '), write(MoveNum), nl,
+    (MoveNum ==3 -> 
+        write('Player Turn: '), write(Player), nl, 
+        write('Push Phase: '), nl,nl
+      ;
+        write('Player Turn: '), write(Player), nl,
+        write('MoveNumber: '), write(MoveNum), nl,
+        write('Optional Move!'),nl,nl
+       ),
+
     (MoveNum < 3 ->
         read_user_input(Move),
         (Move = xxxx -> % SINCE MOVES ARE NOT OBLIGATORY, IF THE USER INPUTS xxxx, THE MOVE IS SKIPPED
@@ -35,11 +42,13 @@ player_turn(Board, Player, MoveNum, FinalTurnBoard) :-
         
                 NextMoveNum is MoveNum + 1, % increment move number
                 player_turn(NewGameState, Player, NextMoveNum, FinalTurnBoard);
-            write('Invalid move! Try again.'), nl, % if invalid, display error message
-            player_turn(Board, Player, MoveNum, FinalTurnBoard)); 
+            write('Invalid move! Try again.'), nl,nl, % if invalid, display error message
+            player_turn(Board, Player, MoveNum, FinalTurnBoard))
+            ; FinalTurnBoard= Board 
+        ).
             %check if Player can Push any Piece, if not he looses the game
 
-        push(Board, Player, FinalTurnBoard)).  
+        % push(Board, Player, FinalTurnBoard)).  
         
 
 
@@ -77,8 +86,8 @@ parse_input([X1, Y1, X2, Y2], Move, _ListOfMoves) :-
 convert_to_index(Board, Move, Indexes, Pieces) :-
     Move = [X1, Y1, X2, Y2],
     
-    % debugging
-    write('Move: '), write(Move), nl,
+    % % debugging
+    % write('Move: '), write(Move), nl,
     
     % converting char to index para account pelo offset do header
     X1Index is X1 - 97 , 
@@ -86,8 +95,8 @@ convert_to_index(Board, Move, Indexes, Pieces) :-
     X2Index is X2 - 97 , 
     Y2Index is Y2 - 48 - 1, 
     
-    % debugging
-    write('Real Indexes Row-Col: '), write([Y1Index, X1Index, Y2Index, X2Index]), nl,
+    % % debugging
+    % write('Real Indexes Row-Col: '), write([Y1Index, X1Index, Y2Index, X2Index]), nl,
     
     % getting pieces
     nth0(Y1Index, Board, Row1),
@@ -96,7 +105,7 @@ convert_to_index(Board, Move, Indexes, Pieces) :-
     nth0(X2Index, Row2, Piece2),
     
     % debugging
-    write('Pieces: '), write([Piece1, Piece2]), nl,
+    write('Elements/Pieces: Piece -> Piece|Element'), write([Piece1, Piece2]), nl, nl,
     
 
     Indexes = [X1Index, Y1Index, X2Index, Y2Index],
@@ -119,20 +128,24 @@ replace_element(List, Index, Value, UpdatedList) :-
     nth0(Index, UpdatedList, Value, Rest).
 
 push(Board, Player, FinalPushGameState):-
-    write('Mandatory push!'), nl,
+    display_boardv2(Board),
+    write('Player Turn: '), write(Player), nl,
+    write('Push-Move number: '), write(3), nl,
+    write('Mandatory push!'), nl,nl,
+   
     read_user_input(Move),
     convert_to_index(Board, Move, [PieceCol,PieceRow, PushCol,PushRow], _Pieces),
    
     (make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState) ->
-        display_boardv2(FinalPushGameState),
-        write('Push Done'), nl,true
-       
+        !
         ;
         
-        write('Invalid push! Try again.'), nl,
+        write('Invalid push! Try again.'), nl,nl,
         
         push(Board, Player, FinalPushGameState)
         ).
 
 % update_board(+Board, +Player, +MoveType, -UpdatedBoard)/4
 % ==============================================================================
+
+

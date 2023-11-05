@@ -13,6 +13,8 @@ change_player(player1,player2).
 change_player(player2,player1).
 
 
+
+
 %anchor_piece(+Player,+Board,+CellPiece)/3
 %Determinar que peça do Player no Board em CellPiece:Row-Col fica com âncora
 %anchor_piece(Player,Board,Row-Col):-
@@ -84,7 +86,6 @@ player_square_piece(Board,player1,Row-Col):-
 
 player_square_piece(Board,player2,Row-Col):-
     cell_has_player_piece(Board,player2,Row-Col,b_square).
-
 
 %player_round_piece(+Board,+Player,+CellPiece)
 %Verifica se peça em Cell:Row-Col é uma square piece do Player
@@ -270,7 +271,7 @@ make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState)
     cell_has_player_piece(Board,Player,PieceRow-PieceCol,Piece),
     change_board_value(Board, PieceRow-PieceCol, empty, NewGameState),
    
-    replace_push_move(NewGameState, Piece, ResultPushCells, FinalPushGameState ),
+    replace_push_move(NewGameState, Piece, ResultPushCells,FinalPushGameState ),
     change_anchor_piece(PushRow-PushCol, Player). %change the anchor to the new piece-Player that push on PushRow-PushCol position/Opponent piece
     
 
