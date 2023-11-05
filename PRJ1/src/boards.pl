@@ -29,7 +29,7 @@ cell_code(out, 58).
 
 % display_board(+Board)
 % Predicado para vizualizar o Board tendo em conta tamanho de linhas e colunas escolhidas do mesmo e display da Âncora
-display_boardv([H| BoardTail]) :-
+display_board([H| BoardTail]) :-
   length(H, SizeCollumns),
   display_board_header(SizeCollumns), nl,
   S is SizeCollumns*4 + 4,
@@ -83,3 +83,95 @@ display_line([Cell | T], RowNumber, ColNumber) :-
     put_code(Code), write(' |'), 
     NextColNumber is ColNumber + 1,
     display_line(T, RowNumber, NextColNumber).
+
+
+%draw banner for the game 
+
+
+
+
+% Predicate to draw a square banner with a title and two stick figures.
+draw_banner(Columns) :-
+    Title = "Push-Fight Game !  ",
+    BannerHeight is Columns,  % Calculate the height of the banner
+    StickManHeight is BannerHeight // 2,  % Calculate the height of the
+    Middle is Columns // 2 + 6,
+    % Calculate padding for title and stick figures
+    length(Title, TitleLength),
+    TitlePad is (Columns - TitleLength) // 2,
+    % Draw the banner
+    draw_top_bottom(Columns),
+    draw_centered_text(Title, Columns, TitlePad),
+    draw_empty_line(Columns),
+    print_stick_man_line(Middle, Columns,StickManHeight),
+    draw_top_bottom(Columns).
+
+% Helper predicate to draw the top and bottom border of the banner.
+draw_top_bottom(Columns) :-
+    fill_line(':', Columns),
+    nl.
+
+% Helper predicate to draw an empty line with colons on the sides.
+draw_empty_line(Columns) :-
+    write(':'),
+    fill_line(' ', Columns - 2),
+    write(':'),
+    nl.
+
+% Helper predicate to draw centered text within the banner.
+draw_centered_text(Text, Columns, _Pad) :-
+    length(Text, TextLength),
+    SidePad is (Columns - TextLength) // 2 - 1,
+    write(':'),
+    fill_line(' ', SidePad), 
+    format('~s~n', [Text]), 
+    fill_line(' ', SidePad), 
+    write(':'), 
+    nl.
+
+% Helper predicate to fill a line with a specific character.
+fill_line(Char, Length) :-
+    ( Length > 0 ->
+        write(Char),
+        NewLength is Length - 1,
+        fill_line(Char, NewLength)
+    ; true
+    ).
+
+% print_stick_men(Columns, StickManHeight) :-
+%     Middle is Columns // 2,
+%     print_stick_man_line(Middle, StickManHeight), nl,
+%     print_push_fight_game(Middle), nl,
+%     print_stick_man_line(Middle, StickManHeight), nl.
+
+print_stick_man_line(_Middle, _Collumns,0).
+print_stick_man_line(Middle, Collumns,StickManHeight) :-
+    StickManHeight > 0,
+    Spaces is Middle - 3,  % Adjust for stick figure width
+    print_row(' ', Spaces),
+    write('O  O'),
+    print_row(' ', Spaces), nl,
+    print_row(' ', Spaces),
+    write('/|\\/|\\'),
+    print_row(' ', Spaces), nl,
+    print_row(' ', Spaces),
+    write('/ \\/ \\'),
+    print_row(' ', Spaces), nl,
+    draw_top_bottom(Collumns), nl,
+    NewStickManHeight is StickManHeight - 3,
+    NewMidle is Middle -3,
+    print_stick_man_line(NewMidle, Collumns,NewStickManHeight).
+
+
+
+
+
+
+print_row(Char, 0) :- 
+write(Char).
+
+print_row(Char, Length) :-
+    Length > 0,
+    write(Char),
+    NewLength is Length - 1,
+    print_row(' ', NewLength).
