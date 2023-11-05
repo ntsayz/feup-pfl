@@ -179,15 +179,24 @@ test_player_make_push_predicates:-
     run_test(make_push(Board2, player2, 1-5, 1-4, _Board2NewStateGame)).
 
 
-   
+test_aux_predicates_game_ai:-
+    board_logic_test(standard_initial_positions, BoardAi),
+    board_logic_test(logic1, Board),
+    run_test(get_player_pieces_lists(BoardAi, player1, _ListOfPlayerSquares, _ListOfPlayersRounds)),
+    run_test(get_player_pieces_lists(BoardAi, player2, _ListOfPlayerSquares2, _ListOfPlayersRounds2)),
+    run_test(player_lost_game(Board, player1)), % 6 is the default game number of Pieces a Player need to have to continue playing
+    run_test(find_valid_push_moves(BoardAi, player1, _ValidPushMoves)). % 6 is the default game number of Pieces a Player need to have to continue playing
 
-run_all_tests :-
+
+
+run_all_tests:-
     
     test_board_basic_predicates,
 
     test_board_player_predicates,
     test_player_moves_predicates,
     test_player_complete_moves_predicates,
-    test_player_make_push_predicates.
+    test_player_make_push_predicates,
+    test_aux_predicates_game_ai.
 
 
