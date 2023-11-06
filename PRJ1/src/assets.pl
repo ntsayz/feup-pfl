@@ -1,5 +1,5 @@
 main_menu_op :- 
-    write('TITLE/LOGO WILL GO HERE'), nl,
+    title,
     write('1. Game'), nl,
     write('2. Rules'), nl, 
     write('0. Exit'), nl.
@@ -17,3 +17,10 @@ game_mode_menu :-
     write('3. Computer vs Computer - Random'), nl,
     write('0. Back'), nl.
 
+title :-
+    write(' ____  _____ '), nl,
+    write('|  _ \\|  ___|'), nl,
+    write('| |_) | |_   '), nl,
+    write('|  __/|  _|  '), nl,
+    write('|_|   |_|    '), nl,
+    write('             '), nl.
