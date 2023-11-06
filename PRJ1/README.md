@@ -143,7 +143,7 @@ Para um movimento ser considerado válido, a posição de destino deve estar vaz
 
 ## 4. Fim do Jogo 
 
-Tbd
+TBD
 
 ## 5. Avaliação do Estado do Jogo
 
@@ -164,20 +164,17 @@ Após a geração de todos os movimentos possíveis, é feita uma filtragem com 
 
 
 # Conclusões
-
-
+TBD
 ## Limitações
-
-
-
+TBD
 ## Melhorias
 
 
 # Bibliografia
 - [Push Fight - Strategic analysis](https://www.abstractgames.org/pushfight.html)
-- [Push Fight Online CvC demo](https://styx.verver.ch/pushfight/)
+- [Push Fight Online CvC](https://styx.verver.ch/pushfight/)
 - [Website Oficial do Jogo - pushfightgame.com](https://pushfightgame.com/)
-- [Computational Complexity of Generalized Push Figh](https://pushfightgame.com/index_htm_files/Push%20Fight%20MIT%20Paper.pdf)
+- [Computational Complexity of Generalized Push Fight](https://pushfightgame.com/index_htm_files/Push%20Fight%20MIT%20Paper.pdf)
 
 
 
