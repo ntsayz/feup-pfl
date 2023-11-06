@@ -106,7 +106,6 @@ Internamente os jogadores são representados como `player1` e `player2` em jogos
 
 O menu principal, acedido através do predicado `main_menu/0`, oferece ao jogador três opções: iniciar o jogo, consultar as regras ou sair da aplicação.
 
-![](assets/main_menu.png)
 
 Após o início do jogo, o jogador é convidado pelo predicado `game_mode_choice/0` a selecionar o tipo de jogo que deseja jogar, sendo-lhe apresentadas as opções: `PvP` , `PvC` e `CvC`. 
 
