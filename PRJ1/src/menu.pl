@@ -1,5 +1,6 @@
 
 main_menu :-
+    change_anchor_piece(null-null, noplayer),
     main_menu_op, 
     read(Choice),
     menu_choice(Choice).

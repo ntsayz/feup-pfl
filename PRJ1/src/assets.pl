@@ -95,8 +95,8 @@ game_mode_menu :-
     write('2. Player vs Computer - Random'), nl,
     write('3. Player vs Computer - Advanced'), nl,
     write('4. Computer vs Player - Advanced'), nl,
-    write('5. Computer vs Computer - Random'), nl,
-    write('6. Computer vs Computer - Advanded-Random'), nl,
+    write('5. Computer vs Computer -  Advanced'), nl,
+    write('6. Computer vs Computer - Advanced-Random'), nl,
     write('7. Computer vs Computer - Advanced'), nl,
 
     write('0. Back'), nl.

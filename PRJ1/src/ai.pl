@@ -62,23 +62,5 @@ ai_push_move(GameState, Player, Val-FinalGameState):-
 
 
 
-% helper - filter out invalid moves
-is_valid_move(Board, Player, Move) :-
-    Move = [CurrRow-CurrCol, DestRow-DestCol],
-    valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol).
-
-%  filter out invalid moves
-filter_valid_moves(Board, Player, PossibleMoves, ValidMoves) :-
-    include(is_valid_move(Board, Player), PossibleMoves, ValidMoves).
-
-%  randomly select a move from a list of valid moves
-random_move(Moves, RandomMove) :-
-    length(Moves, NumMoves),
-    NumMoves > 0,
-    random(0, NumMoves, Index),
-    nth0(Index, Moves, RandomMove).
-
-
-
 
 

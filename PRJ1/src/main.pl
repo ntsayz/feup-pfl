@@ -9,5 +9,5 @@
 :- consult('ai.pl').
 
 % predicate to run the game
-start :- clear_screen, main_menu.
+start :-change_anchor_piece(null-null, noplayer), clear_screen, main_menu.
 
