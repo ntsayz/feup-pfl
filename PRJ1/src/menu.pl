@@ -1,6 +1,6 @@
 % this is temporary
 main_menu :-
-    clear_screen,
+    
     main_menu_op, % maybe change the name in assets.pl
     read(Choice),
     menu_choice(Choice).

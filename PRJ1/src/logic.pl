@@ -2,7 +2,7 @@
 :- use_module(library(lists)).
 :- use_module(library(between)).
 :- use_module(library(aggregate)).
-
+:- use_module(library(random)).
 
 player_pieces(player1, w_square).
 player_pieces(player1, w_round).
@@ -43,7 +43,7 @@ change_size_board(SizeRow, SizeCol):-
     retract(size_col(_)),
     assertz(size_col(SizeCol)).
 
-number_pieces_player(6). % default game number of Pieces a Player need to have to continue playing
+number_pieces_player(5). % default game number of Pieces a Player need to have to continue playing
 
 %change_number_pieces(+NumberOfPieces)
 %Change the Number Of pieces that player must have in order to play again
@@ -53,9 +53,7 @@ change_number_pieces(NumberOfPieces):-
 
 
 
-%set_anchor(+Cell,+Player,+Board)
-%Determina que peça de um Player no Board localizada em Cell:Row-Coll é marcada com a âncora 
-%Aqui teremos de usar assert/assertz?
+
 
 %cell_belongs_board(+Cell)
 %Verificar se coordenadas de uma determinada célula estão dentro dos limites do tabuleiro
@@ -149,6 +147,10 @@ possible_move(Board, CurrRow-CurrCol,NewRow-NewCol, right):- %right move
 %valid_move(+Board,+CurrentPosition,+DestPosition,?Visited)
 %Verifica se mover uma possível peça em CurrentPosition para DestPosition(destination position) é um movimento válido
 
+
+
+
+
 %base case Current Position = DestPosition
 
 valid_move(_Board, _Player, CurrRow-CurrCol, CurrRow-CurrCol, _Visited).
@@ -169,20 +171,27 @@ valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol) :-
     cell_has_player_piece(Board, Player,CurrRow-CurrCol,_Piece), %célula de onde movimento parte, tem de ter uma peça de um Player
     %Chamada recursiva utilizando acumulador, para evitar recursão infinita / evitar voltar a tentar células já tentadas anteriormente
     empty_cell(Board, DestRow-DestCol), %DestinationPosition needs to be an empty cell
-    valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, []).
+    once(valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, [])).
 
-
-
-
-count_pieces(_, _, [], Count, Count).
-%Predicate to count pieces from a list of positions of possible Player pieces
-count_pieces(Board, Player, [Row-Col | RestCells], CurrentCount, FinalCount):-
-    (cell_has_player_piece(Board, Player, Row-Col,_Piece) ->
-        NewCount is CurrentCount +1;
-        NewCount is CurrentCount
+% Find all unique valid moves and remove duplicates
+find_unique_valid_moves(Board, Player, CurrRow-CurrCol, DestRow-DestCol, UniqueMoves) :-
+    findall(
+        Move,
+        valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, Move),
+        Moves
     ),
-    count_pieces(Board, Player, RestCells, NewCount, FinalCount).
-    
+    remove_duplicates(Moves, UniqueMoves).
+
+% Remove duplicates from a list of moves
+remove_duplicates([], []).
+remove_duplicates([Head|Tail], UniqueList) :-
+    member(Head, Tail),
+    !,
+    remove_duplicates(Tail, UniqueList).
+remove_duplicates([Head|Tail], [Head|UniqueList]) :-
+    \+ member(Head, Tail),
+    remove_duplicates(Tail, UniqueList).
+   
 
 % Check that none of the cells in ResultCells are anchor pieces for Opponent
 check_no_anchor_pieces(ResultCells, Opponent) :-
@@ -273,10 +282,10 @@ make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState)
 % Iterate over each row and column of the board
 iterate_over_board(Board, Row, Col) :-
     length(Board, NumRows),
-    between(1, NumRows, Row),
+    between(0, NumRows, Row),
     nth1(Row, Board, CurrentRow),
     length(CurrentRow, NumCols),
-    between(1, NumCols, Col).
+    between(0, NumCols, Col).
 
 
 
@@ -311,32 +320,53 @@ get_all_player_pieces(Board, Player,ListOfPlayerPositionsPieces ):-
     get_player_pieces_lists(Board, Player, ListOfPlayerSquares, ListOfPlayerRounds),
     append(ListOfPlayerSquares, ListOfPlayerRounds, ListOfPlayerPositionsPieces).
 
+%get_all_empty_cells(+Board, -EmptyCellCoordinates)
+%This function returns list with coordinates of all empty cells in the board
+get_all_empty_cells(Board, EmptyCellCoordinates):-
+    findall(Row-Col, (iterate_over_board(Board, Row, Col), empty_cell(Board,Row-Col)), EmptyCellCoordinates).
+
 %
 find_valid_moves(Board, Player, ValidMoves):-
 
     get_all_player_pieces(Board, Player,ListOfPlayerPositionsPieces ),
+    get_all_empty_cells(Board, ListOfEmpty),
 
     findall(CurrRow-CurrCol-DestRow-DestCol,
     (   
-        iterate_over_board(Board, DestRow, DestCol),
         member(CurrRow-CurrCol, ListOfPlayerPositionsPieces),
+        member(DestRow-DestCol, ListOfEmpty),
         valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol)
+
 
 
     ), ValidMoves
     ) .
 
+find_valid_round_moves(Board, Player, ValidRoundMoves):-
+
+    get_player_pieces_lists(Board, Player, _ListOfPlayerSquares, ListOfPlayersRounds),
+    get_all_empty_cells(Board, ListOfEmpty),
+    findall(CurrRow-CurrCol-DestRow-DestCol,
+    (   
+        member(CurrRow-CurrCol, ListOfPlayersRounds),
+        member(DestRow-DestCol, ListOfEmpty),
+        valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol)
+
+
+
+    ), ValidRoundMoves
+    ) .
 
 %find_move_game_states(+Board, +Player, +ListOfNewGameStates)
 %Predicado para obter todos os GameStates resultantes para todos os ValidMoves possíves
 find_move_game_states(Board, Player, ListOfNewGameStates):-
     find_valid_moves(Board, Player, ValidMoves),
-
     findall(BoardGameState,
     (
         member(CurrRow-CurrCol-DestRow-DestCol, ValidMoves),
+        make_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, BoardGameState),
+        \+player_cant_push(BoardGameState-Player) % assegurar que não são escolhidos valid_moves que levam a BoardGameState
 
-        make_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, BoardGameState)
 
     ), ListOfNewGameStates
     
@@ -373,12 +403,24 @@ player_cant_push(Board-Player):-
     find_valid_push_moves(Board, Player, []).
 
 % game_over(+GameState, -Winner)
-game_over(Board-Player, Winner):-
 
+game_over(Board-Player, Winner):-
     player_lost_game(Board, Player),
     change_player(Player, Winner).
 
+game_over(Board-Player, Winner):-
+    player_lost_game(Board, Player),
+    player_cant_push(Board-Player),
+    change_player(Player, Winner).
 
+%case when Player push a piece out of the Board, the winner is Player !
+game_over(Board-Player, Winner):- 
+    change_player(Player, Opponent),
+    player_lost_game(Board, Opponent),
+    change_player(Opponent, Winner).
+   
+   
+   
 
 
 % TODO
@@ -415,5 +457,79 @@ game_over(Board-Player, Winner):-
 %For given GameState, square_pieces next to edge locations give less points ( but less negative then Round_pieces)
 %For given GameState, less roundPiece that have squares between cloosest edge and circle, don have the good defenders squares, so GameState have less Value for Opponent
 
+
+evaluate_push_mobility(GameState, Player, Value):-
+    find_valid_push_moves(GameState, Player, ValidPushMoves),
+    length(ValidPushMoves, LengthOfValidPushMoves), number_pieces_player(N),
+    Value is 4*(LengthOfValidPushMoves // (N // 2 +1) ) .
+
+
+evaluate_move_mobility(GameState, Player, Value):-
+    find_valid_moves(GameState, Player, ValidMoves),
+    length(ValidMoves, LengthOfValidPushMoves), number_pieces_player(N),
+    Value is LengthOfValidPushMoves // N .
+
+
+evaluate_round_pieces_mobility(GameState, Player, Value):-
+    find_valid_round_moves(GameState, Player, ValidRoundMoves),
+    length(ValidRoundMoves, LengthOfValidRoundMoves), number_pieces_player(N),
+    Value is 3* (LengthOfValidRoundMoves // N ) .
+
+
+%Add mais mobility evaluations
+
+evaluate_mobility(GameState, Player, Value):-
+    
+    evaluate_push_mobility(GameState, Player, Value1),
+    evaluate_move_mobility(GameState, Player, Value2),
+    evaluate_round_pieces_mobility(GameState, Player, Value3),
+    Value is Value1 + Value2 + Value3.
+
+
+%value(+GameState, +Player, -Value):-
+value(GameState, Player, Value):-
+    evaluate_mobility(GameState,Player,Value).
 % Heuristic algorithm predicate to do an AI that simulates n (We chooses this) "Optimal" GameStates for a given Player(Him)
 % where he also simulate the responses for every simulated "Optimal " GameState from 1... n
+
+
+evaluate_game_state_list(ListGameStates, Player, SortedListGameStateValue):-
+    findall(Value-GameState,(
+        member(GameState, ListGameStates),
+        value(GameState, Player, Value)
+    ),ListGameStateValue
+    ), keysort(ListGameStateValue, SortedListGameStateValue).
+    
+% Helper predicate to check if the value matches the best value
+equal_value(BestValue, Value-_) :-
+    BestValue == Value.
+
+ai_move_game_state(GameState, Player, Val-RandomBestGameState):-
+    find_move_game_states(GameState, Player, ListOfNewGameStates),
+    change_player(Player, Opponent),
+   
+    evaluate_game_state_list(ListOfNewGameStates, Opponent, SortedListGameStateValue),
+    
+    SortedListGameStateValue = [BestValue-_|_],
+    
+    include(equal_value(BestValue), SortedListGameStateValue, BestGameStates),
+    
+    random_member(Val-RandomBestGameState, BestGameStates).
+    %check also mora Val-FinalGameState with same Val and choose using random choice
+
+
+count_moves(Val0, Val1, Val2, MoveCount):-
+    (Val0 =:= Val1, Val1 =:= Val2 -> MoveCount = 0;
+     Val0 =\= Val1, Val1 =:= Val2 -> MoveCount = 1;
+     Val0 =\= Val1, Val1 =\= Val2 -> MoveCount = 2).
+
+ai_move_turn(GameState, Player, Val-FinalGameState,MoveCount):-
+    evaluate_game_state_list([GameState], Player, [Val0-GameState]),
+
+    ai_move_game_state(GameState, Player, Val1-FirstMoveGameState),
+    ai_move_game_state(FirstMoveGameState, Player, Val2-SecondGameState),
+    keysort([Val0-GameState, Val1-FirstMoveGameState, Val2-SecondGameState ], ListTurnMoves),
+    ListTurnMoves = [BestValue-_|_],
+    include(equal_value(BestValue), ListTurnMoves, BestMoveGameStates),
+    random_member(Val-FinalGameState, BestMoveGameStates),
+    count_moves(Val0, Val1, Val2, MoveCount).
