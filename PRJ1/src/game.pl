@@ -11,9 +11,10 @@ switch_turn(CurrentPlayer, NextPlayer):-
 
 game_loop(Board, CurrentPlayer) :-
     player_turn(Board, CurrentPlayer, 1, BoardAfterMoves),
-   
+    
     push(BoardAfterMoves, CurrentPlayer, FinalTurnBoard),
- 
+
+    game_over(FinalTurnBoard)
     switch_turn(CurrentPlayer, NextPlayer),
     game_loop(FinalTurnBoard, NextPlayer).
 
