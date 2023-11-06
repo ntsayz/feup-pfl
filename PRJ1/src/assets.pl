@@ -78,11 +78,6 @@ print_stick_man_line(Middle, Collumns,StickManHeight) :-
     NewMidle is Middle -6,
     print_stick_man_line(NewMidle, Collumns,NewStickManHeight).
 
-
-
-
-
-
 print_row(Char, 0) :- 
 write(Char).
 
@@ -92,12 +87,18 @@ print_row(Char, Length) :-
     NewLength is Length - 1,
     print_row(' ', NewLength).
 
-    
+
 game_mode_menu :-
+    draw_banner(48), nl,
     write('GAME MODE'), nl,
     write('1. Player vs Player'), nl,
     write('2. Player vs Computer - Random'), nl,
-    write('3. Computer vs Computer - Random'), nl,
+    write('3. Player vs Computer - Advanced'), nl,
+    write('4. Computer vs Player - Advanced'), nl,
+    write('5. Computer vs Computer - Random'), nl,
+    write('6. Computer vs Computer - Advanded-Random'), nl,
+    write('7. Computer vs Computer - Advanced'), nl,
+
     write('0. Back'), nl.
 
 title :-

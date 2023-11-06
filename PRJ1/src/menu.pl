@@ -1,6 +1,5 @@
-% this is temporary
+
 main_menu :-
-    clear_screen,
     main_menu_op, 
     read(Choice),
     menu_choice(Choice).
@@ -44,6 +43,23 @@ game_mode_op(2) :-
 game_mode_op(3) :-
     clear_screen,
     start_game(3).
+
+game_mode_op(4) :-
+    clear_screen,
+    start_game(4).
+
+game_mode_op(5) :-
+    clear_screen,
+    start_game(5).
+
+game_mode_op(6) :-
+    clear_screen,
+    start_game(6).
+
+
+game_mode_op(7) :-
+    clear_screen,
+    start_game(7).
 
 game_mode_op(_Other) :-
     write('Invalid choice. Please select a valid option.'), nl,

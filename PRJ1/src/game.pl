@@ -7,10 +7,10 @@ start_game(1) :-
     initial_board2(Board),
     game_loop(Board, player1).
 
-% PvC
-start_game(2) :-
-    initial_board3(Board),
-    game_loop_pvc_random(Board, player1).
+% PvCR
+start_game(2):-
+    initial_board2(Board),
+    game_loop(Board, player1, ai2_rand).
 
 % CvC
 start_game(3) :-
@@ -22,7 +22,7 @@ start_game(3) :-
 switch_turn(CurrentPlayer, NextPlayer):-
     change_player(CurrentPlayer, NextPlayer).
 
-
+%Para Player vs Player
 game_loop(Board, CurrentPlayer) :-
     player_turn(Board, CurrentPlayer, 1, BoardAfterMoves),
     (   game_over(BoardAfterMoves-CurrentPlayer, Winner) ->
@@ -46,7 +46,63 @@ game_loop(Board, CurrentPlayer) :-
         )
     ).
 
+
+game_loop(Board, player1, ai2_rand):-
+    player_turn(Board, player1, 1, BoardAfterMoves),
+    (   game_over(BoardAfterMoves-player1, Winner) ->
+        
+        announce_winner(Winner),
+        main_menu
+        ;   % Otherwise, attempt to push and continue the game.
+        (push(BoardAfterMoves, player1, FinalTurnBoard),
+            %Check if player after move, can push
+            (   game_over(FinalTurnBoard-player1, Winner) ->
+                
+                announce_winner(Winner),
+                main_menu
+            ;   % If the game is not over, switch players and continue the game loop.
+                game_loop(FinalTurnBoard, ai2_rand, player1)
+            )
+            ;   
+            
+            handle_no_push_possible(player1)
+        )
+    ).
+
+
+
+
+game_loop(Board, ai2_rand, player1):-
+
+    ai_random_move_turn(Board, player2, RandomGameState,MoveCount),
+    display_board(RandomGameState),
+    display_turn_info(ai2_rand, MoveCount),
+    (   game_over(RandomGameState-player2, Winner) ->
+        announce_winner(Winner),
+        main_menu
+        ;   % Otherwise, attempt to push and continue the game.
+       ( ai_random_push(RandomGameState, player2, FinalTurnBoard),
+            display_board(FinalTurnBoard),
+            display_turn_info(ai2_rand, 3),
+            
+            %Check if player after move, can push
+        (   game_over(FinalTurnBoard-player2, Winner) ->
+            announce_winner(Winner),
+            main_menu
+        ;   % If the game is not over, switch players and continue the game loop.
+            game_loop(FinalTurnBoard,player1, ai2_rand)
+
+        )
+        ;
+        handle_no_push_possible(player2)
+
+       )
+    ).
+
+
+
 announce_winner(Winner) :-
+    change_anchor_piece(null-null, noplayer),
     format('#~`#t~*|#~n', [43]),
     format('Game over! The winner is ~w !!!!~n', [Winner]), nl,
     write('Another Game for revenge ?!?'),nl,
@@ -89,88 +145,30 @@ handle_move(Board, Player, MoveNum, FinalTurnBoard) :-
             NextMoveNum is MoveNum + 1,
             player_turn(NewGameState, Player, NextMoveNum, FinalTurnBoard)
         ;
-            write('Invalid move! Try again.'), nl, nl,
+            write('Invalid move! Try again.'), nl, nl, nl,nl,nl,nl,nl,nl,
             player_turn(Board, Player, MoveNum, FinalTurnBoard)
         )
     ).
 
-            
-        
-
-
-
-game_loop_pvc_random(Board, CurrentPlayer) :-
-    (CurrentPlayer == player1 -> 
-        player_turn(Board, CurrentPlayer, 1, NewBoard);  % Player's turn
-        ai_turn(Board, CurrentPlayer, NewBoard)  % AI's turn
-    ),
-    push(NewBoard, CurrentPlayer, FinalTurnBoard),  % Handle the push phase
-    switch_turn(CurrentPlayer, NextPlayer),
-    game_loop_pvc_random(FinalTurnBoard, NextPlayer).
-
-game_loop_cvc(Board, CurrentPlayer) :-
-    ai_turn(Board, CurrentPlayer, NewBoard),  % AI's turn
-    push(NewBoard, CurrentPlayer, FinalTurnBoard),  % Handle the push phase
-    switch_turn(CurrentPlayer, NextPlayer),
-    game_loop_cvc(FinalTurnBoard, NextPlayer).
-
-
-%  handle the AI's turn
-ai_turn(Board, AIPlayer, NewBoard) :-
-    display_board(Board),
-    generate_possible_moves(Board, AIPlayer, PossibleMoves),
-    filter_valid_moves(Board, AIPlayer, PossibleMoves, ValidMoves),
-    random_move(ValidMoves, SelectedMove),
-
-    convert_to_format(SelectedMove, FormattedMove),
-    print_chosen_move(FormattedMove),
-
-    apply_move(Board, AIPlayer, SelectedMove, NewBoard).
-
-
-
-
-
-
-
-% temporario para testar
-move_piece(Board, [X1, Y1, X2, Y2], UpdatedBoard) :-
-    nth0(Y1, Board, Row1),
-    nth0(X1, Row1, Piece),
-    update_board(Board, X1, Y1, empty, TempBoard),
-    update_board(TempBoard, X2, Y2, Piece, UpdatedBoard).
-
-update_board(Board, X, Y, Value, UpdatedBoard) :-
-    nth0(Y, Board, Row),
-    replace_element(Row, X, Value, UpdatedRow),
-    replace_element(Board, Y, UpdatedRow, UpdatedBoard).
-
-replace_element(List, Index, Value, UpdatedList) :-
-    nth0(Index, List, _, Rest),
-    nth0(Index, UpdatedList, Value, Rest).
 
 push(Board, Player, FinalPushGameState):-
-    ( Player == ai -> 
-        % If the player is AI, skip the push phase for now
-        write('AI push phase skipped for now.'), nl,
-        FinalPushGameState = Board  % Assuming you just want to keep the board state unchanged for now
+    
+    display_board(Board),
+    write('Player Turn: '), write(Player), nl,
+    write('Push-Move number: '), write(3), nl,
+    write('Mandatory push!'), nl,nl,nl,nl,nl,nl,
+
+    read_user_input(Move), nl,
+    convert_to_index(Board, Move, [PieceCol,PieceRow, PushCol,PushRow], _Pieces),
+
+    (make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState) ->
+        true
         ;
-        % If the player is not AI, proceed with the push phase as usual
-        display_board(Board),
-        write('Player Turn: '), write(Player), nl,
-        write('Push-Move number: '), write(3), nl,
-        write('Mandatory push!'), nl,nl,
-
-        read_user_input(Move), nl,
-        convert_to_index(Board, Move, [PieceCol,PieceRow, PushCol,PushRow], _Pieces),
-
-        (make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState) ->
-            !
-            ;
-            write('Invalid push! Try again.'), nl,nl,
-            push(Board, Player, FinalPushGameState)
-        )
-    ).
+        
+        write('Invalid push! Try again.'), nl,nl,
+        
+        push(Board, Player, FinalPushGameState)
+        ).
 
 
 % update_board(+Board, +Player, +MoveType, -UpdatedBoard)/4

@@ -11,27 +11,10 @@ player_pieces(player1, w_round).
 player_pieces(player2, b_square).
 player_pieces(player2, b_round).
 
-% PVC
-player_pieces(player1, w_square).
-player_pieces(player1, w_round).
-player_pieces(ai, b_square).
-player_pieces(ai, b_round).
-
-% CVC
-player_pieces(ai1, b_square).
-player_pieces(ai1, b_round).
-player_pieces(ai2, w_square).
-player_pieces(ai2, w_round).
-
 
 change_player(player1,player2).
 change_player(player2,player1).
 
-change_player(player1, ai).
-change_player(ai, player1).
-
-change_player(ai1, ai2).
-change_player(ai2, ai1).
 
 
 
@@ -194,25 +177,6 @@ valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol) :-
     empty_cell(Board, DestRow-DestCol), %DestinationPosition needs to be an empty cell
     once(valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, [])).
 
-% Find all unique valid moves and remove duplicates
-find_unique_valid_moves(Board, Player, CurrRow-CurrCol, DestRow-DestCol, UniqueMoves) :-
-    findall(
-        Move,
-        valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, Move),
-        Moves
-    ),
-    remove_duplicates(Moves, UniqueMoves).
-
-% Remove duplicates from a list of moves
-remove_duplicates([], []).
-remove_duplicates([Head|Tail], UniqueList) :-
-    member(Head, Tail),
-    !,
-    remove_duplicates(Tail, UniqueList).
-remove_duplicates([Head|Tail], [Head|UniqueList]) :-
-    \+ member(Head, Tail),
-    remove_duplicates(Tail, UniqueList).
-   
 
 % Check that none of the cells in ResultCells are anchor pieces for Opponent
 check_no_anchor_pieces(ResultCells, Opponent) :-
@@ -327,14 +291,15 @@ player_lost_game(Board, Player):-
 
 find_valid_push_moves(Board, Player, ValidPushMoves) :-
     get_player_pieces_lists(Board, Player, ListOfPlayerSquares, _ListOfPlayerRounds),
-    findall(
+
+    setof(
         [PieceRow-PieceCol, PushRow-PushCol, ResultPushCells],
         (
             member(PieceRow-PieceCol, ListOfPlayerSquares),
             valid_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, ResultPushCells)
         ),
         ValidPushMoves
-    ).
+    ) .
 
 %Auxilliar predicate to unify List of Pieces
 get_all_player_pieces(Board, Player,ListOfPlayerPositionsPieces ):-
@@ -388,7 +353,6 @@ find_move_game_states(Board, Player, ListOfNewGameStates):-
         make_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, BoardGameState),
         \+player_cant_push(BoardGameState-Player) % assegurar que não são escolhidos valid_moves que levam a BoardGameState
 
-
     ), ListOfNewGameStates
     
     
@@ -398,14 +362,14 @@ find_move_game_states(Board, Player, ListOfNewGameStates):-
 %find_push_game_states(+Board, +Player, +ListOfNewGameStates)
 %Predicado para obter todos os GameStates resultantes para todos os ValidPushMoves possíves
 find_push_game_states(Board, Player, ListOfNewGameStates):-
+    
     find_valid_push_moves(Board, Player, ValidPushMoves),
     findall(BoardGameState,
-
+    
     (
         member([PieceRow-PieceCol, PushRow-PushCol, _ResultPushCells], ValidPushMoves),
-        make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, BoardGameState),
+        once(make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, BoardGameState)),
         \+ player_lost_game(BoardGameState, Player) %AI will not choose moves after push , the player push his own piece out of the board
-
     ), ListOfNewGameStates
 
     ).
@@ -427,17 +391,21 @@ player_cant_push(Board-Player):-
 
 game_over(Board-Player, Winner):-
     player_lost_game(Board, Player),
+    write('CHeck game over ?!?!?Inside1'),nl,
     change_player(Player, Winner).
 
 game_over(Board-Player, Winner):-
     player_lost_game(Board, Player),
     player_cant_push(Board-Player),
+    write('CHeck game over ?!?!?Inside2'),nl,
     change_player(Player, Winner).
+    
 
-%case when Player push a piece out of the Board, the winner is Player !
+%case when Player push a piece out of the Opponent of the Board, the winner is Player !
 game_over(Board-Player, Winner):- 
     change_player(Player, Opponent),
     player_lost_game(Board, Opponent),
+    write('CHeck game over ?!?!?Inside3'),nl,
     change_player(Opponent, Winner).
    
    
@@ -504,14 +472,13 @@ evaluate_mobility(GameState, Player, Value):-
     evaluate_push_mobility(GameState, Player, Value1),
     evaluate_move_mobility(GameState, Player, Value2),
     evaluate_round_pieces_mobility(GameState, Player, Value3),
+    %add more
     Value is Value1 + Value2 + Value3.
 
 
 %value(+GameState, +Player, -Value):-
 value(GameState, Player, Value):-
-    evaluate_mobility(GameState,Player,Value).
-% Heuristic algorithm predicate to do an AI that simulates n (We chooses this) "Optimal" GameStates for a given Player(Him)
-% where he also simulate the responses for every simulated "Optimal " GameState from 1... n
+   evaluate_mobility(GameState,Player,Value).
 
 
 evaluate_game_state_list(ListGameStates, Player, SortedListGameStateValue):-
@@ -521,36 +488,3 @@ evaluate_game_state_list(ListGameStates, Player, SortedListGameStateValue):-
     ),ListGameStateValue
     ), keysort(ListGameStateValue, SortedListGameStateValue).
     
-% Helper predicate to check if the value matches the best value
-equal_value(BestValue, Value-_) :-
-    BestValue == Value.
-
-ai_move_game_state(GameState, Player, Val-RandomBestGameState):-
-    find_move_game_states(GameState, Player, ListOfNewGameStates),
-    change_player(Player, Opponent),
-   
-    evaluate_game_state_list(ListOfNewGameStates, Opponent, SortedListGameStateValue),
-    
-    SortedListGameStateValue = [BestValue-_|_],
-    
-    include(equal_value(BestValue), SortedListGameStateValue, BestGameStates),
-    
-    random_member(Val-RandomBestGameState, BestGameStates).
-    %check also mora Val-FinalGameState with same Val and choose using random choice
-
-
-count_moves(Val0, Val1, Val2, MoveCount):-
-    (Val0 =:= Val1, Val1 =:= Val2 -> MoveCount = 0;
-     Val0 =\= Val1, Val1 =:= Val2 -> MoveCount = 1;
-     Val0 =\= Val1, Val1 =\= Val2 -> MoveCount = 2).
-
-ai_move_turn(GameState, Player, Val-FinalGameState,MoveCount):-
-    evaluate_game_state_list([GameState], Player, [Val0-GameState]),
-
-    ai_move_game_state(GameState, Player, Val1-FirstMoveGameState),
-    ai_move_game_state(FirstMoveGameState, Player, Val2-SecondGameState),
-    keysort([Val0-GameState, Val1-FirstMoveGameState, Val2-SecondGameState ], ListTurnMoves),
-    ListTurnMoves = [BestValue-_|_],
-    include(equal_value(BestValue), ListTurnMoves, BestMoveGameStates),
-    random_member(Val-FinalGameState, BestMoveGameStates),
-    count_moves(Val0, Val1, Val2, MoveCount).

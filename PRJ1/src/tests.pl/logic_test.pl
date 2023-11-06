@@ -241,12 +241,12 @@ test_aux_predicates_game_ai:-
 
 run_all_tests:-
     
-    % test_board_basic_predicates,
+    test_board_basic_predicates,
 
-    % test_board_player_predicates,
-    % test_player_moves_predicates,
-    % test_player_complete_moves_predicates,
-    % test_player_make_push_predicates,
+    test_board_player_predicates,
+    test_player_moves_predicates,
+    test_player_complete_moves_predicates,
+    test_player_make_push_predicates,
     test_aux_predicates_game_ai.
 
 
