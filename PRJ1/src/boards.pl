@@ -67,6 +67,14 @@ display_columns(Size, Code) :- Size > 0,
   put_code(Code), write('   '),
   S is Size-1, C is Code+1,
   display_columns(S, C).
+% display_columns(+Size, +Code)
+% Computação e visualização das colunas do tabuleiro de acordo com o seu tamanho.
+display_columns(0, _):-!.
+display_columns(Size, Code) :- Size > 0,
+  put_code(Code), write('   '),
+  S is Size-1, C is Code+1,
+  display_columns(S, C).
+
 
 %second version
 

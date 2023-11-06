@@ -91,3 +91,19 @@ print_row(Char, Length) :-
     write(Char),
     NewLength is Length - 1,
     print_row(' ', NewLength).
+
+    
+game_mode_menu :-
+    write('GAME MODE'), nl,
+    write('1. Player vs Player'), nl,
+    write('2. Player vs Computer - Random'), nl,
+    write('3. Computer vs Computer - Random'), nl,
+    write('0. Back'), nl.
+
+title :-
+    write(' ____  _____ '), nl,
+    write('|  _ \\|  ___|'), nl,
+    write('| |_) | |_   '), nl,
+    write('|  __/|  _|  '), nl,
+    write('|_|   |_|    '), nl,
+    write('             '), nl.
