@@ -8,7 +8,7 @@ initial_board2([
     [out,empty,b_square,b_round,b_square,w_square,empty,empty,empty,out],
     [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
     [out,out,out,empty,w_square,empty,empty,empty,out,out],
-    [out,out,sr,sr,sr,sr,sr,out,out,out] ] ).
+    [out,out,sr,sr,sr,sr,sr,out,out,out]]).
 
 % ============================= Predicates to manipulate and create different Boards with different sizes, number of Pieces etc ============================
 %Predicate to create board with given SizeRow and SizeCol

@@ -62,6 +62,15 @@ game_mode_op(7) :-
     clear_screen,
     start_game(7).
 
+game_mode_op(8) :-
+    write('Choose a Number (N)'), nl,
+    read(N),
+    write('Choose a  Game Mode (1-7)'), nl,
+    read(M),
+    start_custom_game(N,M).
+
 game_mode_op(_Other) :-
     write('Invalid choice. Please select a valid option.'), nl,
     game_mode_choice.
+
+

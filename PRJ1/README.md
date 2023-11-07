@@ -109,8 +109,8 @@ O menu principal, acedido através do predicado `main_menu/0`, oferece ao jogado
 
 Após o início do jogo, o jogador é convidado pelo predicado `game_mode_choice/0` a selecionar o tipo de jogo que deseja jogar, sendo-lhe apresentadas as opções: `PvP` , `PvC` e `CvC`. 
 Tendo duas IAs , criamos várias combinações de modos de jogo. Algumas opções incluem (PvP), Jogador vs. Computador com AI de estratégia aleatória ou avançada (PvC), e Computador vs. Computador, onde ambos utilizam estratégias avançadas ou uma mistura com aleatórias (CvC).
-# todo - CHANGE PIC
-![](assets/game_mode_menu.png)
+
+![](assets/game_mode_2.png)
 
 Considerando que o equilíbrio entre o número de peças é influenciado pelo formato do tabuleiro, optámos por manter o tamanho do tabuleiro inalterado, não oferecendo a opção de o modificar
 
@@ -152,7 +152,7 @@ São avaliadas três condições para verificar o fim de um jogo:
 
 - Vitória por Empurrar Peça do Oponente para Fora: Se um jogador consegue empurrar uma peça do oponente para fora do tabuleiro, esse jogador é declarado vencedor.
 
-#   TODO -- ADD PICTURE
+![](assets/game_over.png)
 
 ## 5. Avaliação do Estado do Jogo
 
@@ -186,12 +186,12 @@ O processo de tomada de decisão envolve a contagem de movimentos efetuados com 
 
 # Conclusões
 
-
 ## Limitações
-
-
+- As IA não funcionam correctamente com as boards geradas pelo utilizador.
 
 ## Melhorias
+
+- Gostariamos de desenvolver heurísticas mais complexas que levem em conta não apenas a mobilidade e a capacidade do push, mas também a formação de padrões e potenciais armadilhas para o oponente.
 
 
 # Bibliografia

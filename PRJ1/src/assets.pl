@@ -98,7 +98,7 @@ game_mode_menu :-
     write('5. Computer vs Computer -  Advanced'), nl,
     write('6. Computer vs Computer - Advanced-Random'), nl,
     write('7. Computer vs Computer - Advanced'), nl,
-
+    write('8. Create a Custom Board'), nl,
     write('0. Back'), nl.
 
 title :-

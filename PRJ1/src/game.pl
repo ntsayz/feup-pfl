@@ -297,3 +297,57 @@ push(Board, Player, FinalPushGameState):-
 % ==============================================================================
 
 
+start_custom_game(N, Mode) :-
+    Rows is N,
+    Columns is (5 * N) // 3,  % Calculate columns based on the 3:5 ratio (from 6x10 default Board)
+    generate_custom_board(Rows, Columns, CustomBoard),
+    game_loop(CustomBoard, Mode).
+
+
+generate_custom_board(Rows, Columns, Board) :-
+    InnerRows is Rows - 2,  
+    InnerColumns is Columns - 2, 
+    generate_inner_board(InnerRows, InnerColumns, InnerBoard),
+    add_outer_border(InnerBoard, Board).
+
+% inner board, without the 'out' and 'sr' border
+generate_inner_board(Rows, Columns, Board) :-
+    findall(Row, (between(1, Rows, _), generate_inner_row(Columns, Row)), Board).
+
+
+generate_inner_row(Columns, Row) :-
+    findall(Cell, (between(1, Columns, _), random_inner_cell(Cell)), Row).
+
+% generate a random cell, either empty or with a piece  -- deveria ser dynamic de acordo com o ratio
+random_inner_cell(Cell) :-
+    random_member(Cell, [empty,,empty,w_round, w_square, b_round, b_square]).
+
+% add the 'out' and 'sr' border to the inner board
+add_outer_border(InnerBoard, Board) :-
+    length(InnerBoard, Length),
+    InnerRowLength is Length + 2,  % Length is already accounting for vertical 'sr'
+    generate_outer_row(InnerRowLength, OuterRow), 
+    append([OuterRow], InnerBoard, TempBoard),
+    append(TempBoard, [OuterRow], Board).  
+
+
+generate_outer_row(N, Row) :-
+    findall(out, between(1, N, _), Row).
+
+add_side_rails(Board, [TopRow|BottomRowsWithRails]) :-
+    append([sr|_], [sr], SideRails),
+    maplist(add_side_rails_to_row(SideRails), Board, BottomRowsWithRails).
+
+
+add_side_rails_to_row(Row, [sr|RowWithSR]) :-
+    append(Row, [sr], RowWithSR).
+
+
+game_loop(Board, Mode) :-
+    switch(Mode, [
+        1: game_loop(Board, player1),
+        2: game_loop(Board, player1, ai2_rand),
+        3: game_loop(Board, player1, ai2_advanc),
+        4: game_loop(Board, ai1_rand, player2),
+        5: game_loop(Board, ai1_advanc, ai2_advanc)
+    ]).
