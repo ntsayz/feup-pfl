@@ -19,16 +19,17 @@ change_player(player2,player1).
 
 
 
+:- dynamic size_row/1.
+:- dynamic size_col/1.
+:- dynamic anchor_piece/2 .
+:- dynamic number_pieces/1 .
+
 %anchor_piece(+Player,+Board,+CellPiece)/3
 %Determinar que peça do Player no Board em CellPiece:Row-Col fica com âncora
 %anchor_piece(Player,Board,Row-Col):-
 
 %Size of Board/Matrix will always be quadratic axb ( different number of rows and Cols and every row have the same number of Col)
 %size of the board maybe can change by options ?
-:- dynamic size_row/1.
-:- dynamic size_col/1.
-:- dynamic anchor_piece/2 .
-:- dynamic number_pieces/1 .
 
 anchor_piece(null-null, noplayer).
 change_anchor_piece(NewRow-NewCol, Player):-
@@ -404,7 +405,6 @@ game_over(Board-Player, Winner):-
 game_over(Board-Player, Winner):- 
     change_player(Player, Opponent),
     player_lost_game(Board, Opponent),
-    write('CHeck game over ?!?!?Inside3'),nl,
     change_player(Opponent, Winner).
    
    

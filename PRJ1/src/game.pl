@@ -28,7 +28,7 @@ start_game(4) :-
 start_game(5) :-
     initial_board2(Board),
    
-    game_loop(Board, ai1_rand, ai2_advanc).
+    game_loop(Board, ai2_advanc, ai1_rand ).
 
 
 % predicate to switch players
@@ -39,21 +39,21 @@ switch_turn(CurrentPlayer, NextPlayer):-
 game_loop(Board, CurrentPlayer) :-
     player_turn(Board, CurrentPlayer, 1, BoardAfterMoves),
     (   game_over(BoardAfterMoves-CurrentPlayer, Winner) ->
-        % If the game is over after player_turn, announce the winner and return to the main menu.
+       
         announce_winner(Winner),
         main_menu
-    ;   % Otherwise, attempt to push and continue the game.
+    ;   
         (   push(BoardAfterMoves, CurrentPlayer, FinalTurnBoard)->
-            % If push is successful, check for game over condition again.
+            .
             (   game_over(FinalTurnBoard-CurrentPlayer, Winner) ->
-                % If the game is over after push, announce the winner and return to the main menu.
+                
                 announce_winner(Winner),
                 main_menu
-            ;   % If the game is not over, switch players and continue the game loop.
+            ;   
                 switch_turn(CurrentPlayer, NextPlayer),
                 game_loop(FinalTurnBoard, NextPlayer)
             )
-        ;   % If push fails, it means the current player cannot move. The game is over.
+        ;  
             handle_no_push_possible(CurrentPlayer)
         )
     ).
@@ -96,16 +96,16 @@ game_loop(Board, ai2_rand, player1):-
     (   game_over(RandomGameState-player2, Winner) ->
         announce_winner(Winner),
         main_menu
-        ;   % Otherwise, attempt to push and continue the game.
+        ;   
        ( ai_random_push(RandomGameState, player2, FinalTurnBoard)->
             display_board(FinalTurnBoard),
             display_turn_info(ai2_rand, 3),
             
-            %Check if player after move, can push
+            
         (   game_over(FinalTurnBoard-player2, Winner) ->
             announce_winner(Winner),
             main_menu
-        ;   % If the game is not over, switch players and continue the game loop.
+        ;   
             game_loop(FinalTurnBoard,player1, ai2_rand)
 
         )
@@ -126,17 +126,17 @@ game_loop(Board, ai1_rand, ai2_advanc):-
     (   game_over(RandomGameState-player1, Winner) ->
         announce_winner(Winner),
         main_menu
-        ;   % Otherwise, attempt to push and continue the game.
+        ;   
        ( ai_random_push(RandomGameState, player1, FinalTurnBoard)->
             display_board(FinalTurnBoard),
             display_turn_info(ai1_rand, 3),
             
-            %Check if player after move, can push
+            
         (   game_over(FinalTurnBoard-player1, Winner) ->
             announce_winner(Winner),
             main_menu
-        ;   % If the game is not over, switch players and continue the game loop.
-            game_loop(FinalTurnBoard,player1, ai1_rand)
+        ;   
+            game_loop(FinalTurnBoard,ai2_advanc, ai1_rand)
 
         )
         ;
@@ -150,17 +150,17 @@ game_loop(Board, ai1_rand, ai2_advanc):-
 
 
 game_loop(Board, ai2_advanc, ai1_rand):-
-    ai_move_turn(Board, player2, Val-FinalGameState,MoveCount),
+    ai_move_turn(Board, player2, _Val-FinalGameState,MoveCount),
     display_board(FinalGameState),
     display_turn_info(ai2_advanc, MoveCount),
-    write('Pontuacao do estado escolhido Move: '), write(Val), nl, nl,
+   
     (   game_over(FinalGameState-player2, Winner) ->
         announce_winner(Winner),
         main_menu
         ;   
        
-       ( ai_push_move(FinalGameState, player2, Value-FinalTurnBoard-_PushRow-_PushCol)->
-            write('Pontuacao do estado escolhido Push: '), write(Value), nl, nl,
+       ( ai_push_move(FinalGameState, player2, _Value-FinalTurnBoard-_PushRow-_PushCol)->
+           
             display_board(FinalTurnBoard),
             display_turn_info(ai2_advanc, 3),
             
@@ -221,14 +221,14 @@ game_loop(Board, ai2_advanc, player1):-
         
         announce_winner(Winner),
         main_menu
-        ;   % Otherwise, attempt to push and continue the game.
+        ;   
         (push(BoardAfterMoves, player1, FinalTurnBoard)->
             display_board(FinalTurnBoard),
             (   game_over(FinalTurnBoard-player1, Winner) ->
                 
                 announce_winner(Winner),
                 main_menu
-            ;   % If the game is not over, switch players and continue the game loop.
+            ;   
                 game_loop(FinalTurnBoard, ai2_advanc, player1)
             )
             ;   
@@ -241,10 +241,10 @@ game_loop(Board, ai2_advanc, player1):-
 %Computer vs Computer-Advanced
 
 game_loop(Board, ai1_advanc, ai2_advanc):-
-    % display_board(Board),
+    
     ai_move_turn(Board, player1, _Val-FinalGameState,MoveCount),
     display_board(FinalGameState),
-    display_turn_info(ai2_advanc, MoveCount),
+    display_turn_info(ai1_advanc, MoveCount),
     
     (   game_over(FinalGameState-player1, Winner) ->
         announce_winner(Winner),
@@ -253,7 +253,7 @@ game_loop(Board, ai1_advanc, ai2_advanc):-
        
        ( ai_push_move(FinalGameState, player1, _Value-FinalTurnBoard-_PushRow-_PushCol)->
            
-            display_turn_info(ai2_advanc, 3),
+            display_turn_info(ai1_advanc, 3),
             display_board(FinalTurnBoard), nl,
             
         (   game_over(FinalTurnBoard-player1, Winner) ->
