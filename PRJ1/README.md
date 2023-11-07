@@ -99,7 +99,7 @@ O estado do jogo é definido por um tabuleiro `Board` e o jogador da vez `Curren
 [out, out, sr, sr, sr, sr, sr, out, out, out]]
 ~~~
 
-Internamente os jogadores são representados como `player1` e `player2` em jogos *PvP*, `ai` e `player` em *PvC*, e `ai1` ou `ai2` em partidas *CvC*.
+Internamente, os jogadores são representados da seguinte maneira: em jogos Jogador vs. Jogador (PvP), como player1 e player2; em jogos Jogador vs. Computador (PvC), como player1 e ai2_rand ou ai2_advanc dependendo da complexidade da inteligência artificial; e em partidas Computador vs. Computador (CvC), como ai1_advanc e ai2_advanc para estratégias avançadas da IA.
 
 
 ## 2. Visualização do estado de Jogo
@@ -108,12 +108,13 @@ O menu principal, acedido através do predicado `main_menu/0`, oferece ao jogado
 
 
 Após o início do jogo, o jogador é convidado pelo predicado `game_mode_choice/0` a selecionar o tipo de jogo que deseja jogar, sendo-lhe apresentadas as opções: `PvP` , `PvC` e `CvC`. 
-
+Tendo duas IAs , criamos várias combinações de modos de jogo. Algumas opções incluem (PvP), Jogador vs. Computador com AI de estratégia aleatória ou avançada (PvC), e Computador vs. Computador, onde ambos utilizam estratégias avançadas ou uma mistura com aleatórias (CvC).
+# todo - CHANGE PIC
 ![](assets/game_mode_menu.png)
 
 Considerando que o equilíbrio entre o número de peças é influenciado pelo formato do tabuleiro, optámos por manter o tamanho do tabuleiro inalterado, não oferecendo a opção de o modificar
 
-Prosseguimos com o jogo através de `game_loop/2`, que mantém o registo do tabuleiro e de qual jogador tem a vez, invocando `player_turn/4` para controlar o número de jogadas e processá-las, alterando assim o estado do jogo.
+Prosseguimos com o jogo através de `game_loop/2` e `game_loop/3`, que mantêmm o registo do tabuleiro e de qual jogador tem a vez, invocando `player_turn/4` ou `ai_move_turn/4` para controlar o número de jogadas do jogador e da IA e processá-las, alterando assim o estado do jogo.
 
 ![](assets/pvp_move_1.png)
 
@@ -143,24 +144,44 @@ Para um movimento ser considerado válido, a posição de destino deve estar vaz
 
 ## 4. Fim do Jogo 
 
-Tbd
+São avaliadas três condições para verificar o fim de um jogo: 
+
+- Perda por Falta de Peças: Um jogador perde se não tiver mais peças no tabuleiro. Isso é verificado pelo predicado player_lost_game, que calcula o número total de peças de um jogador e compara com o mínimo necessário para continuar o jogo.
+
+- Empate ou Perda por Impossibilidade de empurrar: Se um jogador não puder realizar nenhum empurrão, e esta condição também se aplicar ao oponente, o jogo resulta em empate. Isso é verificado pelo predicado players_cant_push_draw/2. Se apenas o jogador atual não puder empurrar, ele perde a partida, verificado por player_cant_push/1.
+
+- Vitória por Empurrar Peça do Oponente para Fora: Se um jogador consegue empurrar uma peça do oponente para fora do tabuleiro, esse jogador é declarado vencedor.
+
+#   TODO -- ADD PICTURE
 
 ## 5. Avaliação do Estado do Jogo
 
-Sendo o Push Fight um jogo de estratégia, implementamos uma série de heurísticas  que nos ajudaram a entender o game state o e projetar movimentos futuros. 
+A estratégia no jogo é implementada pelo uso de heurísticas que analisam o estado do jogo para compreender e antecipar jogadas futuras. 
 
-- *Força de uma posição* - peças próximas ao centro são consideradas mais fortes por terem mais opções de movimento, e as peças nas bordas como vulneráveis, pois estão mais próximas de serem empurradas.
-- Peças com mais opções de movimento podem proporcionar maior controle sobre o jogo.
-- Verificamos se qualquer jogador está a uma jogada de perder ou ganhar o jogo, o que deveria aumentar a urgência de ações defensivas ou ofensivas.
+Reconhecemos o valor de uma posição pela proximidade das peças ao centro do tabuleiro, atribuindo-lhes maior valor quanto mais opções de movimentos disponíveis. Em contrapartida, peças posicionadas nas bordas são vistas como vulneráveis, correndo um risco maior de serem empurradas para fora. 
+
+Esta avaliação do valor posicional e a capacidade de movimento de cada peça influencia diretamente as ações defensivas e ofensivas das IAs.
+
+- Utilizamos o predicado evaluate_mobility/3 para medir a mobilidade geral, considerando que peças centrais têm mais opções e, portanto, uma posição mais forte.
+- A capacidade de push é avaliada por evaluate_push_mobility/3, que indica o potencial de um jogador para realizar jogadas ofensivas.
+- O evaluate_game_state_list/3 ordena possíveis game states para identificar oportunidades imediatas de vitória ou derrota.
+- A função value/3 usa essas avaliações, permitindo decisões baseadas na qualidade e não apenas na quantidade de jogadas, focando na minimização de riscos e maximização de oportunidades.
 
 
 ## 6. Jogadas do Computador
 
-- **Random AI**
+- **IA Aleatória**
 
-Para cada peça da IA, são gerados todos os movimentos possíveis usando o predicado `generate_moves_for_piece/5` . Este predicado calcula, para uma posição específica de uma peça, todas as posições de destino válidas onde a peça poderia se mover.
+As jogadas desta IA iniciam com o find_move_game_states/3 que gera todos os movimentos válidos para as suas peças, excluindo aqueles que resultariam na incapacidade de empurrar. A escolha é aleatória, mas restringida a movimentos que mantêm o jogo viável para ela.
 
-Após a geração de todos os movimentos possíveis, é feita uma filtragem com o `filter_valid_moves/4`, que utiliza `is_valid_move/3` para assegurar que todos os movimentos considerados são permitidos. Só são mantidos os movimentos válidos na lista de movimentos possíveis, e desses é selecionado um de forma aleatória pelo predicado `random_move/2`.
+Após o movimento, a IA usa find_push_game_states/3 para identificar pushes válidos, evitando aqueles que a levariam a perder. O número de movimentos realizados é contabilizado em MoveCount e a seleção aleatória é feita random_member/2, garantindo que a IA jogue de forma imprevisível mas sem prejudicar-se.
+
+
+- **IA Avançada**
+
+Com o predicado ai_move_game_state/3, ela explora os possíveis movimentos para identificar aqueles que maximizam a posição estratégica, avaliando as jogadas com evaluate_game_state_list/3. Ao identificar múltiplos estados de jogo com o mesmo valor ótimo, ela faz uma seleção aleatória usando random_member/2 para escolher entre eles, evitando padrões previsíveis.
+
+O processo de tomada de decisão envolve a contagem de movimentos efetuados com count_moves/4, permitindo à IA decidir entre realizar zero, um ou dois movimentos antes do empurrão. O predicado ai_push_move/3 é utilizado para escolher o melhor empurrão, também baseando-se na avaliação estratégica dos estados de jogo pós-empurrão, assegurando que a IA atue de maneira sofisticada e com consideração tática, mantendo a competitividade do jogo.
 
 
 # Conclusões
@@ -175,9 +196,9 @@ Após a geração de todos os movimentos possíveis, é feita uma filtragem com 
 
 # Bibliografia
 - [Push Fight - Strategic analysis](https://www.abstractgames.org/pushfight.html)
-- [Push Fight Online CvC demo](https://styx.verver.ch/pushfight/)
+- [Push Fight Online CvC](https://styx.verver.ch/pushfight/)
 - [Website Oficial do Jogo - pushfightgame.com](https://pushfightgame.com/)
-- [Computational Complexity of Generalized Push Figh](https://pushfightgame.com/index_htm_files/Push%20Fight%20MIT%20Paper.pdf)
+- [Computational Complexity of Generalized Push Fight](https://pushfightgame.com/index_htm_files/Push%20Fight%20MIT%20Paper.pdf)
 
 
 
