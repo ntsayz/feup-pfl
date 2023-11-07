@@ -12,11 +12,15 @@ ai_random_move_turn(GameState, Player, RandomGameState,MoveCount):-
     
 ai_random_push(GameState, Player, RandPushGameState):-
     find_push_game_states(GameState, Player, ListOfNewGameStates),
-    random_member(RandPushGameState, ListOfNewGameStates).
+    extract_board_game_states(ListOfNewGameStates, BoardGameStates),
+    random_member(RandPushGameState, BoardGameStates),
+    find_push_coordinates(RandPushGameState, ListOfNewGameStates, PushRow-PushCol),
+    change_anchor_piece(PushRow-PushCol, Player).
+    
 
 
 %Advanced Ai
-equal_value(BestValue, Value-_) :-
+equal_value(BestValue, Value-_):-
     BestValue == Value.
 
 ai_move_game_state(GameState, Player, Val-FinalGameStateWithRand):-
@@ -47,16 +51,43 @@ ai_move_turn(GameState, Player, Val-FinalGameState,MoveCount):-
     ListTurnMoves = [BestValue-_|_],
     include(equal_value(BestValue), ListTurnMoves, BestMoveGameStates),
     random_member(Val-FinalGameState, BestMoveGameStates),
-    count_moves(Val0, Val1, Val2, MoveCount).
-%Predicate of advanced ai to do a push_move
-ai_push_move(GameState, Player, Val-FinalGameState):-
+    count_moves(Val0, Val1, Val2, MoveCount),
+    write(FinalGameState), nl,nl.
+
+
+extract_state(BoardGameState-_-_, BoardGameState).
+extract_board_game_states(ListOfNewGameStates, BoardGameStates) :-
+    maplist(extract_state, ListOfNewGameStates, BoardGameStates).
+
+
+equal_value2(Value, Value-_GameState).
+find_push_coordinates(FinalGameState, ListOfNewGameStates, PushRow-PushCol) :-
+    member(FinalGameState-PushRow-PushCol, ListOfNewGameStates).
+
+
+
+
+ai_push_move(GameState, Player, Val-FinalGameState-PushRow-PushCol):-
 
     find_push_game_states(GameState, Player, ListOfNewGameStates),
+    extract_board_game_states(ListOfNewGameStates, BoardGameStates),
     change_player(Player, Opponent),
-    evaluate_game_state_list(ListOfNewGameStates, Opponent, SortedListGameStateValue),
-    SortedListGameStateValue = [BestValue-_|_],
-    include(equal_value(BestValue), SortedListGameStateValue, BestPushGameStates),
-    random_member(Val-FinalGameState, BestPushGameStates).
+
+
+    evaluate_game_state_list(BoardGameStates, Opponent, SortedListGameStateValue),
+    
+   
+   
+    include(equal_value2(_MinValue), SortedListGameStateValue, MinPushGameStates),
+    
+  
+    random_member(Val-FinalGameState, MinPushGameStates),
+   
+    find_push_coordinates(FinalGameState, ListOfNewGameStates, PushRow-PushCol),
+    change_anchor_piece(PushRow-PushCol, Player).
+
+
+
 
 
 

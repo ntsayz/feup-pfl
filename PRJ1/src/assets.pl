@@ -12,36 +12,35 @@ rules :-
     nl.
 
 
-% Predicate to draw a square banner with a title and two stick figures.
+% Predicates para desenhar um banner com stick figures.
 draw_banner(Columns):-
     Title = "Push-Fight Game !  ",
-    BannerHeight is Columns,  % Calculate the height of the banner
-    StickManHeight is BannerHeight // 2,  % Calculate the height of the
+    BannerHeight is Columns,  
+    StickManHeight is BannerHeight // 2, 
     Middle is Columns // 2 + 6,
-    % Calculate padding for title and stick figures
+    
     length(Title, TitleLength),
     TitlePad is (Columns - TitleLength) // 2,
-    % Draw the banner
+   
     nl,
     draw_top_bottom(Columns),
     draw_centered_text(Title, Columns, TitlePad),
-    % draw_empty_line(Columns),
+    
     print_stick_man_line(Middle, Columns,StickManHeight),
     draw_top_bottom(Columns).
 
-% Helper predicate to draw the top and bottom border of the banner.
+
 draw_top_bottom(Columns) :-
     fill_line(':', Columns),
     nl.
 
-% Helper predicate to draw an empty line with colons on the sides.
+
 draw_empty_line(Columns) :-
     write(':'),
     fill_line(' ', Columns - 2),
     write(':'),
     nl.
 
-% Helper predicate to draw centered text within the banner.
 draw_centered_text(Text, Columns, _Pad) :-
     length(Text, TextLength),
     SidePad is (Columns - TextLength) // 2 +2,
@@ -50,7 +49,7 @@ draw_centered_text(Text, Columns, _Pad) :-
     fill_line(' ', SidePad), 
     nl.
 
-% Helper predicate to fill a line with a specific character.
+
 fill_line(Char, Length) :-
     ( Length > 0 ->
         write(Char),
@@ -94,11 +93,8 @@ game_mode_menu :-
     write('1. Player vs Player'), nl,
     write('2. Player vs Computer - Random'), nl,
     write('3. Player vs Computer - Advanced'), nl,
-    write('4. Computer vs Player - Advanced'), nl,
-    write('5. Computer vs Computer -  Advanced'), nl,
-    write('6. Computer vs Computer - Advanced-Random'), nl,
-    write('7. Computer vs Computer - Advanced'), nl,
-
+    write('4. Computer vs Computer -  Advanced'), nl,
+    write('5. Computer vs Computer - Random-Advanced'), nl,
     write('0. Back'), nl.
 
 title :-

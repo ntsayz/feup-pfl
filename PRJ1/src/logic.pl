@@ -364,7 +364,7 @@ find_move_game_states(Board, Player, ListOfNewGameStates):-
 find_push_game_states(Board, Player, ListOfNewGameStates):-
     
     find_valid_push_moves(Board, Player, ValidPushMoves),
-    findall(BoardGameState,
+    findall(BoardGameState-PushRow-PushCol,
     
     (
         member([PieceRow-PieceCol, PushRow-PushCol, _ResultPushCells], ValidPushMoves),
@@ -391,13 +391,12 @@ player_cant_push(Board-Player):-
 
 game_over(Board-Player, Winner):-
     player_lost_game(Board, Player),
-    write('CHeck game over ?!?!?Inside1'),nl,
     change_player(Player, Winner).
 
 game_over(Board-Player, Winner):-
     player_lost_game(Board, Player),
     player_cant_push(Board-Player),
-    write('CHeck game over ?!?!?Inside2'),nl,
+ 
     change_player(Player, Winner).
     
 
@@ -430,22 +429,7 @@ game_over(Board-Player, Winner):-
         per turn, the problem becomes polynomially solvable again.
 */
 
-%predicate/heuristics to evaluate values of moves, gameStates etc. 
-% predicate to evaluate the Value of a given gameState w.r.t. a given Player1/2 . For GameStates with same value, use real random choose algorithm to avoid Players detect any pattern on the choosen moves
-%Heuristic algorithm: predicate to do an AI that chooses the "best" 0, 1 or 2 moves + push move from a set of possible moves
-
-% give different weights for different heuristic evaluation above ?
-%number of possible push moves: less possible push moves for the opponent, less value The GameState has, better for Player
-%Write more from: https://www.abstractgames.org/pushfight.html
-% For a given, GameState, if opponent squares have less possible push_moves, Val is less
-%For given GameState, if opponent round_pieces, have less valid_moves, this gives less pontuation to this GameState then others
-%Rounde_pieces cant push, so they are more vulnerable to be pushing out
-%More Round_pieces next to edge locations, GameState has less points
-%THe more roundPieces are separated from the SquarePieces of the samePlayer, less value has the GameState for the Opponnent
-%The more roundPieces are far from the centre of the board, less value have the GameState for the Opponent that Player wants to minimize
-%For given GameState, square_pieces next to edge locations give less points ( but less negative then Round_pieces)
-%For given GameState, less roundPiece that have squares between cloosest edge and circle, don have the good defenders squares, so GameState have less Value for Opponent
-
+%
 
 evaluate_push_mobility(GameState, Player, Value):-
     find_valid_push_moves(GameState, Player, ValidPushMoves),
@@ -465,7 +449,7 @@ evaluate_round_pieces_mobility(GameState, Player, Value):-
     Value is 3* (LengthOfValidRoundMoves // N ) .
 
 
-%Add mais mobility evaluations
+%Mais  mobility evaluations
 
 evaluate_mobility(GameState, Player, Value):-
     
@@ -476,9 +460,30 @@ evaluate_mobility(GameState, Player, Value):-
     Value is Value1 + Value2 + Value3.
 
 
+% Predicados para contabilizar se jogador se mantém no centro do tabuleiro, pois tem vantagens
+is_middle_square(Row, Col) :-
+    between(2, 4, Row), % Assuming rows 2 to 5 are considered the middle
+    between(3, 6, Col). % Assuming columns 3 to 6 are considered the middle
+
+
+count_player_middle_pieces(Board, Player, Count) :-
+    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, _ListOfPlayersRounds),
+    include(is_middle_piece(Board), ListOfPlayerSquares, MiddlePlayerSquares),
+    length(MiddlePlayerSquares, Count).
+
+
+is_middle_piece(Board, Row-Col) :-
+    is_middle_square(Row, Col),
+    (player_square_piece(Board, _, Row-Col) ; 
+    player_round_piece(Board, _, Row-Col) ).
+
+
+
 %value(+GameState, +Player, -Value):-
-value(GameState, Player, Value):-
-   evaluate_mobility(GameState,Player,Value).
+value(GameState, Player, Result):-
+   evaluate_mobility(GameState,Player,Value),
+   count_player_middle_pieces(GameState, Player, MiddlePiecesCount),
+   Result is Value + (MiddlePiecesCount * 2).
 
 
 evaluate_game_state_list(ListGameStates, Player, SortedListGameStateValue):-
