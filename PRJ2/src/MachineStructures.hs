@@ -21,19 +21,24 @@ data Inst =
 
 type Code = [Inst]
 -- Using GADTs (Generalized Algebraic Data Types): Integers and Booleans ( booleans are represented as Integer)
-data StackValue where
-  IntVal :: Integer -> StackValue
-  BoolVal :: Bool -> StackValue
+data StackValue
+    = IntVal Integer
+    | TT
+    | FF
 
 -- Here we are deriving Show to use on stack2Str to convert the stack to a string
 instance Show StackValue where
   show (IntVal xs) = show xs
-  show (BoolVal xs) = show xs
+  show TT = show True
+  show FF = show False
 -- To compare two StackValues on Tests
 instance Eq StackValue where
-    (IntVal x) == (IntVal y) = x == y
-    (BoolVal x) == (BoolVal y) = x == y
-    _ == _ = False
+  (IntVal x) == (IntVal y) = x == y
+  TT == TT = True
+  FF == FF = True
+  _ == _ = False
+
+
 
 
 
@@ -41,7 +46,33 @@ instance Eq StackValue where
 
 -- With the GADT definition above, we define the Stack type to that can deal with Integers and Booleans on the same stack
 type Stack = [StackValue]
+-- Here we define operations on the stack ( LIFO)
+push :: StackValue -> Stack -> Stack
+push x ys = x:ys
 
+true :: Stack -> Stack
+true = push TT
+
+false :: Stack -> Stack
+false = push FF
+
+pop :: Stack -> Stack
+pop  (_:xs) = xs
+pop _ = error "Stack.pop: empty stack"
+
+top :: Stack -> StackValue
+top (x:_) = x
+top _ = error "Stack.top: empty stack"
+
+createEmptyStack :: Stack
+createEmptyStack = []
+
+isEmpty :: Stack -> Bool
+isEmpty [] = True
+isEmpty _ = False
+
+stack2Str :: Stack -> String
+stack2Str = intercalate "," . map show
 
 
 
@@ -56,14 +87,10 @@ instance Show State where
     intercalate "," . map (\(k, v) -> k ++ "=" ++ show v) . sortOn fst $ Map.toList st
 
 
-createEmptyStack :: Stack
-createEmptyStack = []
+
 
 createEmptyState :: State
 createEmptyState = State Map.empty
-
-stack2Str :: Stack -> String
-stack2Str = intercalate "," . map show
 
 
 state2Str :: State -> String

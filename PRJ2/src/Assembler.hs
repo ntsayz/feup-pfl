@@ -27,4 +27,21 @@ module Assembler where
 
 import MachineStructures
 
+
+
+-- Transition function for assembler 
+exec :: (Code, Stack, State) -> (Code, Stack, State)
+exec (instr:code, stack, state) = 
+    case instr of
+        Push n -> (code, push (IntVal n) stack, state)
+        Tru -> (code, true stack, state)
+        Fals -> (code, false stack, state)
+
+-- to run the code using exec for every instruction for a givan code, stack and state
+runState :: State -> Int
+
+
 -- run :: (Code, Stack, State) -> (Code, Stack, State)
+
+run :: (Code, Stack, State) -> (Code, Stack, State)
+run ([], stack, state) = ([], stack, state)  -- No instructions left

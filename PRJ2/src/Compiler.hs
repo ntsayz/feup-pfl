@@ -7,6 +7,15 @@ machine instructions (as defined in part 1). The main compiler is function:
 • compile :: [Stm] → Code
 
 
+Traduz uma expressão numa sequência de instruções
+Análogo a eval, mas gera instruções em vez valores
+CHECK THIS:
+Invariante
+A execução de compile e acrescenta o valor de e ao topo
+da pilha.
+
+
+
 -}
 
 module Compiler where

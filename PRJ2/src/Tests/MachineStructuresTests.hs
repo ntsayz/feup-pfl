@@ -19,8 +19,8 @@ import  Data.Map as Map
 testStackValueShow :: Test
 testStackValueShow = TestList [
     TestCase (assertEqual "for (show (IntVal 42))," "42" (show (IntVal 42))),
-    TestCase (assertEqual "for (show (BoolVal True))," "True" (show (BoolVal True))),
-    TestCase (assertEqual "for (show (BoolVal False))," "False" (show (BoolVal False)))
+    TestCase (assertEqual "for (show (TT))," "True" (show (BoolVal True))),
+    TestCase (assertEqual "for (show (FF))," "False" (show (BoolVal False)))
     ]
 
 

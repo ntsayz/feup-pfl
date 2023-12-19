@@ -28,6 +28,20 @@ prop_state2Str (State state) =
     expectedStr = intercalate "," . map (\(k, v) -> k ++ "=" ++ show v) $ sortedStateList
     stateStr = state2Str (State state)
 
+
+
+-- Check this : 
+-- Correção
+-- O interpretador implementa correctamente a semântica
+-- operacional:
+-- e ⇒ n se e só se eval e = n
+-- Prova: por indução estrutural sobre e.
+
+-- For compiler:
+-- Invariante
+-- A execução de compile e acrescenta o valor de e ao topo
+-- da pilha.
+
 main :: IO ()
 main = do
     quickCheck prop_createEmptyStack
