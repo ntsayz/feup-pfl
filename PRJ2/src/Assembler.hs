@@ -38,7 +38,9 @@ exec (instr:code, stack, state) =
         Fals -> (code, false stack, state)
 
 -- to run the code using exec for every instruction for a givan code, stack and state
-runState :: State -> Int
+runInstructions :: (Code, Stack, State) -> (Code, Stack, State)
+runInstructions ([], stack, state) = ([], stack, state)
+
 
 
 -- run :: (Code, Stack, State) -> (Code, Stack, State)
