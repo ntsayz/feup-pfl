@@ -6,6 +6,8 @@ import MachineStructures
 import Assembler
 import Test.HUnit hiding (State)
 import Data.Map as Map
+import Control.Exception (ErrorCall(..), evaluate, handle)
+
 
 
 
@@ -78,9 +80,13 @@ testEQUnderflow = TestList [
 --  assert an error
 assertError :: String -> a -> Assertion
 assertError msg action = 
-    handle (\(ErrorCall _) -> return ()) $ do
+    handle handler $ do
         evaluate action
         assertFailure msg
+  where
+    handler :: ErrorCall -> IO ()
+    handler _ = return ()
+
 -- We use this function to extract the second element of a triple, which is the stack (Code, *Stack*, State)
 snd3 :: (a, b, c) -> b
 snd3 (_, y, _) = y
