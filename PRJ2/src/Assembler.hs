@@ -102,8 +102,6 @@ exec (instr:code, stack, state) =
         Loop c1 c2 -> (loop c1 c2 ++ code, stack, state)
         Noop -> let (nextStack, nextState) = noop stack state
                 in (code, nextStack, nextState)
-        Equ -> --TODO
-        Le -> --TODO
         And -> --TODO
         Neg -> --TODO
         otherwise -> error $ "Run-time error"
