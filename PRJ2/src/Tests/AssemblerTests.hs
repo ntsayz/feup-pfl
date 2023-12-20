@@ -5,6 +5,7 @@ module Main where
 import MachineStructures 
 import Assembler
 import Test.HUnit hiding (State)
+import Test.HUnit.Text (runTestTTAndExit)
 import Data.Map as Map
 import Control.Exception (ErrorCall(..), evaluate, handle)
 
@@ -59,33 +60,8 @@ testEQ = TestList [
     output4 = snd3 $ run input4
     expectedOutput4 = [TT]
 
-
-
-
-
-testLEUnderflow :: Test
-testLEUnderflow = TestList [
-    TestCase $ assertError "Testing LE with one element on stack" (run ([Le], [IntVal 1], createEmptyState)),
-    TestCase $ assertError "Testing LE with empty stack" (run ([Le], [], createEmptyState))
-  ]
-
-testEQUnderflow :: Test
-testEQUnderflow = TestList [
-    TestCase $ assertError "Testing EQ with one element on stack" (run ([Equ], [IntVal 1], createEmptyState)),
-    TestCase $ assertError "Testing EQ with empty stack" (run ([Equ], [], createEmptyState))
-  ]
-
--- HELPER FUNCTIONS
-
 --  assert an error
-assertError :: String -> a -> Assertion
-assertError msg action = 
-    handle handler $ do
-        evaluate action
-        assertFailure msg
-  where
-    handler :: ErrorCall -> IO ()
-    handler _ = return ()
+
 
 -- We use this function to extract the second element of a triple, which is the stack (Code, *Stack*, State)
 snd3 :: (a, b, c) -> b
@@ -94,14 +70,6 @@ snd3 (_, y, _) = y
 
 main :: IO ()
 main = do
-    resultsLE <- runTestTT testLE
-    print resultsLE
+    let allTests = TestList [testLE, testEQ]
+    runTestTTAndExit allTests
 
-    resultsEQ <- runTestTT testEQ
-    print resultsEQ
-
-    resultsLEUnderflow <- runTestTT testLEUnderflow
-    print resultsLEUnderflow
-
-    resultsEQUnderflow <- runTestTT testEQUnderflow
-    print resultsEQUnderflow

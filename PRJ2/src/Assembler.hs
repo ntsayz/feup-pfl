@@ -44,7 +44,7 @@ exec (instr:code, stack, state) =
                   stack' = pop stack -- Remove the top element from the stack
                   (IntVal y) = top stack' -- Extracting the next element
                   stack'' = pop stack' -- Remove the next element from the stack
-              in (code, push (if y <= x then TT else FF) stack'', state)
+              in (code, push (if x <= y then TT else FF) stack'', state)
         Equ ->
             if length stack < 2
                 then error "Run-time error: The stack does not have enough values for Equ instruction"
@@ -58,6 +58,10 @@ exec (instr:code, stack, state) =
 -- to run the code using exec for every instruction for a givan code, stack and state
 runInstructions :: (Code, Stack, State) -> (Code, Stack, State)
 runInstructions ([], stack, state) = ([], stack, state)
+runInstructions ((instr:rest), stack, state) = 
+    let (newCode, newStack, newState) = exec ([instr], stack, state)
+    in runInstructions (rest, newStack, newState)
+
 
 
 
@@ -65,5 +69,7 @@ runInstructions ([], stack, state) = ([], stack, state)
 
 run :: (Code, Stack, State) -> (Code, Stack, State)
 run ([], stack, state) = ([], stack, state)  -- No instructions left
+run (code, stack, state) = runInstructions (code, stack, state) -- 
+
 
 
