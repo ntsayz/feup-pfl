@@ -58,3 +58,13 @@ test-suite PropertyTests
                        , HUnit >=1.6 
                           , QuickCheck
   default-language:    Haskell2010
+
+test-suite AssemblerTests
+  main-is:             AssemblerTests.hs
+  type:                exitcode-stdio-1.0
+  hs-source-dirs:      src/Tests
+  build-depends:       base
+                        , containers >=0.6.5.1
+                       , PRJ2
+                       , HUnit
+  default-language:    Haskell2010

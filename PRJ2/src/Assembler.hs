@@ -36,6 +36,24 @@ exec (instr:code, stack, state) =
         Push n -> (code, push (IntVal n) stack, state)
         Tru -> (code, true stack, state)
         Fals -> (code, false stack, state)
+        Le ->
+          if length stack < 2
+              then error "Runtime error: The stack does not have enough values for Le instruction"
+              else let
+                  (IntVal x) = top stack -- Extracting the top element
+                  stack' = pop stack -- Remove the top element from the stack
+                  (IntVal y) = top stack' -- Extracting the next element
+                  stack'' = pop stack' -- Remove the next element from the stack
+              in (code, push (if y <= x then TT else FF) stack'', state)
+        Equ ->
+            if length stack < 2
+                then error "Run-time error: The stack does not have enough values for Equ instruction"
+                else let
+                    (IntVal x) = top stack
+                    stack' = pop stack
+                    (IntVal y) = top stack'
+                    stack'' = pop stack'
+                in (code, push (if x == y then TT else FF) stack'', state)
 
 -- to run the code using exec for every instruction for a givan code, stack and state
 runInstructions :: (Code, Stack, State) -> (Code, Stack, State)
@@ -47,3 +65,5 @@ runInstructions ([], stack, state) = ([], stack, state)
 
 run :: (Code, Stack, State) -> (Code, Stack, State)
 run ([], stack, state) = ([], stack, state)  -- No instructions left
+
+

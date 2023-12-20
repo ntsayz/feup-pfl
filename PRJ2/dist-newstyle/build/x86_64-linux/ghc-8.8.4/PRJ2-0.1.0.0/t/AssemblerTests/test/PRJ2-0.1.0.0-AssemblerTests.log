@@ -1,0 +1,31 @@
+Test suite AssemblerTests: RUNNING...
+Cases: 4  Tried: 0  Errors: 0  Failures: 0                                          ### Error in:   0
+src/Assembler.hs:67:1-43: Non-exhaustive patterns in function run
+
+Cases: 4  Tried: 1  Errors: 1  Failures: 0                                          ### Error in:   1
+src/Assembler.hs:67:1-43: Non-exhaustive patterns in function run
+
+Cases: 4  Tried: 2  Errors: 2  Failures: 0                                          ### Error in:   2
+src/Assembler.hs:67:1-43: Non-exhaustive patterns in function run
+
+Cases: 4  Tried: 3  Errors: 3  Failures: 0                                          ### Error in:   3
+src/Assembler.hs:67:1-43: Non-exhaustive patterns in function run
+
+Cases: 4  Tried: 4  Errors: 4  Failures: 0
+Cases: 4  Tried: 0  Errors: 0  Failures: 0                                          ### Error in:   0
+src/Assembler.hs:67:1-43: Non-exhaustive patterns in function run
+
+Cases: 4  Tried: 1  Errors: 1  Failures: 0                                          ### Error in:   1
+src/Assembler.hs:67:1-43: Non-exhaustive patterns in function run
+
+Cases: 4  Tried: 2  Errors: 2  Failures: 0                                          ### Error in:   2
+src/Assembler.hs:67:1-43: Non-exhaustive patterns in function run
+
+Cases: 4  Tried: 3  Errors: 3  Failures: 0                                          ### Error in:   3
+src/Assembler.hs:67:1-43: Non-exhaustive patterns in function run
+
+Cases: 4  Tried: 4  Errors: 4  Failures: 0
+Counts {cases = 4, tried = 4, errors = 4, failures = 0}
+Counts {cases = 4, tried = 4, errors = 4, failures = 0}
+Test suite AssemblerTests: PASS
+Test suite logged to: /mnt/c/Users/Ntsay Zacarias/Documents/feup/pfl/PRJ2/dist-newstyle/build/x86_64-linux/ghc-8.8.4/PRJ2-0.1.0.0/t/AssemblerTests/test/PRJ2-0.1.0.0-AssemblerTests.log
