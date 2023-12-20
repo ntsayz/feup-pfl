@@ -7,7 +7,7 @@ module MachineStructures where
 
 
 import qualified Data.Map as Map
-import Data.List (intercalate, sortOn)-- to use on stack2Str and state2Str
+import Data.List (intercalate, sortOn, delete)-- to use on stack2Str and state2Str
 
 
 
@@ -20,11 +20,11 @@ data Inst =
 
 
 type Code = [Inst]
--- Using GADTs (Generalized Algebraic Data Types): Integers and Booleans ( booleans are represented as Integer)
-data StackValue
-    = IntVal Integer
-    | TT
-    | FF
+-- Using GADTs (Generalized Algebraic Data Types): Integers and Booleans ( booleans are represented as TT or FF)
+data StackValue where
+  IntVal :: !Integer -> StackValue
+  TT :: StackValue
+  FF :: StackValue
 
 -- Here we are deriving Show to use on stack2Str to convert the stack to a string
 instance Show StackValue where
@@ -77,8 +77,9 @@ stack2Str = intercalate "," . map show
 
 
 -- State/storage using map for variable = value
--- State is a new is a new type of Map (Map.Map String Integer)
-newtype State = State (Map.Map String Integer) deriving (Eq) --Our State uses Map.Map String Integer Eq to compare two states on Tests
+-- State is  new type of Map (Map.Map String StackValue)
+-- State/Storage uses StackValues (Integers and Booleans)
+newtype State = State (Map.Map String StackValue) deriving (Eq) --Our State uses Map.Map String Integer Eq to compare two states on Tests
 
 
 
@@ -88,6 +89,17 @@ instance Show State where
 
 
 
+insertOrUpdate :: String -> StackValue -> State -> State
+insertOrUpdate var val (State st) = State ( Map.insert var val st )
+
+deleteVar :: String -> State -> State
+deleteVar var (State st) = State ( Map.delete var st )
+
+getVarValue:: String -> State -> StackValue
+getVarValue var (State st) = 
+  case Map.lookup var st of
+    Just val -> val
+    Nothing -> error $ "Variable " ++ var ++ " not found in state"--TODO: deal whith this error this on run function catching this error?
 
 createEmptyState :: State
 createEmptyState = State Map.empty
@@ -95,3 +107,5 @@ createEmptyState = State Map.empty
 
 state2Str :: State -> String
 state2Str st = "State: " ++ show st
+
+
