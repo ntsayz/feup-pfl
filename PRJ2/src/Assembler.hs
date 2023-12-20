@@ -87,7 +87,7 @@ exec (instr:code, stack, state) =
               in (code, push (if x <= y then TT else FF) stack'', state)
         Equ ->
             if length stack < 2
-                then error "Run-time error: The stack does not have enough values for Equ instruction"
+                then error "Runtime error: The stack does not have enough values for Equ instruction"
                 else let
                     (IntVal x) = top stack
                     stack' = pop stack
@@ -102,8 +102,24 @@ exec (instr:code, stack, state) =
         Loop c1 c2 -> (loop c1 c2 ++ code, stack, state)
         Noop -> let (nextStack, nextState) = noop stack state
                 in (code, nextStack, nextState)
-        And -> --TODO
-        Neg -> --TODO
+        And ->
+            if length stack < 2
+                then error "Runtime error: The stack does not have enough values for And instruction"
+                else let
+                    a = top stack
+                    stack' = pop stack
+                    b = top stack'
+                    stack'' = pop stack'
+                    result = if (a /= FF && a /= IntVal 0) && (b /= FF && b /= IntVal 0) then TT else FF
+                in (code, push result stack'', state)
+        Neg ->
+            if null stack
+                then error "Runtime error: The stack is empty for Neg instruction"
+                else let
+                    a = top stack
+                    stack' = pop stack
+                    result = if a == FF || a == IntVal 0 then TT else FF
+                in (code, push result stack', state)
         otherwise -> error $ "Run-time error"
 exec ([], stack, state) = ([], stack, state) -- No instructions to execute
 
