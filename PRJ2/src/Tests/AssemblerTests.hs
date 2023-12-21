@@ -10,7 +10,9 @@ import Data.Map as Map
 import Control.Exception (ErrorCall(..), evaluate, handle)
 
 
-
+-- We use this function to extract the second element of a triple, which is the stack (Code, *Stack*, State)
+snd3 :: (a, b, c) -> b
+snd3 (_, y, _) = y
 
 testLE :: Test
 testLE = TestList [
@@ -60,16 +62,25 @@ testEQ = TestList [
     output4 = snd3 $ run input4
     expectedOutput4 = [TT]
 
---  assert an error
+testAnd :: Test
+testAnd = TestList [
+    TestCase (assertEqual "Testing And with True and False" [FF] (snd3 $ run ([Push 1, Push 0, And], [], createEmptyState))),
+    TestCase (assertEqual "Testing And with True and True" [TT] (snd3 $ run ([Push 1, Push 1, And], [], createEmptyState)))
+    ]
+
+testNeg :: Test
+testNeg = TestList [
+    TestCase (assertEqual "Testing Neg with True" [FF] (snd3 $ run ([Push 1, Neg], [], createEmptyState))),
+    TestCase (assertEqual "Testing Neg with False" [TT] (snd3 $ run ([Push 0, Neg], [], createEmptyState)))
+    ]
 
 
--- We use this function to extract the second element of a triple, which is the stack (Code, *Stack*, State)
-snd3 :: (a, b, c) -> b
-snd3 (_, y, _) = y
+
+
 
 
 main :: IO ()
 main = do
-    let allTests = TestList [testLE, testEQ]
+    let allTests = TestList [testLE, testEQ, testAnd, testNeg]
     runTestTTAndExit allTests
 
