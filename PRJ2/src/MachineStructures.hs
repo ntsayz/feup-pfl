@@ -1,6 +1,8 @@
 
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StrictData #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Eta reduce" #-}
 module MachineStructures where
 -- PFL 2023/24 - Haskell practical assignment quickstart
 -- Part 1
@@ -17,6 +19,27 @@ data Inst =
   Push !Integer | Add | Mult | Sub | Tru | Fals | Equ | Le | And | Neg | Fetch !String | Store !String | Noop |
   Branch !Code !Code | Loop !Code !Code
   deriving Show
+
+-- We use this for Unit and property tests
+instance Eq Inst where
+    (Push x) == (Push y) = x == y
+    Add == Add = True
+    Mult == Mult = True
+    Sub == Sub = True
+    Tru == Tru = True
+    Fals == Fals = True
+    Equ == Equ = True
+    Le == Le = True
+    And == And = True
+    Neg == Neg = True
+    Fetch x == Fetch y = x == y
+    Store x == Store y = x == y
+    Noop == Noop = True
+    (Branch c1 d1) == (Branch c2 d2) = c1 == c2 && d1 == d2
+    (Loop c1 d1) == (Loop c2 d2) = c1 == c2 && d1 == d2
+    _ == _ = False
+
+
 
 
 type Code = [Inst]
@@ -39,9 +62,14 @@ instance Eq StackValue where
   _ == _ = False
 
 
+isBoolVal :: StackValue -> Bool
+isBoolVal x = x == TT || x == FF
 
+isIntVal:: StackValue -> Bool
+isIntVal (IntVal _) = True
+isIntVal _ = False
 
-
+-- define ord for StackValue IntVal
 
 
 -- With the GADT definition above, we define the Stack type to that can deal with Integers and Booleans on the same stack
@@ -50,19 +78,15 @@ type Stack = [StackValue]
 push :: StackValue -> Stack -> Stack
 push x ys = x:ys
 
-true :: Stack -> Stack
-true = push TT
-
-false :: Stack -> Stack
-false = push FF
 
 pop :: Stack -> Stack
 pop  (_:xs) = xs
-pop _ = error "Stack.pop: empty stack"
+pop _ = []
 
-top :: Stack -> StackValue
-top (x:_) = x
-top _ = error "Stack.top: empty stack"
+top :: Stack -> Maybe StackValue
+top (x:_) = Just x
+top _ = Nothing
+
 
 createEmptyStack :: Stack
 createEmptyStack = []
@@ -95,17 +119,27 @@ insertOrUpdate var val (State st) = State ( Map.insert var val st )
 deleteVar :: String -> State -> State
 deleteVar var (State st) = State ( Map.delete var st )
 
-getVarValue:: String -> State -> StackValue
-getVarValue var (State st) = 
+getVarValue :: String -> State -> Either String StackValue
+getVarValue var (State st) =
   case Map.lookup var st of
-    Just val -> val
-    Nothing -> error $ "Variable " ++ var ++ " not found in state"--TODO: deal whith this error this on run function catching this error?
+    Just val -> Right val
+    Nothing -> Left $ "Variable '" ++ var ++ "' not found in state."
 
 createEmptyState :: State
 createEmptyState = State Map.empty
 
 
 state2Str :: State -> String
-state2Str st = "State: " ++ show st
+state2Str st =  show st
 
+
+-- to ensure that stack, code and state are valid on execution
+isValidStack :: Stack -> Bool
+isValidStack _ = True  
+
+isValidState :: State -> Bool
+isValidState _ = True  
+
+isValidCode :: Code -> Bool
+isValidCode _ = True  
 

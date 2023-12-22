@@ -2,8 +2,8 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE StrictData #-}
 module Main where
-    
-import MachineStructures 
+
+import MachineStructures
 
 import Test.HUnit hiding (State)
 
@@ -19,8 +19,8 @@ import  Data.Map as Map
 testStackValueShow :: Test
 testStackValueShow = TestList [
     TestCase (assertEqual "for (show (IntVal 42))," "42" (show (IntVal 42))),
-    TestCase (assertEqual "for (show (TT))," "True" (show (BoolVal True))),
-    TestCase (assertEqual "for (show (FF))," "False" (show (BoolVal False)))
+    TestCase (assertEqual "for (show (TT))," "True" (show TT)),
+    TestCase (assertEqual "for (show (FF))," "False" (show FF))
     ]
 
 
@@ -42,7 +42,7 @@ testCreateEmptyState = TestCase (assertEqual "for createEmptyState," (State Map.
 
 testStack2Str :: Test
 testStack2Str = TestList [
-    let stack = [IntVal 42, BoolVal True, IntVal (-5)]
+    let stack = [IntVal 42, TT, IntVal (-5)]
     in TestCase (assertEqual "for (stack2Str stack)," "42,True,-5" (stack2Str stack))
     ]
 
@@ -50,7 +50,7 @@ testStack2Str = TestList [
 testState2Str :: Test
 testState2Str = TestList [
     let state = State $ Map.fromList [("a", 1), ("b", 2), ("c", 3)]
-    in TestCase (assertEqual "for (state2Str state)," "State: a=1,b=2,c=3" (state2Str state))
+    in TestCase (assertEqual "for (state2Str state)," "a=1,b=2,c=3" (state2Str state))
     ]
 
 

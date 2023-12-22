@@ -24,6 +24,7 @@
 -- when called with wrong configurations
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
 {-# HLINT ignore "Eta reduce" #-}
+{-# OPTIONS_GHC -Wno-overlapping-patterns #-}
 module Assembler where
 
 
@@ -31,107 +32,165 @@ import MachineStructures
 
 -- helper functions to deal with stack and state at same time
 -- Needs to get the value for a given variable from the state and put the value on the stack
-fetch :: String -> Stack -> State -> Stack
-fetch x stack state = push (getVarValue x state) stack
+fetch :: String -> Stack -> State -> Either String Stack
+fetch x stack state = case getVarValue x state of
+                        Right val -> Right $ push val stack
+                        Left errorMsg -> Left errorMsg
 
-store :: String -> Stack -> State -> State
-store x stack state = insertOrUpdate x (top stack) state
 
-add :: Stack -> Stack
-add stack = let (IntVal x) = top stack
-                (IntVal y) = top (pop stack)
-            in push (IntVal (x+y))  (pop stack)
-sub :: Stack -> Stack
-sub stack = let (IntVal x) = top stack
-                (IntVal y) = top (pop stack)
-            in push (IntVal (x-y))  (pop stack)
+--TODO: change this to be deal in exec returning a Left with error message string
+store :: String -> Stack -> State -> Either String (Stack, State)
+store x stack state = case stack of
+    value:rest -> Right (rest, insertOrUpdate x value state)
 
-mult :: Stack -> Stack
-mult stack = let (IntVal x) = top stack
-                 (IntVal y) = top (pop stack)
-            in push (IntVal (x*y))  (pop stack)
+    _ -> Left "Run-time error: Invalid operation for store."
+
+
+
+true :: Stack -> Either String Stack
+true stack = case stack of
+    stack -> Right (push TT stack)
+    _ -> Left "Run-time error: Invalid operation for Tru."
+
+false :: Stack -> Either String Stack
+false stack = case stack of
+    stack -> Right (push FF stack)
+    _ -> Left "Run-time error: Invalid operation for Fals"
+add :: Stack -> Either String Stack
+add stack = case stack of
+    (IntVal x):IntVal y:rest -> Right $ push (IntVal (x + y)) rest
+    _ -> Left "Run-time error: insufficient values or type error for 'add'"
+
+sub :: Stack -> Either String Stack
+sub stack = case stack of  
+    (IntVal x):IntVal y:rest -> Right $ push (IntVal (x - y)) rest
+    _ -> Left "Run-time error: insufficient values or type error for for 'sub'"
+
+
+mult :: Stack -> Either String Stack
+mult stack = case stack of  
+    (IntVal x):IntVal y:rest -> Right $ push (IntVal (x * y)) rest
+    _ -> Left "Run-time error: insufficient values or type error for 'mult'"
+
 
 
 -- helper functions to deal with conditional instructions
+le :: Stack -> Either String Stack
+le stack = case stack of
+    IntVal x:IntVal y:rest -> Right $ push (if x < y then TT else FF) rest
+    _ -> Left "Run-time error: insufficient values or invalid values for 'le'"
 
-branch :: Code -> Code -> Stack -> Code
-branch c1 c2 stack = 
-    case top stack of
-        TT -> c1
-        FF -> c2
-        _  -> error "Top of stack is not a boolean value"
+areComparable :: StackValue -> StackValue -> Bool
+areComparable (IntVal _) (IntVal _) = True
+areComparable TT TT = True
+areComparable FF FF = True
+areComparable TT FF= True
+areComparable FF TT= True
+areComparable _ _ = False
+
+
+
+equ :: Stack -> Either String Stack
+equ stack = case stack of
+    x:y:rest | areComparable x y -> 
+        Right $ push (if x == y then TT else FF) rest
+    _ -> Left "Run-time error: insufficient values or incomparable types for 'equ'"
+
+
+andInstr :: Stack -> Either String Stack
+andInstr stack = case stack of
+    a:b:rest | isBoolVal a && isBoolVal b -> 
+        Right $ push (if a == TT && b == TT then TT else FF) rest
+    _ -> Left "Run-time error: insufficient or invalid values for 'and'"
+
+
+neg :: Stack -> Either String Stack
+neg stack = case top stack of
+    Just FF -> Right $ push TT (pop stack)
+    Just TT -> Right $ push FF (pop stack)
+    _ -> Left "Run-time error: Top of stack is not a boolean value for 'neg'"
+
+
+branch :: Code -> Code -> Stack -> Either String Code
+branch c1 c2 stack = case top stack of
+    Just TT -> Right c1
+    Just FF -> Right c2
+    _       -> Left "Run-time error: Top of stack is not a boolean value"
+
 noop:: Stack -> State -> (Stack, State)
 noop stack state = (stack, state)
 -- Loop defined as "a combination of other constructs, including the branch instruction and itself."
-loop :: Code -> Code -> Code 
+loop :: Code -> Code -> Code
 loop c1 c2 = c1 ++ [Branch (c2 ++ [Loop c1 c2]) [Noop]]
 
+--TODO: IMPORTANTE: deal with runtime errors on all cases, Left on every case
+-- TODO: on run to a more simpler general aproach, or on exec we need to deal when Instr is 
+-- used with not enough values on the stack, invalid stack, invalid state, etc, 
+-- invalid type of values to use on store etc
+
 -- Transition function for assembler 
-exec :: (Code, Stack, State) -> (Code, Stack, State)
-exec (instr:code, stack, state) = 
+exec :: (Code, Stack, State) -> Either String (Code, Stack, State)
+
+exec (instr:code, stack, state)
+    | not (isValidCode (instr:code))   = Left "Invalid Code detected."
+    | not (isValidStack stack) = Left "Invalid Stack state detected."
+    | not (isValidState state) = Left "Invalid State/Store detected."
+    | otherwise = 
     case instr of
-        Push n ->   (code, push (IntVal n) stack, state)
-        Fetch x ->  (code, fetch x stack state,state)
-        Store x -> let updatedState = store x stack state -- Here, we ensure the top value of stack is stored in state before doung pop on the stack
-               in (code, pop stack, updatedState)
-        Tru -> (code, true stack, state)
-        Fals -> (code, false stack, state)
-        Le ->
-          if length stack < 2
-              then error "Runtime error: The stack does not have enough values for Le instruction"
-              else let
-                  (IntVal x) = top stack -- Extracting the top element
-                  stack' = pop stack -- Remove the top element from the stack
-                  (IntVal y) = top stack' -- Extracting the next element
-                  stack'' = pop stack' -- Remove the next element from the stack
-              in (code, push (if x <= y then TT else FF) stack'', state)
-        Equ ->
-            if length stack < 2
-                then error "Runtime error: The stack does not have enough values for Equ instruction"
-                else let
-                    (IntVal x) = top stack
-                    stack' = pop stack
-                    (IntVal y) = top stack'
-                    stack'' = pop stack'
-                in (code, push (if x == y then TT else FF) stack'', state)
-        Add -> (code, add stack, state)
-        Sub -> (code, sub stack, state)
-        Mult -> (code, mult stack, state)
-        Branch c1 c2 -> let nextCodeToRun = branch c1 c2 stack
-                        in (nextCodeToRun ++ code, pop stack, state) -- we add the result code of the conditional evaluation to the code to run, on the begining of Code
-        Loop c1 c2 -> (loop c1 c2 ++ code, stack, state)
+        Push n -> Right (code, push (IntVal n) stack, state)
+        Fetch x -> case fetch x stack state of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+        Store x -> case store x stack state of
+              Right (newStack, newState) -> Right (code, newStack, newState)
+              Left errMsg -> Left errMsg
+        Tru -> case true stack of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+        Fals -> case false stack of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+        Add -> case add stack of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+        Sub -> case sub stack of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+        Mult -> case mult stack of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+        Branch c1 c2 -> case branch c1 c2 stack of
+              Right newCode -> Right (newCode ++ code,pop stack, state)
+              Left errMsg -> Left errMsg
+        Loop c1 c2 -> Right (loop c1 c2 ++ code, stack, state)
         Noop -> let (nextStack, nextState) = noop stack state
-                in (code, nextStack, nextState)
-        And ->
-            if length stack < 2
-                then error "Runtime error: The stack does not have enough values for And instruction"
-                else let
-                    a = top stack
-                    stack' = pop stack
-                    b = top stack'
-                    stack'' = pop stack'
-                    result = if (a /= FF && a /= IntVal 0) && (b /= FF && b /= IntVal 0) then TT else FF
-                in (code, push result stack'', state)
-        Neg ->
-            if null stack
-                then error "Runtime error: The stack is empty for Neg instruction"
-                else let
-                    a = top stack
-                    stack' = pop stack
-                    result = if a == FF || a == IntVal 0 then TT else FF
-                in (code, push result stack', state)
-        otherwise -> error $ "Run-time error"
-exec ([], stack, state) = ([], stack, state) -- No instructions to execute
+                in Right (code, nextStack, nextState)
+        Le -> case le stack of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+        Equ -> case equ stack of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+        And -> case andInstr stack of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+           
+        Neg -> case neg stack of
+              Right newStack -> Right (code, newStack, state)
+              Left errMsg -> Left errMsg
+        _ -> Left "Instruction does not exist" -- Indeed we use GRDts, so maybe this is not necessary, but the project assigment asks for it
+exec ([], stack, state) = Right ([], stack, state) -- No instructions to execute
 
-runInstructions ((instr:rest), stack, state) = 
-    let (newCode, newStack, newState) = exec ([instr], stack, state)
-    in runInstructions (rest, newStack, newState)
-
-
-
-
+exec (code, stack, state) 
+    | not (isValidCode code)   = Left "Invalid Code detected."
+    | not (isValidStack stack) = Left "Invalid Stack state detected."
+    | not (isValidState state) = Left "Invalid State/Store detected."
+        
 -- run :: (Code, Stack, State) -> (Code, Stack, State)
 
 run :: (Code, Stack, State) -> (Code, Stack, State)
 run ([], stack, state) = ([], stack, state)  -- No instructions left to run
-run (code, stack, state) = run (exec (code, stack, state)) -- run the code using exec for every instruction for a givan code, stack and state
+run (code, stack, state) =
+    case exec (code, stack, state) of
+        Right result -> run result
+        Left errorMsg -> error "Run-time error"
