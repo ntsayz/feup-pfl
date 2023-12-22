@@ -26,7 +26,7 @@ testStackValueShow = TestList [
 
 testStateShow :: Test
 testStateShow = TestList [
-    let state = State $ Map.fromList [("x", 3), ("y", -1), ("z", 5)]
+    let state = State $ Map.fromList [("x", IntVal 3), ("y", IntVal (-1)), ("z", IntVal 5)]
     in TestCase (assertEqual "for (show state)," "x=3,y=-1,z=5" (show state))
     ]
 
@@ -49,7 +49,7 @@ testStack2Str = TestList [
 
 testState2Str :: Test
 testState2Str = TestList [
-    let state = State $ Map.fromList [("a", 1), ("b", 2), ("c", 3)]
+    let state = State $ Map.fromList [("a", IntVal 1), ("b", IntVal 2), ("c", IntVal 3)]
     in TestCase (assertEqual "for (state2Str state)," "a=1,b=2,c=3" (state2Str state))
     ]
 
