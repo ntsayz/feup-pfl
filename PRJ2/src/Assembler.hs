@@ -118,10 +118,11 @@ branch c1 c2 stack = case top stack of
     _       -> Left "Run-time error: Top of stack is not a boolean value"
 
 noop:: Stack -> State -> (Stack, State)
-noop stack state = (stack, state)
--- Loop defined as "a combination of other constructs, including the branch instruction and itself."
+noop stack state = (stack, state)-- dummy function to just return the stack and state
+
+-- Loop is defined as "a combination of other constructs, including the branch instruction and itself."
 loop :: Code -> Code -> Code
-loop c1 c2 = c1 ++ [Branch (c2 ++ [Loop c1 c2]) [Noop]]
+loop c1 c2 = c1 ++ [Branch (c2 ++ [Loop c1 c2]) [Noop]] -- Errors come from the other constructs
 
 --TODO: IMPORTANTE: deal with runtime errors on all cases, Left on every case
 -- TODO: on run to a more simpler general aproach, or on exec we need to deal when Instr is 

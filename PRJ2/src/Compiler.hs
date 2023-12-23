@@ -17,15 +17,46 @@ da pilha.
 
 
 -}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Use :" #-}
 
 module Compiler where
 
-
--- compile :: [Stm] → Code
+import ImperativeLanguage
+import MachineStructures
 
 -- -- two mandatory auxiliary functions which compile arithmetic and boolean expressions
--- compA :: Aexp -> Code
--- compA = undefined -- TODO
+compA :: Aexp -> Code
+compA (INTVAL  x) = [Push x]
+compA (VAR x) = [Fetch x]
+compA (ADD x y) = compA y ++ compA x ++ [Add]
+compA (SUB x y ) = compA y ++ compA x ++ [Sub] -- in the correct order to have the right stack values to add x + y
+compA (MULT x y) = compA y ++ compA x ++ [Mult]
 
--- compB :: Bexp -> Code
--- compB = undefined -- TODO
+
+
+-- helper function to use on EQU 
+compCompExpr :: CompExpr -> Code
+compCompExpr (AEXPR x) = compA x
+compCompExpr (BEXPR x) = compB x
+
+
+compB :: Bexp -> Code
+compB TRU = [Tru]
+compB FALS = [Fals]
+compB (EQU x y) = compCompExpr y ++ compCompExpr x ++ [Equ]
+compB (LE x y) = compA y ++ compA x ++ [Le]
+compB (NEG x) = compB x ++ [Neg]
+compB (AND x y) = compB y ++ compB x ++ [And]
+
+
+
+
+compile :: [Stm] -> Code
+compile [] = [] --base case
+compile (stm:xs) = 
+    case stm of
+        ASSIGN var aexp -> compA aexp ++ [Store var] ++ compile xs
+        SEQ stm1 stm2 -> compile [stm1] ++ compile [stm2] ++ compile xs
+        IF bexp stm1 stm2 -> compB bexp ++ [Branch (compile [stm1]) (compile [stm2])] ++ compile xs
+        WHILE bexp stm -> [Loop (compB bexp) (compile [stm])] ++ compile xs
