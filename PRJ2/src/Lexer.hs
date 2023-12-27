@@ -44,7 +44,7 @@ data Token =
     | CloseParen
 
 
-    -- Add other tokens as necessary for your language
+    
     deriving (Eq, Show)
 
 

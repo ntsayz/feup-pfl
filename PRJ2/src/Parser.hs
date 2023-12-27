@@ -99,7 +99,7 @@ parseTerm tokens =
             let (aexp, restOfTokens') = parseAexp restOfTokens
             in case restOfTokens' of
                 (CloseParen : restOfTokens'') -> (aexp, restOfTokens'')
-                _ -> error "Missing closing parenthesis"
+                _ -> error "Missing closing parenthesis" -- TODO:Use Left, right -> improve error handling, only run interprete/assembler handle error as Run-time error, others returns string like  on exec of the Assembler
         _ -> error "Invalid term syntax on Aexp"
 
 -- Parses multiplication expressions
