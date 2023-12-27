@@ -23,6 +23,7 @@ da pilha.
 module Compiler where
 
 import ImperativeLanguage
+    ( Aexp(..), Bexp(..), Stm(..), CompExpr(..), Program )
 import MachineStructures
 
 -- -- two mandatory auxiliary functions which compile arithmetic and boolean expressions
@@ -52,7 +53,7 @@ compB (AND x y) = compB y ++ compB x ++ [And]
 
 
 
-compile :: [Stm] -> Code
+compile :: Program -> Code
 compile [] = [] --base case
 compile (stm:xs) = 
     case stm of

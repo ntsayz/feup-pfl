@@ -21,6 +21,7 @@ module Main where
 -- Do property tests for the main functions of of every source file ( The lexer, assembler, compiler etc)
 import MachineStructures
 import Data.List (isInfixOf,sort)
+import Data.Map as Map
 
 prop_createEmptyStack :: Bool
 prop_createEmptyStack = null createEmptyStack

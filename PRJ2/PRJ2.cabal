@@ -80,7 +80,7 @@ test-suite ImperativeLanguageTests
   default-language:    Haskell2010
 
 test-suite CompilerTests
-  main-is:             ImperativeLanguageTests.hs
+  main-is:             CompilerTests.hs
   type:                exitcode-stdio-1.0
   hs-source-dirs:      src/Tests
   build-depends:       base

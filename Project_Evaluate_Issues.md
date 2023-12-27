@@ -10,6 +10,7 @@
 
 - check this, tool for parsers [link](https://hackage.haskell.org/package/happy) 
 - check this, tool for parsers [link](https://hackage.haskell.org/package/parsec)
+- Check with professor how with our structure of the project the "Main.hs" file should be done to deliver the project !!!!!
 
 ## Project 2 - Review & Retrospective Phase of already done work
 - Part1 done

@@ -42,5 +42,6 @@ testCompExprCreation = TestList [
 
 -- Main test runner
 main = do
-    _ <- runTestTT $ TestList [testAexpCreation, testBexpCreation, testStmCreation, testCompExprCreation]
-    return ()
+    
+    let allTests = TestList [testAexpCreation, testBexpCreation, testStmCreation, testCompExprCreation]
+    runTestTTAndExit allTests

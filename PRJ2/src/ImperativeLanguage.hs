@@ -52,6 +52,7 @@ data Stm = ASSIGN !String !Aexp -- Terminal terms from Aexp and Bexp
          | IF !Bexp !Stm !Stm
          | WHILE !Bexp !Stm
          deriving (Eq, Show)
-
+         
+type Program = [Stm] -- A program is a list of statements
 
 --type Program = [Stm] -- A program is a list of statements
