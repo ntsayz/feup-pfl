@@ -46,13 +46,14 @@ data Bexp = TRU -- Terminal term
           | NEG !Bexp
           | AND !Bexp !Bexp
           deriving (Eq, Show)
-
+-- Our SEQ Term needs to ensure  (instr1 ; instr2) ( using parenthesis with sequence of statements):Eg: "x := 42; if x <= 43 then x := 1; else (x := 33; x := x+1;)"
 data Stm = ASSIGN !String !Aexp -- Terminal terms from Aexp and Bexp
-         | SEQ !Stm !Stm
+         | SEQ !Stm !Stm --TODO: use list of statements to deal with sequence of statements?
+         | SEQN ![Stm]
          | IF !Bexp !Stm !Stm
          | WHILE !Bexp !Stm
          deriving (Eq, Show)
-         
+
 type Program = [Stm] -- A program is a list of statements
 
 --type Program = [Stm] -- A program is a list of statements

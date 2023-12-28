@@ -36,7 +36,7 @@ compA (MULT x y) = compA y ++ compA x ++ [Mult]
 
 
 
--- helper function to use on EQU 
+-- We use this auxiliary function to help deal with the two types of expressions ( Aexp and Bexp)
 compCompExpr :: CompExpr -> Code
 compCompExpr (AEXPR x) = compA x
 compCompExpr (BEXPR x) = compB x

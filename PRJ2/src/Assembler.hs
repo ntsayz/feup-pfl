@@ -77,7 +77,7 @@ mult stack = case stack of
 -- helper functions to deal with conditional instructions
 le :: Stack -> Either String Stack
 le stack = case stack of
-    IntVal x:IntVal y:rest -> Right $ push (if x < y then TT else FF) rest
+    IntVal x:IntVal y:rest -> Right $ push (if x <= y then TT else FF) rest
     _ -> Left "Run-time error: insufficient values or invalid values for 'le'"
 
 areComparable :: StackValue -> StackValue -> Bool

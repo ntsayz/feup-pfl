@@ -8,7 +8,6 @@ module Main where
 import Test.HUnit
 import Compiler
 import MachineStructures
-import ImperativeLanguage
 import ImperativeLanguage (Bexp(FALS))
 
 

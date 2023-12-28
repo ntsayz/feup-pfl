@@ -1,8 +1,15 @@
+module Main where
+
+import Assembler
+import Parser
+import Test.HUnit hiding (State)
+import Test.HUnit.Text (runTestTTAndExit)
+
 --Test functions for the Parser module
 
--- testParser :: String -> (String, String)
--- testParser programCode = (stack2Str stack, store2Str store)
---   where (_,stack,store) = run(compile (parse programCode), createEmptyStack, createEmptyStore)
+testParser :: String -> (String, String)
+testParser programCode = (stack2Str stack, store2Str store)
+  where (_,stack,store) = run(compile (parse programCode), createEmptyStack, createEmptyStore)
 
 
 -- Examples:
