@@ -36,6 +36,7 @@ into its corresponding representation in the Stm data (a list of statements Stm)
 {-# HLINT ignore "Eta reduce" #-}
 module Parser where
 import ImperativeLanguage
+
 import Lexer
 import Data.List (isPrefixOf, isInfixOf)
 import Data.Char
@@ -55,26 +56,54 @@ import Data.Char
 
 -}
 -- Parser to deal with terms (e.g. 5, x, (5 + 3))
-parseTerm :: [Token] -> (Aexp, [Token])
+parseTerm :: [Token] -> (CompExpr, [Token])
 parseTerm tokens =
     case tokens of
-        (IntLit x : restOfTokens) -> (INTVAL x, restOfTokens)
-        (VarName x : restOfTokens) -> (VAR x, restOfTokens)
+        (IntLit x : restOfTokens) -> (AEXPR (INTVAL x), restOfTokens)
+        (VarName x : restOfTokens) -> (AEXPR (VAR x), restOfTokens)
         (OpenParen : restOfTokens) ->
-            let (aexp, restOfTokens') = parseAexp restOfTokens -- We call aexp parser to parse the expression inside the parenthesis
-            in case restOfTokens' of
-                (CloseParen : restOfTokens'') -> (aexp, restOfTokens'')
-                _ -> error "Missing closing parenthesis" -- TODO:Use Left, right -> improve error handling, only run interprete/assembler handle error as Run-time error, others returns string like  on exec of the Assembler
-        _ -> error "Invalid term syntax on Aexp"
+            -- Determine if the expression inside the parentheses is Aexp or Bexp
+            case nextExpressionType restOfTokens of
+                AexpType -> 
+                    let (aexp, restOfTokens') = parseAexp restOfTokens
+                    in case restOfTokens' of
+                        (CloseParen : restOfTokens'') -> (AEXPR aexp, restOfTokens'')
+                        _ -> error "Missing closing parenthesis for Aexp"
+                BexpType -> 
+                    let (bexp, restOfTokens') = parseBexp restOfTokens
+                    in case restOfTokens' of
+                        (CloseParen : restOfTokens'') -> (BEXPR bexp, restOfTokens'')
+                        _ -> error "Missing closing parenthesis for Bexp"
+        _ -> error "Invalid term syntax on CompExpr"
+
+--TODO: finishi this and do this for other cases or statements cases
+-- Helper function to determine the type of expression (Aexp or Bexp)
+nextExpressionType :: [Token] -> ExprType
+nextExpressionType (OpNot : _) = BexpType
+nextExpressionType (OpenParen: OpNot : _) = BexpType 
+nextExpressionType (BoolLit _ : _) = BexpType
+nextExpressionType (_ : OpLe : _) = AexpType
+nextExpressionType (_ : OpEqInt : _) = BexpType
+nextExpressionType (VarName _ : OpAssign : BoolLit _ : _) = BexpType
+    
+nextExpressionType (IntLit _ : _) = AexpType
+nextExpressionType ( _: OpEqBool : _ : _) = BexpType
+nextExpressionType _ = AexpType -- Default to Aexp for other cases
+
+data ExprType = AexpType | BexpType
+
 
 -- Parses multiplication expressions
-parseProduct :: [Token] -> (Aexp, [Token])
+-- Parses multiplication expressions
+parseProduct :: [Token] -> (CompExpr, [Token])
 parseProduct tokens =
     let (term1, rest) = parseTerm tokens in
     case rest of
         (OpMult : rest') ->
             let (term2, rest'') = parseProduct rest' in
-            (MULT term1 term2, rest'') -- Where we get the complete multiplication expression
+            case (term1, term2) of
+                (AEXPR a1, AEXPR a2) -> (AEXPR (MULT a1 a2), rest'')
+                _ -> error "Type mismatch in multiplication expression"
         _ -> (term1, rest) -- If we don't have a multiplication expression we return the term and the rest of the tokens
 
 
@@ -90,7 +119,7 @@ parseSum tokens =
         (OpSub : rest') ->
             let (term2, rest'') = parseSum rest' in
             (SUB term1 term2, rest'')
-        _ -> (term1, rest)
+        _noAddOrSub -> (term1, rest)
 
 
 
@@ -108,7 +137,7 @@ parseAnd tokens =
     in case rest1 of
         (OpAnd : rest2) -> let (expr2, rest3) = parseAnd rest2
                            in (AND expr1 expr2, rest3)
-        _ -> (expr1, rest1)
+        _noAnd -> (expr1, rest1)
 
 parseEquality :: [Token] -> (Bexp, [Token])
 parseEquality tokens =
@@ -116,13 +145,16 @@ parseEquality tokens =
     in case rest1 of
         (OpEq : rest2) -> let (expr2, rest3) = parseEquality rest2
                           in (EQU (BEXPR expr1) (BEXPR expr2), rest3)
-        _ -> (expr1, rest1)
+        _noEquality -> (expr1, rest1)
 
 parseNegation :: [Token] -> (Bexp, [Token])
-parseNegation (OpNot : tokens) =
-    let (expr, rest) = parseNegation tokens
-    in (NEG expr, rest)
+parseNegation (OpNot : OpenParen : tokens) =
+    let (expr, rest) = parseBexp tokens
+    in case rest of
+        CloseParen : rest' -> (NEG expr, rest')
+        _noCloseParen -> error "Syntax error: missing closing parenthesis in negation"
 parseNegation tokens = parseRelation tokens
+
 
 parseRelation :: [Token] -> (Bexp, [Token])
 parseRelation tokens =
@@ -137,6 +169,25 @@ parseRelation tokens =
 parseBexp :: [Token] -> (Bexp, [Token])
 parseBexp tokens = parseAnd tokens  -- We need to Start with the lowest precedence
 
+
+parseOptionalParensBexp :: [Token] -> (Bexp, [Token])
+parseOptionalParensBexp (OpenParen : tokens) = 
+    let (expr, rest) = parseBexp tokens
+    in case rest of
+        CloseParen : rest' -> (expr, rest')
+        _noCloseParen -> error "Syntax error: missing closing parenthesis in bexp"
+parseOptionalParensBexp tokens = parseBexp tokens
+
+parseOptionalParensStm :: [Token] -> (Stm, [Token])
+parseOptionalParensStm (OpenParen : tokens) = 
+    let (stm, rest) = parseStm tokens
+    in case rest of
+        CloseParen : Semicolon : rest' -> (stm, rest')
+        _noCloseParen -> error "Syntax error: missing closing parenthesis in stm"
+parseOptionalParensStm tokens = parseStm tokens
+
+
+
 -- Funtions to check if the variable name contains any reserved keywords (case-insensitive)
 reservedKeywords :: [String]
 reservedKeywords = ["else", "then", "if", "while", "not", "do", "and"]
@@ -147,90 +198,101 @@ containsReservedKeyword varName =
     let varNameLower = map toLower varName
     in any (`isInfixOf` varNameLower) (map toLower <$> reservedKeywords)
 
+
+-- Parses either an arithmetic or a boolean expression
+parseCompExpr :: [Token] -> (CompExpr, [Token])
+parseCompExpr tokens =
+    let (aexpResult, aexpRest) = parseAexp tokens
+    in if not (null aexpRest) && aexpRest /= tokens
+       then (AEXPR aexpResult, aexpRest)
+       else let (bexpResult, bexpRest) = parseBexp tokens
+            in (BEXPR bexpResult, bexpRest)
 -- Parsing logic for assignments
 parseAssign :: [Token] -> (Stm, [Token])
-parseAssign (VarName var : OpAssign : restOfTokens) -- We need to check if the variable name contains any reserved keywords (case-insensitive)
-    |   containsReservedKeyword var = error "Syntax error: variable name contains reserved keyword"
-    |   otherwise =
-        let (aexp, rest) = parseAexp restOfTokens
+parseAssign (VarName var : OpAssign : restOfTokens)
+    | containsReservedKeyword var = error "Syntax error: variable name contains reserved keyword"
+    | otherwise =
+        let (compExpr, rest) = parseCompExpr restOfTokens
         in case rest of
-            (Semicolon : rest') -> (ASSIGN var aexp, rest')
-            _missingSemicolon -> error "Syntax error: missing semicolon after assignment"
+            (Semicolon : rest') -> (ASSIGN var compExpr, rest')
+            _noSemicolon -> error "Syntax error: missing semicolon after assignment"
 parseAssign _ = error "Syntax error: parseAssign called for wrong syntax/Tokens" -- TODO: improve error handling, only run interprete/assembler handle error as Run-time error
+
+
+
 
 -- Parsing logic for if statements
 parseIf :: [Token] -> (Stm, [Token])
-parseIf tokens = 
+parseIf tokens =
     case tokens of
         KWIf : restAfterIf ->
-            let (bexpCondition, restAfterBexp) = case restAfterIf of
-                    (OpenParen : rest) -> 
-                        let (bexp, restAfterBexp') = parseBexp rest
-                        in case restAfterBexp' of
-                            (CloseParen : rest') -> (bexp, rest')
-                            _missingCloseParen -> error "Syntax error: missing closing parenthesis after condition"
-                    _noParenthesisCond -> parseBexp restAfterIf -- We don't have parenthesis on condition
-                (thenStm, tokensAfterThenStm) = parseStm $ tail (dropWhile (/= KWThen) restAfterBexp)
-                (elseStm, restAfterElseStm) = parseStm $ tail (dropWhile (/= KWElse) tokensAfterThenStm)
+            let (bexpCondition, restAfterBexp) = parseOptionalParensBexp restAfterIf
+                (thenStm, tokensAfterThenStm) = parseOptionalParensStm $ tail (dropWhile (/= KWThen) restAfterBexp)
+                (elseStm, restAfterElseStm) = parseOptionalParensStm $ tail (dropWhile (/= KWElse) tokensAfterThenStm)
             in (IF bexpCondition thenStm elseStm, restAfterElseStm)
-        _anyOtherTOkenCase -> error "Syntax error: expected 'if' at the beginning" -- TODO: improve error handling, only run interprete/assembler handle error as Run-time error
+        _ -> error "Syntax error: expected 'if' at the beginning"
 
 parseWhile :: [Token] -> (Stm, [Token])
-parseWhile tokens = 
+parseWhile tokens =
     case tokens of
-        KWWhile : restAfterWhile ->
-            case restAfterWhile of
-                (OpenParen : rest) ->
-                    let (bexpCondition, restAfterBexp) = parseBexp rest
-                    in case restAfterBexp of
-                        (CloseParen : restAfterCloseParen) -> 
-                            case dropWhile (/= KWDo) restAfterCloseParen of
-                                (KWDo : OpenParen : restAfterDo) -> 
-                                    let (doStm, restAfterDoStm) = parseStm restAfterDo
-                                    in case restAfterDoStm of
-                                        (CloseParen : restAfterCloseDo) -> (WHILE bexpCondition doStm, restAfterCloseDo)
-                                        _missingCloseParen -> error "Syntax error: missing closing parenthesis after 'do' block"
-                                _missingDoOpenParen -> error "Syntax error: expected 'do' followed by open parenthesis"
-                        _missingCloseParen -> error "Syntax error: missing closing parenthesis after condition"
-                _missingOpenParen -> error "Syntax error: expected open parenthesis after 'while'"
-        _anyOtherTOkenCase -> error "Syntax error: expected 'while' at the beginning"
--- Check for parse statement cases using tokens@, alias for tokens to catch patterns of statements
+        KWWhile : OpenParen : restAfterWhile ->
+            let (bexpCondition, restAfterBexp) = parseBexp restAfterWhile
+            in case restAfterBexp of
+                CloseParen : KWDo : restAfterDo ->
+                    let (doStm, restAfterDoStm) = parseOptionalParensStm restAfterDo
+                    in (WHILE bexpCondition doStm, restAfterDoStm)
+                _ -> error "Syntax error: missing closing parenthesis or 'do' keyword"
+        _ -> error "Syntax error: expected 'while' at the beginning"
+
 -- Function to parse a single statement (ASSIGN, IF, WHILE, etc.)
 parseSingleStm :: [Token] -> (Stm, [Token])
 parseSingleStm tokens =
     case tokens of
-
+        OpenParen : rest -> 
+            -- Parsing a sequence of statements inside parentheses
+            let (stmList, rest') = parseStmList rest []
+            in case rest' of
+                CloseParen : rest'' -> (SEQ stmList, rest'')
+                _noCloseParen -> error "Syntax error: missing closing parenthesis in sequence"
         tokens@(VarName _ : OpAssign : _) -> parseAssign tokens
         tokens@(KWIf : _) -> parseIf tokens
         tokens@(KWWhile : _) -> parseWhile tokens
-        _ -> error "Syntax error: invalid single statement"
+        _invalidSingleStm -> error "Syntax error: invalid single statement"
+
 
 -- Function to parse a sequence of statements (SEQ) or a single statement
 -- we only deal with SEQ = (stm1 ; stm2), where cant have nested SEQ ( inside parenthesis)
 --TODO: nested SEQ ( inside parenthesis) is not a good syntax, the proper way would be: SEQN = (stm1 ; stm2 ; ... ; stmn)
 -- or using SEQ (!Stm, !Stm) we would have : code syntax like : (stm1; ((stm2; stm3;))) ... nested SEQ ...
+-- Function to parse a sequence of statements
 parseStm :: [Token] -> (Stm, [Token])
 parseStm tokens =
     case tokens of
-        -- Here we handle sequences of statements/(two) inside parenthesis
         OpenParen : rest ->
-            let (stm1, restAfterStm1) = parseSingleStm rest
-            in case restAfterStm1 of
-                Semicolon : restAfterSemicolon -> -- The semicolon is checked here for the possible single statements like ASSIGN, IF, WHILE
-                    let (stm2, restAfterStm2) = parseSingleStm restAfterSemicolon
-                    in case restAfterStm2 of
-                        CloseParen : Semicolon : restAfterSeq -> (SEQ stm1 stm2, restAfterSeq)
-                        _ -> error "Syntax error: invalid sequence or missing closing parenthesis/semicolon"
-                _ -> error "Syntax error: missing semicolon after first statement in sequence"
+            -- Parsing a sequence of statements inside parentheses
+            let (stmList, rest') = parseStmList rest []
+            in case rest' of
+                CloseParen : rest'' -> (SEQ stmList, rest'')
+                _ -> error "Syntax error: missing closing parenthesis in sequence"
+        _seqOfStmsWithoutParen ->
+            -- Parsing a sequence of statements without parentheses
+            let (stmList, rest') = parseStmList tokens []
+            in (SEQ stmList, rest')
+        
 
 
-        -- Here we treat basic sequences/Statements
-        _ ->
+-- Helper function to parse a list of statements
+parseStmList :: [Token] -> [Stm] -> ([Stm], [Token])
+parseStmList tokens acc =
+    case tokens of
+        CloseParen : rest -> (acc, tokens)
+        Semicolon : rest ->
+            let (stm, rest') = parseSingleStm rest
+            in parseStmList rest' (acc ++ [stm])
+        _singleStm -> 
+            let (stm, rest') = parseSingleStm tokens
+            in if null rest' then (acc ++ [stm], rest') else parseStmList rest' (acc ++ [stm])
 
-            let (stm1, restOfTokens) = parseSingleStm tokens
-            in case restOfTokens of
-                Semicolon : rest -> (stm1, rest) -- Also here, we ensure semicolon is checked here for the possible single statements like ASSIGN, IF, WHILE
-                _ -> error "Syntax error: missing semicolon after statement"
 
 --TODO: use list of statements to deal with sequence of statements on SEQ?
 -- TODO: check cases of: if can have or not () on condition and then, while always have () else can have or not, while always have () on condition and on body after do

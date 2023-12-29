@@ -38,7 +38,8 @@ data Token =
     | OpSub
     | OpMult
     | OpLe
-    | OpEq
+    | OpEqInt
+    | OpEqBool
     | OpNot
     | OpAnd
     | OpAssign
@@ -87,10 +88,10 @@ lexer (c:cs)
         let (intToken, rest) = lexerIntLit (c:cs)
         in intToken : lexer rest -- we assume only positive integers
 
-    | c == '=' && not (null cs) && head cs == '=' = OpEq : lexer (tail cs)--TODO: check if this is the correct way to do it using head and tail
+    | c == '=' && not (null cs) && head cs == '=' = OpEqInt : lexer (tail cs)--TODO: check if this is the correct way to do it using head and tail
     | "True" `isPrefixOf` (c:cs) = BoolLit True : lexer (drop 4 (c:cs))
     | "False" `isPrefixOf` (c:cs) = BoolLit False : lexer (drop 5 (c:cs))
-    | c == '=' = OpEq : lexer cs -- Equality for boolean expressions
+    | c == '=' = OpEqBool : lexer cs -- Equality for boolean expressions
     | c == ':' && not (null cs) && head cs == '=' = OpAssign : lexer (tail cs)
     | "not" `isPrefixOf` (c:cs) = OpNot : lexer (drop 3 (c:cs))
     | "while" `isPrefixOf` (c:cs) = KWWhile : lexer (drop 5 (c:cs))

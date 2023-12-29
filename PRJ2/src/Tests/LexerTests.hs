@@ -5,11 +5,14 @@ import Lexer
 import MachineStructures
 import ImperativeLanguage
 import Lexer (lexer, Token (OpEq))
+import Control.Exception (evaluate, try, ErrorCall(..), SomeException(..) )
 
-
+import Data.List (isPrefixOf, isInfixOf)
 -- Tests for every possible Token/statements as group of tokens
 
 
+import Control.Exception
+import Control.Monad
 
 
 
@@ -41,15 +44,15 @@ lexerVarNameTests = TestList [
     TestCase (assertEqual "for (lexerVarName \"x_1_2_\")" [VarName "x_1_2_"] (lexerVarName "x_1_2_")),
     TestCase (assertEqual "for (lexerVarName \"x_1_2_3\")" [VarName "x_1_2_3"] (lexerVarName "x_1_2_3")),
     TestCase (assertEqual "Simple variable name" [VarName "x123"] (lexerVarName "x123")),
-    TestCase (assertEqual "Variable name with operators" [VarName "y",OpAdd, OpEq] (lexerVarName "y+=")),
-    TestCase (assertEqual "Variable name with operators" [VarName "y",OpSub, OpEq] (lexerVarName "y-=")),
+   TestCase (assertEqual "Variable name with operators" [VarName "y",OpAdd, OpEq] (lexerVarName "y+=")),
+   TestCase (assertEqual "Variable name with operators" [VarName "y",OpSub, OpEq] (lexerVarName "y-=")),
     TestCase (assertEqual "Variable name with operators" [VarName "y",OpMult, OpEq] (lexerVarName "y*=")),
     TestCase (assertEqual "Variable name with operators" [VarName "y",OpLe] (lexerVarName "y<=")),
     TestCase (assertEqual "Variable name with operators" [VarName "y",OpEq] (lexerVarName "y==")),
-    TestCase (assertEqual "Variable name with operators" [VarName "y!",OpEq] (lexerVarName "y!=")),
-    TestCase (assertEqual "Variable name with operators" [VarName "y&&"] (lexerVarName "y&&")),
-    TestCase (assertEqual "Variable name with operators" [VarName "y||"] (lexerVarName "y||")),
-    TestCase (assertEqual "Variable name with operators" [VarName "y_2_A_ZX!"] (lexerVarName "y_2_A_ZX!")),
+    TestCase (assertEqual "Variable name with operators" [VarName "y!",OpEq] (lexerVarName "y!=")), -- needs to throw error
+    TestCase (assertEqual "Variable name with operators" [VarName "y&&"] (lexerVarName "y&&")), -- needs to throw error
+    TestCase (assertEqual "Variable name with operators" [VarName "y||"] (lexerVarName "y||")),-- needs to throw error
+    TestCase (assertEqual "Variable name with operators" [VarName "y_2_A_Z!"] (lexerVarName "y_2_A_Z!")), -- needs to throw error
     TestCase (assertEqual "Variable name with semicolon" [VarName "variable", Semicolon] (lexerVarName "variable;"))
     ]
 
@@ -62,16 +65,22 @@ lexerIntLitTests = TestList [
 
 -- Test cases for lexer
 lexerTests :: Test
-lexerTests= TestList [ 
+lexerTests= TestList [
     TestCase (assertEqual "Combination of tokens" [VarName "x", OpAssign, IntLit 5, Semicolon] (lexer "x := 5;")),
-    TestCase (assertEqual "Complex expression" [KWIf, VarName "x", OpLe, IntLit 10, KWThen, VarName "y", OpAssign, BoolLit True, Semicolon, KWElse, VarName "y", OpAssign, BoolLit False, Semicolon] (lexer "if x < 10 then y := True; else y := False;")),
-    TestCase (assertEqual "Keywords and operators" [KWWhile, VarName "x", OpEq, IntLit 0, KWDo, VarName "x", OpAssign, VarName "x", OpSub, IntLit 1, Semicolon] (lexer "while x != 0 do x := x - 1;")),
-    TestCase (assertEqual "Keywords and operators" [KWWhile, VarName "x", OpEq, IntLit 0, KWDo, VarName "x", OpAssign, VarName "x", OpSub, IntLit 1, Semicolon] (lexer "while (x != 0) do (x := x - 1;)"))
+    TestCase (assertEqual "Complex expression" [KWIf, VarName "x", OpLe, IntLit 10, KWThen, VarName "y", OpAssign, BoolLit True, Semicolon, KWElse, VarName "y", OpAssign, BoolLit False, Semicolon] (lexer "if x < 10 then y := True; else y := False;")), --needs to throm error, because we don use <, just <=
+    TestCase (assertEqual "Complex expression" [KWIf, VarName "x", OpLe, IntLit 10, KWThen, VarName "y", OpAssign, BoolLit True, Semicolon, KWElse, VarName "y", OpAssign, BoolLit False, Semicolon] (lexer "if x <= 10 then y := True; else y := False;")), --no error, because we use <=
+    TestCase (assertEqual "Complex expression" [KWIf,OpenParen,OpNot,BoolLit True,OpAnd,IntLit 2,OpLe,IntLit 5,OpEq,IntLit 3,OpEq,IntLit 4,CloseParen,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "y",OpAssign,IntLit 2,Semicolon](lexer "if (not True and 2 <= 5 = 3 == 4) then x :=1; else y := 2;")),
+   
+    TestCase (assertEqual "Complex expression" [KWWhile,OpenParen,OpNot,OpenParen,VarName "i",OpEq,IntLit 1,CloseParen,CloseParen,KWDo,OpenParen,VarName "fact",OpAssign,VarName "fact",OpMult,VarName "i",Semicolon,VarName "i",OpAssign,VarName "i",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon](lexer "while (not(i == 1)) do (fact := fact * i; i := i - 1;);")),
+    TestCase (assertEqual "Complex expression" [VarName "x",OpAssign,IntLit 42,Semicolon,KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen] (lexer "x := 42; if x <= 43 then x := 1; else (x := 33; x := x+1;)")),
+    TestCase (assertEqual "Complex expression" [VarName "x",OpAssign,IntLit 2,Semicolon,VarName "y",OpAssign,OpenParen,VarName "x",OpSub,IntLit 3,CloseParen,OpMult,OpenParen,IntLit 4,OpAdd,IntLit 2,OpMult,IntLit 3,CloseParen,Semicolon,VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",OpMult,OpenParen,IntLit 2,CloseParen,Semicolon] (lexer "x := 2; y := (x - 3)*(4 + 2*3); z := x +x*(2);"))
+    
     ]
 
-  
+-- Total only 5 errors in 30 Tried the rest of TestCases with assertEqual are True
 -- Main function to run tests
+main :: IO ()
 main = do
-    let allTests = TestList [lexerVarNameTests, lexerIntLitTests, lexerProjectExamplesCase]
+    let allTests = TestList [lexerVarNameTests, lexerIntLitTests, lexerProjectExamplesCase, lexerTests]
 
     runTestTTAndExit allTests

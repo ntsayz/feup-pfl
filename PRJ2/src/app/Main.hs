@@ -1,27 +1,25 @@
 module Main where
 -- PFL 2023/24 - Haskell practical assignment quickstart
 
-import Assembler (run)
-import MachineStructures 
+import Assembler 
+import MachineStructures
+import Parser
+import Lexer
+import Compiler
 
--- simple test program
-testProgram :: (Code, Stack, State)
-testProgram = 
-    ( [ Push 10
-      , Push 20
-      , Add
-      , Store "x" 
-      , Fetch "x"
-      , Push 5
-      , Mult
-      ], 
-      [], 
-      createEmptyState 
-    )
 
+
+testParser :: String -> (String, String)
+testParser programCode = (stack2Str stack, state2Str state)
+  where (_,stack,state) = run(compile (parse programCode), createEmptyStack, createEmptyState)
+
+
+testAssembler :: Code -> (String, String)
+testAssembler code = (stack2Str stack, state2Str state)
+  where (_,stack,state) = run(code, createEmptyStack, createEmptyState)
 main :: IO ()
 main = do
-    let (code, stack, state) = run testProgram
+    let (stack, state) = testParser "i := 10; fact := 1; while (not(i == 1)) do (fact := fact * i; i := i - 1;);"
     putStrLn $ "Final Stack: " ++ show stack
     putStrLn $ "Final State: " ++ show state
 

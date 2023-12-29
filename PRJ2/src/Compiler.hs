@@ -52,12 +52,15 @@ compB (AND x y) = compB y ++ compB x ++ [And]
 
 
 
-
+-- To deal with Stm on of our imperative language 
 compile :: Program -> Code
 compile [] = [] --base case
-compile (stm:xs) = 
+compile (stm:xs) =
     case stm of
-        ASSIGN var aexp -> compA aexp ++ [Store var] ++ compile xs
-        SEQ stm1 stm2 -> compile [stm1] ++ compile [stm2] ++ compile xs
-        IF bexp stm1 stm2 -> compB bexp ++ [Branch (compile [stm1]) (compile [stm2])] ++ compile xs
-        WHILE bexp stm -> [Loop (compB bexp) (compile [stm])] ++ compile xs
+        ASSIGN var compExpr -> compCompExpr compExpr ++ [Store var] ++ compile xs
+        SEQ [] -> compile xs -- Handle empty sequence
+        SEQ (stm1:restOfStms) -> compile [stm1]  ++ compile restOfStms ++compile xs
+        IF bexp stm1 stm2 -> compB bexp ++ [Branch (compile [stm1]) (compile [stm2])] ++ compile xs -- stm1 or stm1 can be SEQ
+        WHILE bexp stm -> [Loop (compB bexp) (compile [stm])] ++ compile xs -- stm can be SEQ
+
+    
