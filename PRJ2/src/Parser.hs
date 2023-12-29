@@ -59,7 +59,7 @@ import Data.Char
 parseTerm :: [Token] -> (CompExpr, [Token])
 parseTerm tokens =
     case tokens of
-        (IntLit x : restOfTokens) -> (AEXPR (INTVAL x), restOfTokens)
+        (IntLit x : restOfTokens) -> (AEXPR (INTVAL x), restOfTokens) -- TODO: Improve this
         (VarName x : restOfTokens) -> (AEXPR (VAR x), restOfTokens)
         (OpenParen : restOfTokens) ->
             -- Determine if the expression inside the parentheses is Aexp or Bexp
@@ -76,7 +76,8 @@ parseTerm tokens =
                         _ -> error "Missing closing parenthesis for Bexp"
         _ -> error "Invalid term syntax on CompExpr"
 
---TODO: finishi this and do this for other cases or statements cases
+--TODO: finish this and do this for other cases or statements cases
+data ExprType = AexpType | BexpType
 -- Helper function to determine the type of expression (Aexp or Bexp)
 nextExpressionType :: [Token] -> ExprType
 nextExpressionType (OpNot : _) = BexpType
@@ -90,7 +91,6 @@ nextExpressionType (IntLit _ : _) = AexpType
 nextExpressionType ( _: OpEqBool : _ : _) = BexpType
 nextExpressionType _ = AexpType -- Default to Aexp for other cases
 
-data ExprType = AexpType | BexpType
 
 
 -- Parses multiplication expressions
@@ -139,11 +139,11 @@ parseAnd tokens =
                            in (AND expr1 expr2, rest3)
         _noAnd -> (expr1, rest1)
 
-parseEquality :: [Token] -> (Bexp, [Token])
+parseEquality :: [Token] -> (Bexp, [Token]) -- TODO: improve this
 parseEquality tokens =
     let (expr1, rest1) = parseNegation tokens
     in case rest1 of
-        (OpEq : rest2) -> let (expr2, rest3) = parseEquality rest2
+        (OpEqBool : rest2) -> let (expr2, rest3) = parseEquality rest2
                           in (EQU (BEXPR expr1) (BEXPR expr2), rest3)
         _noEquality -> (expr1, rest1)
 
