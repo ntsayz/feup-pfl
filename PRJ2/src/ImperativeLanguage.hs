@@ -51,7 +51,8 @@ data Bexp = TRU -- Terminal term
 
 
 -- Our SEQ Term needs to ensure  (instr1 ; instr2) ( using parenthesis with sequence of statements):Eg: "x := 42; if x <= 43 then x := 1; else (x := 33; x := x+1;)"
-data Stm = ASSIGN !String !CompExpr -- Terminal terms from Aexp and Bexp
+data Stm = ASSIGNBOOL !String !Bexp -- Terminal terms from Aexp and Bexp
+         | ASSIGNINT !String !Aexp -- Terminal terms from Aexp and Bexp
          | SEQ ![Stm]
          | IF !Bexp !Stm !Stm
          | WHILE !Bexp !Stm

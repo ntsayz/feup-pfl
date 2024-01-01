@@ -173,7 +173,7 @@ parseAnd' leftTerm (OpAnd : tokens) =
 parseAnd' left tokens = Just (left, tokens)
 
 
-
+-- Function that is the entry point for parsing Bexp expressions
 parseBexp :: [Token] -> Maybe (Bexp, [Token])
 parseBexp tokens = 
    case parseAnd tokens of
@@ -183,8 +183,42 @@ parseBexp tokens =
     
     
 
+-- parser for Stm expressions for our Imperative Language
 
 
+
+-- parser for assigments (eg: x := 42; or x := True; etc)
+parseAssignment :: [Token] -> Maybe (Stm, [Token])
+parseAssignment (VarName var : OpAssign : tokens) =
+    case parseAexp tokens of -- if parseAexp dont parse nothing, or just parse a part of the tokens, parseBexp will be called
+        Just (aexp, Semicolon : restTokens) -> Just (ASSIGNINT var aexp, restTokens)
+        _noSemicolon -> 
+            case parseBexp tokens of
+                Just (bexp, Semicolon : restTokens) -> Just (ASSIGNBOOL var bexp, restTokens)
+                _noBexp -> Nothing  
+parseAssignment _ = Nothing
+
+
+parseSeq :: [Token] -> Maybe (Stm, [Token])
+parseSeq (OpenParen : tokens) = parseSeq' [] tokens
+parseSeq _ = Nothing
+
+parseSeq' :: [Stm] -> [Token] -> Maybe (Stm, [Token])
+parseSeq' acc (CloseParen : restTokens) = Just (SEQ (reverse acc), restTokens)
+parseSeq' acc tokens =
+    case parseStm tokens of
+        Just (stm, Semicolon : restAfterStm) -> parseSeq' (stm : acc) restAfterStm
+        _ -> Nothing  
+
+
+
+parseStm :: [Token] -> Maybe (Stm, [Token])
+parseStm tokens = trace ("parseStm: " ++ show tokens) $
+    case parseAssignment tokens of
+        Just (stm, []) -> Just (stm, []) 
+        Just (stm, restAfterStm) -> Just (stm, restAfterStm)
+        _incompleteParsing -> Nothing  -- Handle all other cases
+        --Nothing -> parseIf tokens <|> parseWhile tokens <|> parseSeq tokens
 
 
 

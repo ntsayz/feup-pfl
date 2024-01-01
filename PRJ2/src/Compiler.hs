@@ -59,7 +59,8 @@ compile :: Program -> Code
 compile [] = [] --base case
 compile (stm:xs) =
     case stm of
-        ASSIGN var compExpr -> compCompExpr compExpr ++ [Store var] ++ compile xs
+        ASSIGNBOOL var bexp -> compB bexp ++ [Store var] ++ compile xs
+        ASSIGNINT var aexp -> compA aexp ++ [Store var] ++ compile xs
         SEQ [] -> compile xs -- Handle empty sequence
         SEQ (stm1:restOfStms) -> compile [stm1]  ++ compile restOfStms ++compile xs
         IF bexp stm1 stm2 -> compB bexp ++ [Branch (compile [stm1]) (compile [stm2])] ++ compile xs -- stm1 or stm1 can be SEQ

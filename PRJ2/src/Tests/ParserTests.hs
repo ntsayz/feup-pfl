@@ -6,6 +6,7 @@ import ImperativeLanguage
 import Lexer
 import Test.HUnit hiding (State)
 import Test.HUnit.Text (runTestTTAndExit,runTestTT)
+import ParserV2 (parseAnd)
 
 --Test functions for the Parser module
 
@@ -46,6 +47,12 @@ parseAndEvaluateBexp :: String -> Bexp
 parseAndEvaluateBexp str =
     case parseBexp . lexer $ str of
         Just (bexp, _) -> bexp
+        Nothing -> error "Parse error"
+
+parseAndEvaluateStm :: String -> Stm
+parseAndEvaluateStm str =
+    case parseStm . lexer $ str of
+        Just (stm, _) -> stm
         Nothing -> error "Parse error"
 
 
@@ -306,7 +313,50 @@ allFirstBexpTests = TestList [TestLabel "testBoolTerm" testBoolTerm,
                          TestLabel "testAND" testAND]
 
 
+
+-- Test parsers for statements
+
+testAssigmentParsing :: Test
+testAssigmentParsing = TestList [
+    
+    TestCase $ assertEqual "x := 5" (ASSIGNINT "x" (INTVAL 5)) (parseAndEvaluateStm "x := 5;"),
+    TestCase $ assertEqual "y := 3 * 4" (ASSIGNINT "y" (MULT (INTVAL 3) (INTVAL 4))) (parseAndEvaluateStm "y := 3 * 4;"),
+    TestCase $ assertEqual "z := 2 + 3 - 1" (ASSIGNINT "z" (SUB (ADD (INTVAL 2) (INTVAL 3)) (INTVAL 1))) (parseAndEvaluateStm "z := 2 + 3 - 1;"),
+    
+    
+    TestCase $ assertEqual "a := True" (ASSIGNBOOL "a" TRU) (parseAndEvaluateStm "a := True;"),
+    TestCase $ assertEqual "b := False" (ASSIGNBOOL "b" FALS) (parseAndEvaluateStm "b := False;"),
+    TestCase $ assertEqual "c := x <= y" (ASSIGNBOOL "c" (LE (VAR "x") (VAR "y"))) (parseAndEvaluateStm "c := x <= y;"),
+    
+    
+    TestCase $ assertEqual "d := (5 + 3) * 2" (ASSIGNINT "d" (MULT (ADD (INTVAL 5) (INTVAL 3)) (INTVAL 2))) (parseAndEvaluateStm "d := (5 + 3) * 2;"),
+    TestCase $ assertEqual "e := not (x = y)" 
+           (ASSIGNBOOL "e" (NEG (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y"))))) 
+           (parseAndEvaluateStm "e := not (x = y);"),
+ 
+  
+    TestCase $ assertEqual "f := 1 + 2 * 3" (ASSIGNINT "f" (ADD (INTVAL 1) (MULT (INTVAL 2) (INTVAL 3)))) (parseAndEvaluateStm "f := 1 + 2 * 3;"),
+    TestCase $ assertEqual "g := (True and False) and x = 5" 
+           (ASSIGNBOOL "g" (AND (AND TRU FALS) (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (INTVAL 5))))) 
+           (parseAndEvaluateStm "g := (True and False) and x = 5;"),
+    TestCase $ assertEqual "a := x <= 5" (ASSIGNBOOL "a" (LE (VAR "x") (INTVAL 5))) (parseAndEvaluateStm "a := x <= 5;"),
+    TestCase $ assertEqual "b := y == 7" (ASSIGNBOOL "b" (EQUINT (VAR "y") (INTVAL 7))) (parseAndEvaluateStm "b := y == 7;"),
+    TestCase $ assertEqual "c := z = True" (ASSIGNBOOL "c" (EQUBOOL (AEXPRBOOL (VAR "z")) TRU)) (parseAndEvaluateStm "c := z = True;"),
+    TestCase $ assertEqual "d := (x <= 5) = (y == 3)" (ASSIGNBOOL "d" (EQUBOOL (LE (VAR "x") (INTVAL 5)) (EQUINT (VAR "y") (INTVAL 3)))) (parseAndEvaluateStm "d := (x <= 5) = (y == 3);"),
+    TestCase $ assertEqual "e := (w <= 2) = False" (ASSIGNBOOL "e" (EQUBOOL (LE (VAR "w") (INTVAL 2)) FALS)) (parseAndEvaluateStm "e := (w <= 2) = False;"),
+    TestCase $ assertEqual "f := (v == 4) = True" (ASSIGNBOOL "f" (EQUBOOL (EQUINT (VAR "v") (INTVAL 4)) TRU)) (parseAndEvaluateStm "f := (v == 4) = True;"),
+    TestCase $ assertEqual "g := (u <= 6) = (t == 1) and False" (ASSIGNBOOL "g" (AND (EQUBOOL (LE (VAR "u") (INTVAL 6)) (EQUINT (VAR "t") (INTVAL 1))) FALS)) (parseAndEvaluateStm "g := (u <= 6) = (t == 1) and False;"),
+    TestCase $ assertEqual "h := x <= 4 and y = True" (ASSIGNBOOL "h" (AND (LE (VAR "x") (INTVAL 4)) (EQUBOOL (AEXPRBOOL (VAR "y")) TRU))) (parseAndEvaluateStm "h := x <= 4 and y = True;"),
+    TestCase $ assertEqual "i := not (z = False)" (ASSIGNBOOL "i" (NEG (EQUBOOL (AEXPRBOOL (VAR "z")) FALS))) (parseAndEvaluateStm "i := not (z = False);"),
+    TestCase $ assertEqual "k := (u <= 2) and not (t = False)" (ASSIGNBOOL "k" (AND (LE (VAR "u") (INTVAL 2)) (NEG (EQUBOOL (AEXPRBOOL (VAR "t")) FALS)))) (parseAndEvaluateStm "k := (u <= 2) and not (t = False);"),
+    TestCase $ assertEqual "l := not (x = y) and (z <= 5) = True" (ASSIGNBOOL "l" (AND (NEG (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y")))) (EQUBOOL (LE (VAR "z") (INTVAL 5)) TRU))) (parseAndEvaluateStm "l := not (x = y) and (z <= 5) = True;")
+
+    ]
+
+allStatmentsTests :: Test
+allStatmentsTests = TestList [TestLabel "testSAssigmentParsing" testAssigmentParsing]
+
 main :: IO ()
 main = do
-    let allTests = TestList [ allNewBexpTests, allAexpTests, allFirstBexpTests]
+    let allTests = TestList [ allNewBexpTests, allAexpTests, allFirstBexpTests, allStatmentsTests]
     runTestTTAndExit allTests
