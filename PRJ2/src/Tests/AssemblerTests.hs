@@ -33,7 +33,7 @@ testLE = TestList [
 
     input2 = ([Push 4, Push 4, Le], createEmptyStack, createEmptyState)
     output2 = snd3 $ run input2
-    expectedOutput2 = [FF]
+    expectedOutput2 = [TT]
 
     input3 = ([Push 4, Push 5, Le], createEmptyStack, createEmptyState)
     output3 = snd3 $ run input3
@@ -41,7 +41,7 @@ testLE = TestList [
 
     input4 = ([Push 0, Push 0, Le], createEmptyStack, createEmptyState)
     output4 = snd3 $ run input4
-    expectedOutput4 = [FF]
+    expectedOutput4 = [TT]
 
 
 testFetchLe :: Test

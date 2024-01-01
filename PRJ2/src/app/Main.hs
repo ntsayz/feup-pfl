@@ -17,13 +17,65 @@ import Compiler
 -- testAssembler :: Code -> (String, String)
 -- testAssembler code = (stack2Str stack, state2Str state)
 --   where (_,stack,state) = run(code, createEmptyStack, createEmptyState)
-
+{--
 main :: IO ()
 main = do
     putStrLn $ "Final Stack: " 
     putStrLn $ "Final State: " 
 
+--}
 
+{--
+pp :: Code
+pp = [
+    Push 5, Push 3, Add, 
+    Push 10, Push 2, Sub, 
+    Push 2, Push 3, Mult, 
+    
+    Store "x", 
+    Fetch "x", 
+    Push 1, Add, 
+
+    Tru, 
+    Fals,
+    And, 
+    Neg, 
+
+    Push 7,
+    Le,
+    Equ]
+--}
+
+
+part_one_example :: Code
+part_one_example = [
+    -- Stack: [], State: {}
+    Push 5,      -- Stack: [5], State: {}
+    Push 3,      -- Stack: [3, 5], State: {}
+    Add,         -- Stack: [8], State: {}   (3 + 5)
+    Store "x",   -- Stack: [], State: {"x": 8}  (store 8 in "x")
+
+    Push 10,     -- Stack: [10], State: {"x": 8}
+    Push 2,      -- Stack: [2, 10], State: {"x": 8}
+    Sub,         -- Stack: [8], State: {"x": 8} (10 - 2)
+    Push 2,      -- Stack: [2, 8], State: {"x": 8}
+    Push 3,      -- Stack: [3, 2, 8], State: {"x": 8}
+    Mult,        -- Stack: [6, 8], State: {"x": 8} (2 * 3)
+    Fetch "x",   -- Stack: [8, 6, 8], State: {"x": 8} (fetch value of "x")
+    Add,         -- Stack: [14, 8], State: {"x": 8} (8 + 6)
+    Push 7,      -- Stack: [7, 14, 8], State: {"x": 8}
+    Le
+    ]
+
+
+main :: IO ()
+main = do
+    let (_, finalStack, finalState) = run (part_one_example, createEmptyStack, createEmptyState)
+
+    putStrLn "Stack:"
+    print $ stack2Str finalStack
+    putStrLn "State:"
+    print $ state2Str finalState
 
 
 

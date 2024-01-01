@@ -52,31 +52,28 @@ O módulo Assembler é onde se encontra a funcionalidade central do interpretado
 
 Lógica de execução 
 
-`exec`: Esta função é o coração do interpretador. Ela recebe uma tupla de Código, Pilha e Estado e aplica a primeira instrução da lista de Código à Pilha e ao Estado atuais. A função trata cada tipo de instrução de forma diferente, actualizando a pilha e o estado conforme necessário.
+`exec`: Esta função recebe uma tuple `(Code, Stack, State)` e aplica a primeira instrução da lista à Stack e ao State atuais.
+
+~~~hs
+type Stack = [StackValue]
+~~~
 
 
 
-erros: Um tratamento de erros robusto é implementado para detetar erros de tempo de execução, como underflows na stack ou operações inválidas . Isto assegura que o intérprete se comporta de forma previsível e segura em situações erróneas.
+##  Exemplos 
 
-Instruções de fluxo de controlo: A ramificação e o ciclo são fundamentais para a execução condicional e as construções de ciclo. Alteram o fluxo de execução do programa com base nos valores da pilha ou transformam a lista de códigos para implementar a lógica de ciclo.
+~~~hs
+    -- Stack: [], State: {}
+    Push 5,      -- [5]     {}
+    Push 3,      -- [3, 5]  {}
+    Add,         -- [8]     {}   (3 + 5)
+    Store "x",   -- [],     {"x": 8}  
+    Push 2,      -- [2, 8]  {"x": 8}
+    Mult,        -- [16]    {"x": 8} (2 * 8)
+    Store "y"    -- []      {"x": 8, "y": 16} 
+~~~
 
-## Resultado 
-
-    Instruções e manipulação da pilha: Instruções como Push, Add, Sub e Mult manipulam diretamente a pilha, quer adicionando novos valores, quer executando operações sobre os valores existentes na pilha.
-
-    Interação de estados: Instruções como Fetch e Store interagem com o estado para recuperar ou atualizar valores de variáveis, fazendo a ponte entre as operações efémeras da pilha e as alterações mais persistentes do estado.
-
-    Gestão do fluxo de controlo: Branch e Loop usam o estado atual da pilha (particularmente os valores do topo) para decidir o curso futuro do programa, tomando decisões dinâmicas baseadas em dados de tempo de execução.
-
-Cenários de exemplo
-
-    Computação aritmética: Para uma sequência de código como [Push 1, Push 2, Add], o interpretador coloca 1 e 2 na pilha e, em seguida, adiciona esses dois valores, atualizando a pilha com o resultado (3).
-
-    Lógica condicional: Numa instrução Branch, a decisão sobre o caminho a seguir baseia-se no valor booleano no topo da pilha, demonstrando como o estado da pilha influencia o fluxo de controlo do programa.
-
-    Tratamento de erros: Se uma instrução Adicionar for encontrada com menos de dois itens na pilha, o interpretador lança um erro em tempo de execução, mostrando a importância do tratamento de erros na robustez do sistema.
 
 
 ## IMPLEMENTAÇÃO - PARTE 2
 
-![just testing](lexical-analysis.png)
