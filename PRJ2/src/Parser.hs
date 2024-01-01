@@ -1,310 +1,272 @@
-{- 
-   - Part 2
-
-
-    Definition of our parser: 
-
-    Entity
-
-    which takes the tokens from the lexer and returns a syntax tree based on a grammar. 
-    The grammar is often expressed in a meta language such as Backus-Naur Form (BNF) ( or others). 
-    The grammar is the language of languages and provides the rules and syntax.
-
-  
-  
- -}
-
-
- {-
- 
-     Define a parser which transforms an imperative program represented as a string
-into its corresponding representation in the Stm data (a list of statements Stm).
-  The parser with the help oft the lexer, will take a list of tokens,
-  and return a list of statements (Stm) that represents the program.
-  Using pattern matching and recursion to process the list of tokens,
-  builds an abstract syntax tree (AST) that represents the program.
-  
-  This AST is the output of the parser that will be used by the compiler.
-  
-  The compiler (compile) will take the AST and generate the machine code.
-  
-  The run (assembler/interpreter) will take the machine code and execute it.
- 
- 
- -}
-
-
--- {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
--- {-# HLINT ignore "Eta reduce" #-}
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Eta reduce" #-}
 module Parser where
--- import ImperativeLanguage
+import ImperativeLanguage
 
--- import Lexer
--- import Data.List (isPrefixOf, isInfixOf)
--- import Data.Char
-
--- --Parser will Define Abstract Syntax Trees, Concrete Syntax Tree or other kind of tree to use on the arithmetical and boolean expressions and other things
--- -- We construct our AST (Abstract Syntax Tree) that represents a given CFG ( context free grammar for our language)
--- -- The way the parser constructs AST's ditate the precedence and associativity of the operators/statements (arithmetical, boolean and use of parenthesis)
--- --  type Program = [Stm]
-
--- {-
---    Need to consider operator precedence and associativity in arithmetic expressions and boolean expressions
---    Using recursive descent parsing: we break down the parsing process into hierarchy of functions, 
---    where they have a level of precedence between them.
---    TODO: explain how it works on the report
---    TODO: check project instructions for more details(
---    TODO: check how negative numbers are handled on the report x + -1 is just x - 1
-
--- -}
--- -- Parser to deal with terms (e.g. 5, x, (5 + 3))
--- parseTerm :: [Token] -> (CompExpr, [Token])
--- parseTerm tokens =
---     case tokens of
---         (IntLit x : restOfTokens) -> (AEXPR (INTVAL x), restOfTokens) -- TODO: Improve this
---         (VarName x : restOfTokens) -> (AEXPR (VAR x), restOfTokens)
---         (OpenParen : restOfTokens) ->
---             -- Determine if the expression inside the parentheses is Aexp or Bexp
---             case nextExpressionType restOfTokens of
---                 AexpType -> 
---                     let (aexp, restOfTokens') = parseAexp restOfTokens
---                     in case restOfTokens' of
---                         (CloseParen : restOfTokens'') -> (AEXPR aexp, restOfTokens'')
---                         _ -> error "Missing closing parenthesis for Aexp"
---                 BexpType -> 
---                     let (bexp, restOfTokens') = parseBexp restOfTokens
---                     in case restOfTokens' of
---                         (CloseParen : restOfTokens'') -> (BEXPR bexp, restOfTokens'')
---                         _ -> error "Missing closing parenthesis for Bexp"
---         _ -> error "Invalid term syntax on CompExpr"
-
--- --TODO: finish this and do this for other cases or statements cases
--- data ExprType = AexpType | BexpType
--- -- Helper function to determine the type of expression (Aexp or Bexp)
--- nextExpressionType :: [Token] -> ExprType
--- nextExpressionType (OpNot : _) = BexpType
--- nextExpressionType (OpenParen: OpNot : _) = BexpType 
--- nextExpressionType (BoolLit _ : _) = BexpType
--- nextExpressionType (_ : OpLe : _) = AexpType
--- nextExpressionType (_ : OpEqInt : _) = BexpType
--- nextExpressionType (VarName _ : OpAssign : BoolLit _ : _) = BexpType
-    
--- nextExpressionType (IntLit _ : _) = AexpType
--- nextExpressionType ( _: OpEqBool : _ : _) = BexpType
--- nextExpressionType _ = AexpType -- Default to Aexp for other cases
-
-
-
--- -- Parses multiplication expressions
--- -- Parses multiplication expressions
--- parseProduct :: [Token] -> (CompExpr, [Token])
--- parseProduct tokens =
---     let (term1, rest) = parseTerm tokens in
---     case rest of
---         (OpMult : rest') ->
---             let (term2, rest'') = parseProduct rest' in
---             case (term1, term2) of
---                 (AEXPR a1, AEXPR a2) -> (AEXPR (MULT a1 a2), rest'')
---                 _ -> error "Type mismatch in multiplication expression"
---         _ -> (term1, rest) -- If we don't have a multiplication expression we return the term and the rest of the tokens
-
-
--- -- Parses addition and subtraction expressions
--- parseSum :: [Token] -> (Aexp, [Token])
--- parseSum tokens =
---    -- here we call parseProduct to parse the multiplication expression, and calling before parseSum we ensure precedence
---     let (term1, rest) = parseProduct tokens in
---     case rest of
---         (OpAdd : rest') ->
---             let (term2, rest'') = parseSum rest' in
---             (ADD term1 term2, rest'')
---         (OpSub : rest') ->
---             let (term2, rest'') = parseSum rest' in
---             (SUB term1 term2, rest'')
---         _noAddOrSub -> (term1, rest)
-
-
-
--- -- Parsing logic for arithmetic expressions
--- -- Example: parseAexp [IntLit 5, OpAdd, IntLit 3, OpMult, IntLit 2]
--- -- returns (MULT (ADD (INTVAL 5) (INTVAL 3)) (INTVAL 2), [])
--- parseAexp :: [Token] -> (Aexp, [Token])
--- parseAexp tokens = parseSum tokens
-
--- -- Auxiliary functions for parsing boolean expressions
--- -- We take into account operator precedence and associativity
--- parseAnd :: [Token] -> (Bexp, [Token])
--- parseAnd tokens =
---     let (expr1, rest1) = parseEquality tokens
---     in case rest1 of
---         (OpAnd : rest2) -> let (expr2, rest3) = parseAnd rest2
---                            in (AND expr1 expr2, rest3)
---         _noAnd -> (expr1, rest1)
-
--- parseEquality :: [Token] -> (Bexp, [Token]) -- TODO: improve this
--- parseEquality tokens =
---     let (expr1, rest1) = parseNegation tokens
---     in case rest1 of
---         (OpEqBool : rest2) -> let (expr2, rest3) = parseEquality rest2
---                           in (EQU (BEXPR expr1) (BEXPR expr2), rest3)
---         _noEquality -> (expr1, rest1)
-
--- parseNegation :: [Token] -> (Bexp, [Token])
--- parseNegation (OpNot : OpenParen : tokens) =
---     let (expr, rest) = parseBexp tokens
---     in case rest of
---         CloseParen : rest' -> (NEG expr, rest')
---         _noCloseParen -> error "Syntax error: missing closing parenthesis in negation"
--- parseNegation tokens = parseRelation tokens
-
-
--- parseRelation :: [Token] -> (Bexp, [Token])
--- parseRelation tokens =
---     let (expr1, rest1) = parseAexp tokens
---     in case rest1 of
---         (OpLe : rest2) -> let (expr2, rest3) = parseAexp rest2
---                           in (LE expr1 expr2, rest3)
---         _ -> error "Error on: relational operator with boolean terms" -- TODO: improve error handling, only run interprete/assembler handle error as Run-time error
--- -- Parsing logic for boolean expressions
--- -- Example: parseBexp [KWTrue, OpAnd, KWFalse, OpNot, OpAnd, KWTrue]
---    -- returns (AND TRU (NEG (AND FALS TRU)), [])
--- parseBexp :: [Token] -> (Bexp, [Token])
--- parseBexp tokens = parseAnd tokens  -- We need to Start with the lowest precedence
-
-
--- parseOptionalParensBexp :: [Token] -> (Bexp, [Token])
--- parseOptionalParensBexp (OpenParen : tokens) = 
---     let (expr, rest) = parseBexp tokens
---     in case rest of
---         CloseParen : rest' -> (expr, rest')
---         _noCloseParen -> error "Syntax error: missing closing parenthesis in bexp"
--- parseOptionalParensBexp tokens = parseBexp tokens
-
--- parseOptionalParensStm :: [Token] -> (Stm, [Token])
--- parseOptionalParensStm (OpenParen : tokens) = 
---     let (stm, rest) = parseStm tokens
---     in case rest of
---         CloseParen : Semicolon : rest' -> (stm, rest')
---         _noCloseParen -> error "Syntax error: missing closing parenthesis in stm"
--- parseOptionalParensStm tokens = parseStm tokens
-
-
-
--- -- Funtions to check if the variable name contains any reserved keywords (case-insensitive)
--- reservedKeywords :: [String]
--- reservedKeywords = ["else", "then", "if", "while", "not", "do", "and"]
-
--- -- Check if the variable name contains any reserved keywords (case-insensitive)
--- containsReservedKeyword :: String -> Bool
--- containsReservedKeyword varName =
---     let varNameLower = map toLower varName
---     in any (`isInfixOf` varNameLower) (map toLower <$> reservedKeywords)
-
-
--- -- Parses either an arithmetic or a boolean expression
--- parseCompExpr :: [Token] -> (CompExpr, [Token])
--- parseCompExpr tokens =
---     let (aexpResult, aexpRest) = parseAexp tokens
---     in if not (null aexpRest) && aexpRest /= tokens
---        then (AEXPR aexpResult, aexpRest)
---        else let (bexpResult, bexpRest) = parseBexp tokens
---             in (BEXPR bexpResult, bexpRest)
--- -- Parsing logic for assignments
--- parseAssign :: [Token] -> (Stm, [Token])
--- parseAssign (VarName var : OpAssign : restOfTokens)
---     | containsReservedKeyword var = error "Syntax error: variable name contains reserved keyword"
---     | otherwise =
---         let (compExpr, rest) = parseCompExpr restOfTokens
---         in case rest of
---             (Semicolon : rest') -> (ASSIGN var compExpr, rest')
---             _noSemicolon -> error "Syntax error: missing semicolon after assignment"
--- parseAssign _ = error "Syntax error: parseAssign called for wrong syntax/Tokens" -- TODO: improve error handling, only run interprete/assembler handle error as Run-time error
+import Lexer
+import Data.List (isPrefixOf, isInfixOf)
+import Data.Char
+import Debug.Trace (trace)
+import Control.Applicative ((<|>))
 
 
 
 
--- -- Parsing logic for if statements
--- parseIf :: [Token] -> (Stm, [Token])
--- parseIf tokens =
---     case tokens of
---         KWIf : restAfterIf ->
---             let (bexpCondition, restAfterBexp) = parseOptionalParensBexp restAfterIf
---                 (thenStm, tokensAfterThenStm) = parseOptionalParensStm $ tail (dropWhile (/= KWThen) restAfterBexp)
---                 (elseStm, restAfterElseStm) = parseOptionalParensStm $ tail (dropWhile (/= KWElse) tokensAfterThenStm)
---             in (IF bexpCondition thenStm elseStm, restAfterElseStm)
---         _ -> error "Syntax error: expected 'if' at the beginning"
-
--- parseWhile :: [Token] -> (Stm, [Token])
--- parseWhile tokens =
---     case tokens of
---         KWWhile : OpenParen : restAfterWhile ->
---             let (bexpCondition, restAfterBexp) = parseBexp restAfterWhile
---             in case restAfterBexp of
---                 CloseParen : KWDo : restAfterDo ->
---                     let (doStm, restAfterDoStm) = parseOptionalParensStm restAfterDo
---                     in (WHILE bexpCondition doStm, restAfterDoStm)
---                 _ -> error "Syntax error: missing closing parenthesis or 'do' keyword"
---         _ -> error "Syntax error: expected 'while' at the beginning"
-
--- -- Function to parse a single statement (ASSIGN, IF, WHILE, etc.)
--- parseSingleStm :: [Token] -> (Stm, [Token])
--- parseSingleStm tokens =
---     case tokens of
---         OpenParen : rest -> 
---             -- Parsing a sequence of statements inside parentheses
---             let (stmList, rest') = parseStmList rest []
---             in case rest' of
---                 CloseParen : rest'' -> (SEQ stmList, rest'')
---                 _noCloseParen -> error "Syntax error: missing closing parenthesis in sequence"
---         tokens@(VarName _ : OpAssign : _) -> parseAssign tokens
---         tokens@(KWIf : _) -> parseIf tokens
---         tokens@(KWWhile : _) -> parseWhile tokens
---         _invalidSingleStm -> error "Syntax error: invalid single statement"
+parseTerm :: [Token] -> Maybe (Aexp, [Token])
+parseTerm (OpenParen : restTokensAfterOpenParen) =
+    case parseAexp restTokensAfterOpenParen of
+        Just (expr, CloseParen : restAfterCloseParen) -> Just (expr, restAfterCloseParen)
+        _ -> Nothing  -- Handle error, incomplete parse, or missing CloseParen
+parseTerm (IntLit n : restAfterIntList) = Just (INTVAL n, restAfterIntList)
+parseTerm (VarName v : restAfterVarName) = Just (VAR v, restAfterVarName)
+parseTerm _ = Nothing  -- Handle error for unexpected token
 
 
--- -- Function to parse a sequence of statements (SEQ) or a single statement
--- -- we only deal with SEQ = (stm1 ; stm2), where cant have nested SEQ ( inside parenthesis)
--- --TODO: nested SEQ ( inside parenthesis) is not a good syntax, the proper way would be: SEQN = (stm1 ; stm2 ; ... ; stmn)
--- -- or using SEQ (!Stm, !Stm) we would have : code syntax like : (stm1; ((stm2; stm3;))) ... nested SEQ ...
--- -- Function to parse a sequence of statements
--- parseStm :: [Token] -> (Stm, [Token])
--- parseStm tokens =
---     case tokens of
---         OpenParen : rest ->
---             -- Parsing a sequence of statements inside parentheses
---             let (stmList, rest') = parseStmList rest []
---             in case rest' of
---                 CloseParen : rest'' -> (SEQ stmList, rest'')
---                 _ -> error "Syntax error: missing closing parenthesis in sequence"
---         _seqOfStmsWithoutParen ->
---             -- Parsing a sequence of statements without parentheses
---             let (stmList, rest') = parseStmList tokens []
---             in (SEQ stmList, rest')
-        
 
 
--- -- Helper function to parse a list of statements
--- parseStmList :: [Token] -> [Stm] -> ([Stm], [Token])
--- parseStmList tokens acc =
---     case tokens of
---         CloseParen : rest -> (acc, tokens)
---         Semicolon : rest ->
---             let (stm, rest') = parseSingleStm rest
---             in parseStmList rest' (acc ++ [stm])
---         _singleStm -> 
---             let (stm, rest') = parseSingleStm tokens
---             in if null rest' then (acc ++ [stm], rest') else parseStmList rest' (acc ++ [stm])
+parseProduct :: [Token] -> Maybe (Aexp, [Token])
+parseProduct tokens =
+    case parseTerm tokens of
+        Just (leftTerm, restAfterLeftTerm) -> parseProduct' leftTerm restAfterLeftTerm
+        Nothing -> Nothing
+
+parseProduct' :: Aexp -> [Token] -> Maybe (Aexp, [Token])
+parseProduct' leftTerm (OpMult : tokens) =
+    case parseTerm tokens of
+        Just (rightTerm, restAfterRightTerm) -> parseProduct' (MULT leftTerm rightTerm) restAfterRightTerm
+        Nothing -> Nothing
+parseProduct' left tokens = Just (left, tokens)
 
 
--- --TODO: use list of statements to deal with sequence of statements on SEQ?
--- -- TODO: check cases of: if can have or not () on condition and then, while always have () else can have or not, while always have () on condition and on body after do
 
--- buildData :: [Token] -> Program
+parseSum :: [Token] -> Maybe (Aexp, [Token])
+parseSum tokens =
+    case parseProduct tokens of
+        Just (leftTerm, restAfterLeftTerm) -> parseSum' leftTerm restAfterLeftTerm
+        Nothing -> Nothing
+
+parseSum' :: Aexp -> [Token] -> Maybe (Aexp, [Token])
+parseSum' leftTerm (OpAdd : tokens) =
+    case parseProduct tokens of
+        Just (rightTerm, restAfterRightTerm) -> parseSum' (ADD leftTerm rightTerm) restAfterRightTerm
+        Nothing -> Nothing
+parseSum' leftTerm (OpSub : tokens) =
+    case parseProduct tokens of
+        Just (rightTerm, restAfterRightTerm) -> parseSum' (SUB leftTerm rightTerm) restAfterRightTerm
+        Nothing -> Nothing
+parseSum' left tokens = Just (left, tokens)
+
+
+
+parseAexp :: [Token] -> Maybe (Aexp, [Token])
+parseAexp tokens =
+    case parseSum tokens of
+        Just (aexp, []) -> Just (aexp, [])
+        Just (aexp, restAfterAexp) -> Just (aexp, restAfterAexp)
+        _incompleteParsing -> Nothing  -- Handle incomplete parse or error
+
+
+
+-- parser for Bexp expressions for our Imperative Language
+
+
+parseBoolLiteral :: [Token] -> Maybe (Bexp, [Token])
+parseBoolLiteral (BoolLit True : restTokens) = Just (TRU, restTokens)
+parseBoolLiteral (BoolLit False : restTokens) = Just (FALS, restTokens)
+parseBoolLiteral _ = Nothing  -- This case handles when the input token list does not start with a boolean literal
+
+
+parseBoolVar :: [Token] -> Maybe (Bexp, [Token])
+parseBoolVar (VarName name : restTokens) = Just (AEXPRBOOL (VAR name), restTokens)
+parseBoolVar _ = Nothing  -- Handle the case where the token is not a variable name
+
+parseBexpTerm :: [Token] -> Maybe (Bexp, [Token])
+parseBexpTerm (OpenParen : restTokensAfterOpenParen) =
+    case parseBexp restTokensAfterOpenParen of
+        Just (bexp, CloseParen : restAfterBexp) -> Just (bexp, restAfterBexp)
+        _noBexp -> Nothing
+
+parseBexpTerm tokens =
+    case parseAexp tokens of
+        Just (aexp, restAfterAexp) -> Just (AEXPRBOOL aexp, restAfterAexp)
+        Nothing -> parseSimpleBexp tokens
+-- This is for case we dont have parentheses and we need to check for the other cases respecting the precedence and not just stop on BoolLiteral or VarBool eg: True = False
+
+
+parseSimpleBexp :: [Token] -> Maybe (Bexp, [Token])
+parseSimpleBexp tokens =
+    parseBoolLiteral tokens <|>
+    parseBoolVar tokens
+
+
+
+
+
+parseLe:: [Token] -> Maybe (Bexp, [Token])
+parseLe tokens =
+    case parseBexpTerm tokens of
+        Just (leftTerm, restAfterLeftTerm) -> parseLe' leftTerm restAfterLeftTerm
+        Nothing -> Nothing
+
+parseLe' :: Bexp -> [Token] -> Maybe (Bexp, [Token])
+parseLe' leftTerm (OpLe : tokens) =
+    case parseBexpTerm tokens of
+        Just (rightTerm, restAfterRightTerm) ->
+            case (leftTerm, rightTerm) of
+                (AEXPRBOOL leftAexp, AEXPRBOOL rightAexp) ->
+                    parseLe' (LE leftAexp rightAexp) restAfterRightTerm
+                noAEXPRBOOL_ -> Nothing
+        Nothing -> Nothing
+parseLe' left tokens = Just (left, tokens)
+
+parseEquality :: [Token] -> Maybe (Bexp, [Token])
+parseEquality tokens =
+    case parseLe tokens of
+        Just (leftTerm, restAfterLeftTerm) -> parseEquality' leftTerm restAfterLeftTerm
+        Nothing -> Nothing
+
+parseEquality' :: Bexp -> [Token] -> Maybe (Bexp, [Token])
+parseEquality' leftTerm (OpEqInt : tokens) =
+    case parseLe tokens of
+        Just (rightTerm, restAfterRightTerm) ->
+            case (leftTerm, rightTerm) of
+                (AEXPRBOOL leftAexp, AEXPRBOOL rightAexp) ->
+                    parseEquality' (EQUINT leftAexp rightAexp) restAfterRightTerm
+                noAEXPRBOOL_ -> Nothing
+        Nothing -> Nothing
+parseEquality' left tokens = Just (left, tokens)
+
+--TODO: explain this to professor !!! we can have for not not not x = True -> not (not (not (x) ) )  = True)))
+-- TODO: check this : left to right associativity (from project instructions), normally not is right to left
+
+parseNot :: [Token] -> Maybe (Bexp, [Token])
+parseNot (OpNot : restTokens) =
+    case parseNot restTokens of
+        Just (bexp, remainingTokens) -> Just (NEG bexp, remainingTokens)
+        Nothing -> parseEquality restTokens  -- Proceed to the next level of parsing
+parseNot tokens = parseEquality tokens  -- Continue to call parseEquality for non-'not' cases
+
+
+parseEqBool :: [Token] -> Maybe (Bexp, [Token])
+parseEqBool tokens =
+    case parseNot tokens of
+        Just (leftTerm, restAfterLeftTerm) -> parseEqBool' leftTerm restAfterLeftTerm
+        Nothing -> Nothing
+
+parseEqBool' :: Bexp -> [Token] -> Maybe (Bexp, [Token])
+parseEqBool' leftTerm (OpEqBool : tokens) =
+    case parseNot tokens of
+        Just (rightTerm, restAfterRightTerm) -> Just (EQUBOOL leftTerm rightTerm, restAfterRightTerm)
+        Nothing -> Nothing
+parseEqBool' left tokens = Just (left, tokens)
+
+parseAnd :: [Token] -> Maybe (Bexp, [Token])
+parseAnd tokens =
+    case parseEqBool tokens of
+        Just (leftTerm, restAfterLeftTerm) -> parseAnd' leftTerm restAfterLeftTerm
+        Nothing -> Nothing
+parseAnd' :: Bexp -> [Token] -> Maybe (Bexp, [Token])
+parseAnd' leftTerm (OpAnd : tokens) =
+    case parseEqBool tokens of
+        Just (rightTerm, restAfterRightTerm) -> Just (AND leftTerm rightTerm, restAfterRightTerm)
+        Nothing -> Nothing
+parseAnd' left tokens = Just (left, tokens)
+
+
+-- Function that is the entry point for parsing Bexp expressions
+parseBexp :: [Token] -> Maybe (Bexp, [Token])
+parseBexp tokens =
+   case parseAnd tokens of
+        Just (bexp, []) -> Just (bexp, [])
+        Just (bexp, restAfterBexp) -> Just (bexp, restAfterBexp)
+        _incompleteParsing -> Nothing  -- Handle incomplete parse or error
+
+
+
+-- parser for Stm expressions for our Imperative Language
+
+
+
+-- parser for assigments (eg: x := 42; or x := True; etc)
+parseAssignment :: [Token] -> Maybe (Stm, [Token])
+parseAssignment (VarName var : OpAssign : tokens) =
+    case parseAexp tokens of -- if parseAexp dont parse nothing, or just parse a part of the tokens, parseBexp will be called
+        Just (aexp, Semicolon : restTokens) -> Just (ASSIGNINT var aexp, restTokens)
+        _noSemicolon ->
+            case parseBexp tokens of
+                Just (bexp, Semicolon : restTokens) -> Just (ASSIGNBOOL var bexp, restTokens)
+                _noBexp -> Nothing
+parseAssignment _ = Nothing
+
+-- parser for Sequence of assigments ( more then one inside parenthesis)
+parseSeq :: [Token] -> Maybe (Stm, [Token])
+parseSeq (OpenParen : tokens) = trace ("parseSeq: tokens: " ++ show tokens) $ parseSeq' [] tokens
+parseSeq _ = Nothing
+
+parseSeq' :: [Stm] -> [Token] -> Maybe (Stm, [Token])
+parseSeq' acc (CloseParen : Semicolon : restTokens) =  Just (SEQ (reverse acc), restTokens)
+parseSeq' acc (CloseParen : KWElse: restTokens) = trace ("parseSeq': tokens: " ++ show (KWElse: restTokens)) $ Just (SEQ (reverse acc), KWElse: restTokens) -- for ) with no ; after then
+parseSeq' acc tokens = 
+    case parseStm tokens of
+        Just (stm, restAfterStm) -> parseSeq' (stm : acc) restAfterStm
+        _ -> Nothing
+
+-- for then statements,SEQ needs to no evaluate Semicolon after CloseParen
+
+
+parseIf :: [Token] -> Maybe (Stm, [Token])
+parseIf (KWIf : tokens) = do
+    (condExpr, restAfterCond) <- parseBexp tokens
+    case restAfterCond of
+        KWThen : restAfterThen -> do
+            (thenStm, restAfterThenStm) <- parseStm restAfterThen
+            case restAfterThenStm of
+                KWElse : restAfterElse -> do
+                    (elseStm, restAfterElseStm) <- parseStm restAfterElse
+                    return (IF condExpr thenStm elseStm, restAfterElseStm)
+                _noElse -> Nothing -- Error handling if 'else' is missing
+        _notThen -> Nothing -- Error handling if 'then' is missing
+parseIf _ = Nothing
+
+-- parser for while loops
+parseWhile :: [Token] -> Maybe (Stm, [Token])
+parseWhile (KWWhile : tokens) = do
+    (condExpr, restAfterCond) <- parseBexp tokens
+    case restAfterCond of
+        KWDo : restAfterDo -> do
+            (loopBody, restAfterLoopBody) <- parseStm restAfterDo
+            return (WHILE condExpr loopBody, restAfterLoopBody)
+        _notDo -> Nothing -- Error handling if 'do' is missing
+parseWhile _ = Nothing
+
+
+
+parseStm :: [Token] -> Maybe (Stm, [Token])
+parseStm tokens = trace ("parseStm: tokens: " ++ show tokens) $
+    parseSeq tokens  <|> parseIf tokens <|> parseWhile tokens <|> parseAssignment tokens 
+    -- Continue to add other parsers like parseWhile as needed
+
+
+buildData :: [Token] -> Program
+buildData tokens = fst $ parseStms tokens
+
+parseStms :: [Token] -> (Program, [Token])
+parseStms [] = ([], [])
+parseStms tokens =
+    case parseStm tokens of
+        Just (stm, restTokens) -> 
+            let (stms, remaining) = parseStms restTokens
+            in (stm : stms, remaining)
+        Nothing -> ([], tokens)  -- If no statement can be parsed, return the remaining tokens
+
+
+
+
+parse :: String -> Program
+parse = buildData . lexer -- parse will be the composition of builData and lexer
+-- buildData :: [Token] -> Maybe (Aexp, [Token])
 -- buildData tokens =
---         let (stm, restOfTokens) = parseStm tokens
---         in stm : buildData restOfTokens -- list of statements constructed recursively
-
-
--- parse :: String -> Program
--- parse = buildData . lexer -- parse will be the composition of builData and lexer
+--         case parseExpression tokens of
+--             Just (aexp, []) -> Just (aexp, [])
+--             _errorParsingTokens ->  Nothing
 

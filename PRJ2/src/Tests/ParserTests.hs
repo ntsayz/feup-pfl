@@ -6,7 +6,7 @@ import ImperativeLanguage
 import Lexer
 import Test.HUnit hiding (State)
 import Test.HUnit.Text (runTestTTAndExit,runTestTT)
-import ParserV2 (parseAnd)
+import Parser (parseAnd, parseWhile)
 
 --Test functions for the Parser module
 
@@ -68,7 +68,7 @@ testPrecedence = TestList [
     TestCase $ assertEqual "2 + 3 * 4 - 5" (SUB (ADD (INTVAL 2) (MULT (INTVAL 3) (INTVAL 4))) (INTVAL 5)) (parseAndEvaluateAexp "2 + 3 * 4 - 5"),
     TestCase $ assertEqual "4 + 5 * 6 - 7" (SUB (ADD (INTVAL 4) (MULT (INTVAL 5) (INTVAL 6))) (INTVAL 7)) (parseAndEvaluateAexp "4 + 5 * 6 - 7"),
     TestCase $ assertEqual "3 * 4 + 6 * 2" (ADD (MULT (INTVAL 3) (INTVAL 4)) (MULT (INTVAL 6) (INTVAL 2))) (parseAndEvaluateAexp "3 * 4 + 6 * 2")
-   
+
     ]
 
 
@@ -123,7 +123,7 @@ testParseBoolLiteral = TestList [
 testParseEquality :: Test
 testParseEquality = TestList [
     TestCase $ assertEqual "for 3 == 3," (EQUINT (INTVAL 3) (INTVAL 3)) (parseAndEvaluateBexp "3 == 3")
-   
+
     ]
 
 
@@ -133,8 +133,8 @@ testParseEqBool = TestList [
     TestCase $ assertEqual "for True = False," (EQUBOOL TRU FALS) (parseAndEvaluateBexp "True = False"),
     TestCase $ assertEqual "for (True = False) = (False = False)," (EQUBOOL (EQUBOOL TRU FALS) (EQUBOOL FALS FALS)) (parseAndEvaluateBexp "(True = False) = (False = False)"),-- using parentheses
     TestCase $ assertEqual "for (2 + 1 == x) = (False = False)," (EQUBOOL (EQUINT (ADD (INTVAL 2) (INTVAL 1)) (VAR "x")) (EQUBOOL FALS FALS)) (parseAndEvaluateBexp "(2 + 1 == x) = (False = False)")-- using parentheses
-    
-    
+
+
     ]
 
 
@@ -142,11 +142,11 @@ testParseEqBool = TestList [
 testParseBoolVar :: Test
 testParseBoolVar = TestList [
     TestCase $ assertEqual "for x," (AEXPRBOOL (VAR "x")) (parseAndEvaluateBexp "x")
-    
+
     ]
 
 testParseLe :: Test
-testParseLe = TestList [ 
+testParseLe = TestList [
     TestCase $ assertEqual "for 2 <= 3," (LE (INTVAL 2) (INTVAL 3)) (parseAndEvaluateBexp "2 <= 3"),
     TestCase $ assertEqual "for x <= 5," (LE (VAR "x") (INTVAL 5)) (parseAndEvaluateBexp "x <= 5"),
     TestCase $ assertEqual "for (1 <= 2) = True," (EQUBOOL (LE (INTVAL 1) (INTVAL 2)) TRU) (parseAndEvaluateBexp "(1 <= 2) = True"),
@@ -172,15 +172,15 @@ testNot = TestList [
     TestCase $ assertEqual "for not (x = True)," (NEG (EQUBOOL (AEXPRBOOL (VAR "x")) TRU)) (parseAndEvaluateBexp "not (x = True)"),
     TestCase $ assertEqual "for not (not (x == 1))," (NEG (NEG (EQUINT (VAR "x") (INTVAL 1)))) (parseAndEvaluateBexp "not (not (x == 1))"),
     TestCase $ assertEqual "for not not (x = False)," (NEG (NEG (EQUBOOL (AEXPRBOOL (VAR "x")) FALS))) (parseAndEvaluateBexp "not not (x = False)"),
-    TestCase $ assertEqual "for not not not x == 2," 
+    TestCase $ assertEqual "for not not not x == 2,"
                (NEG (NEG (NEG (EQUINT (VAR "x") (INTVAL 2)))) )
                (parseAndEvaluateBexp "not not not x == 2"),
 
-    TestCase $ assertEqual "for not not not x = True," 
-               (EQUBOOL (NEG (NEG (NEG (AEXPRBOOL (VAR "x"))))) TRU) 
+    TestCase $ assertEqual "for not not not x = True,"
+               (EQUBOOL (NEG (NEG (NEG (AEXPRBOOL (VAR "x"))))) TRU)
                (parseAndEvaluateBexp "not not not x = True"),
 
-    TestCase $ assertEqual "for not not not x = y," 
+    TestCase $ assertEqual "for not not not x = y,"
                (EQUBOOL (NEG (NEG (NEG (AEXPRBOOL (VAR "x"))))) (AEXPRBOOL (VAR "y")))
                (parseAndEvaluateBexp "not not not x = y")
     ]
@@ -189,47 +189,47 @@ testNot = TestList [
 
 testAndOperations :: Test
 testAndOperations = TestList [
-    TestCase $ assertEqual "for True and True," 
-               (AND TRU TRU) 
+    TestCase $ assertEqual "for True and True,"
+               (AND TRU TRU)
                (parseAndEvaluateBexp "True and True"),
 
-    TestCase $ assertEqual "for False and True," 
-               (AND FALS TRU) 
+    TestCase $ assertEqual "for False and True,"
+               (AND FALS TRU)
                (parseAndEvaluateBexp "False and True"),
 
-    TestCase $ assertEqual "for x and y," 
-               (AND (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y"))) 
+    TestCase $ assertEqual "for x and y,"
+               (AND (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y")))
                (parseAndEvaluateBexp "x and y"),
 
-    TestCase $ assertEqual "for not x and y," 
-               (AND (NEG (AEXPRBOOL (VAR "x"))) (AEXPRBOOL (VAR "y"))) 
+    TestCase $ assertEqual "for not x and y,"
+               (AND (NEG (AEXPRBOOL (VAR "x"))) (AEXPRBOOL (VAR "y")))
                (parseAndEvaluateBexp "not x and y"),
 
-    TestCase $ assertEqual "for x and not y," 
-               (AND (AEXPRBOOL (VAR "x")) (NEG (AEXPRBOOL (VAR "y")))) 
+    TestCase $ assertEqual "for x and not y,"
+               (AND (AEXPRBOOL (VAR "x")) (NEG (AEXPRBOOL (VAR "y"))))
                (parseAndEvaluateBexp "x and not y"),
 
-    TestCase $ assertEqual "for (x = 2) and (y = 3)," 
-           (AND (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (INTVAL 2))) 
-                (EQUBOOL (AEXPRBOOL (VAR "y")) (AEXPRBOOL (INTVAL 3)))) 
+    TestCase $ assertEqual "for (x = 2) and (y = 3),"
+           (AND (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (INTVAL 2)))
+                (EQUBOOL (AEXPRBOOL (VAR "y")) (AEXPRBOOL (INTVAL 3))))
            (parseAndEvaluateBexp "(x = 2) and (y = 3)"),
 
-    TestCase $ assertEqual "for (1 + 1 == 2) and True," 
-           (AND (EQUINT (ADD (INTVAL 1) (INTVAL 1)) (INTVAL 2)) TRU) 
+    TestCase $ assertEqual "for (1 + 1 == 2) and True,"
+           (AND (EQUINT (ADD (INTVAL 1) (INTVAL 1)) (INTVAL 2)) TRU)
            (parseAndEvaluateBexp "(1 + 1 == 2) and True"),
 
-    TestCase $ assertEqual "for False and (3 <= 4)," 
-               (AND FALS (LE (INTVAL 3) (INTVAL 4))) 
+    TestCase $ assertEqual "for False and (3 <= 4),"
+               (AND FALS (LE (INTVAL 3) (INTVAL 4)))
                (parseAndEvaluateBexp "False and (3 <= 4)"),
 
-    TestCase $ assertEqual "for not (x = y) and (3 == 3)," 
-           (AND (NEG (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y")))) 
-                (EQUINT (INTVAL 3) (INTVAL 3))) 
+    TestCase $ assertEqual "for not (x = y) and (3 == 3),"
+           (AND (NEG (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y"))))
+                (EQUINT (INTVAL 3) (INTVAL 3)))
            (parseAndEvaluateBexp "not (x = y) and (3 == 3)"),
 
-    TestCase $ assertEqual "for (x and y) and (not z)," 
-           (AND (AND (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y"))) 
-                (NEG (AEXPRBOOL (VAR "z")))) 
+    TestCase $ assertEqual "for (x and y) and (not z),"
+           (AND (AND (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y")))
+                (NEG (AEXPRBOOL (VAR "z"))))
            (parseAndEvaluateBexp "(x and y) and (not z)")
     ]
 
@@ -318,26 +318,26 @@ allFirstBexpTests = TestList [TestLabel "testBoolTerm" testBoolTerm,
 
 testAssigmentParsing :: Test
 testAssigmentParsing = TestList [
-    
+
     TestCase $ assertEqual "x := 5" (ASSIGNINT "x" (INTVAL 5)) (parseAndEvaluateStm "x := 5;"),
     TestCase $ assertEqual "y := 3 * 4" (ASSIGNINT "y" (MULT (INTVAL 3) (INTVAL 4))) (parseAndEvaluateStm "y := 3 * 4;"),
     TestCase $ assertEqual "z := 2 + 3 - 1" (ASSIGNINT "z" (SUB (ADD (INTVAL 2) (INTVAL 3)) (INTVAL 1))) (parseAndEvaluateStm "z := 2 + 3 - 1;"),
-    
-    
+
+
     TestCase $ assertEqual "a := True" (ASSIGNBOOL "a" TRU) (parseAndEvaluateStm "a := True;"),
     TestCase $ assertEqual "b := False" (ASSIGNBOOL "b" FALS) (parseAndEvaluateStm "b := False;"),
     TestCase $ assertEqual "c := x <= y" (ASSIGNBOOL "c" (LE (VAR "x") (VAR "y"))) (parseAndEvaluateStm "c := x <= y;"),
-    
-    
+
+
     TestCase $ assertEqual "d := (5 + 3) * 2" (ASSIGNINT "d" (MULT (ADD (INTVAL 5) (INTVAL 3)) (INTVAL 2))) (parseAndEvaluateStm "d := (5 + 3) * 2;"),
-    TestCase $ assertEqual "e := not (x = y)" 
-           (ASSIGNBOOL "e" (NEG (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y"))))) 
+    TestCase $ assertEqual "e := not (x = y)"
+           (ASSIGNBOOL "e" (NEG (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y")))))
            (parseAndEvaluateStm "e := not (x = y);"),
- 
-  
+
+
     TestCase $ assertEqual "f := 1 + 2 * 3" (ASSIGNINT "f" (ADD (INTVAL 1) (MULT (INTVAL 2) (INTVAL 3)))) (parseAndEvaluateStm "f := 1 + 2 * 3;"),
-    TestCase $ assertEqual "g := (True and False) and x = 5" 
-           (ASSIGNBOOL "g" (AND (AND TRU FALS) (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (INTVAL 5))))) 
+    TestCase $ assertEqual "g := (True and False) and x = 5"
+           (ASSIGNBOOL "g" (AND (AND TRU FALS) (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (INTVAL 5)))))
            (parseAndEvaluateStm "g := (True and False) and x = 5;"),
     TestCase $ assertEqual "a := x <= 5" (ASSIGNBOOL "a" (LE (VAR "x") (INTVAL 5))) (parseAndEvaluateStm "a := x <= 5;"),
     TestCase $ assertEqual "b := y == 7" (ASSIGNBOOL "b" (EQUINT (VAR "y") (INTVAL 7))) (parseAndEvaluateStm "b := y == 7;"),
@@ -353,10 +353,152 @@ testAssigmentParsing = TestList [
 
     ]
 
+testSeqStatements :: Test
+testSeqStatements = TestList [
+    TestCase $ assertEqual "(x := 5; x := x - 1;);"
+               (SEQ [ASSIGNINT "x" (INTVAL 5), ASSIGNINT "x" (SUB (VAR "x") (INTVAL 1))])
+               (parseAndEvaluateStm "(x := 5; x := x - 1;);"),
+
+    TestCase $ assertEqual "(y := 10; z := y + 5;);"
+               (SEQ [ASSIGNINT "y" (INTVAL 10), ASSIGNINT "z" (ADD (VAR "y") (INTVAL 5))])
+               (parseAndEvaluateStm "(y := 10; z := y + 5;);"),
+
+    TestCase $ assertEqual "(a := True; b := a = False;);"
+               (SEQ [ASSIGNBOOL "a" TRU, ASSIGNBOOL "b" (EQUBOOL (AEXPRBOOL (VAR "a")) FALS)])
+               (parseAndEvaluateStm "(a := True; b := a = False;);"),
+
+    TestCase $ assertEqual "(c := x <= y; d := x == 2;)"
+               (SEQ [ASSIGNBOOL "c" (LE (VAR "x") (VAR "y")), ASSIGNBOOL "d" (EQUINT (VAR "x") (INTVAL 2))])
+               (parseAndEvaluateStm "(c := x <= y; d := x == 2;);"),
+
+    TestCase $ assertEqual "(e := not (x = y); f := True and False;)"
+               (SEQ [ASSIGNBOOL "e" (NEG (EQUBOOL (AEXPRBOOL (VAR "x")) (AEXPRBOOL (VAR "y")))), ASSIGNBOOL "f" (AND TRU FALS)])
+               (parseAndEvaluateStm "(e := not (x = y); f := True and False;);")
+    ]
+
+   -- tests for if statements
+testIfStatements :: Test
+testIfStatements = TestList [
+    TestCase $ assertEqual "Simple if-then-else without parentheses"
+               (IF (LE (VAR "x") (INTVAL 43)) (ASSIGNINT "x" (INTVAL 1)) (ASSIGNINT "y" (INTVAL 2)))
+               (parseAndEvaluateStm "if x <= 43 then x := 1; else y := 2;"),
+
+    TestCase $ assertEqual "Complex if-then-else with parentheses"
+               (IF (AND (NEG TRU) (EQUBOOL (LE (INTVAL 2) (INTVAL 5)) (EQUINT (INTVAL 3) (INTVAL 4)))) (SEQ [ASSIGNINT "x" (INTVAL 1), ASSIGNINT "y" (INTVAL 2)]) (ASSIGNINT "y" (INTVAL 3)))
+               (parseAndEvaluateStm "if (not True and 2 <= 5 = 3 == 4) then (x := 1; y := 2;) else y := 3;"),
+    TestCase $ assertEqual "Single statement in then and else without parentheses"
+               (IF (EQUINT (VAR "x") (INTVAL 33)) (ASSIGNINT "x" (INTVAL 1)) (ASSIGNINT "y" (INTVAL 2)))
+               (parseAndEvaluateStm "if x == 33 then x := 1; else y := 2;"),
+
+    TestCase $ assertEqual "Multiple statements in then and else with parentheses"
+               (IF (EQUBOOL (AEXPRBOOL (VAR "y")) TRU) (SEQ [ASSIGNINT "x" (INTVAL 33), ASSIGNINT "x" (ADD (VAR "x") (INTVAL 1))]) (SEQ [ASSIGNINT "x" (INTVAL 33), ASSIGNINT "x" (ADD (VAR "x") (INTVAL 1))]))
+               (parseAndEvaluateStm "if (y = True) then (x := 33; x := x + 1;) else (x := 33; x := x + 1;);"),
+
+    TestCase $ assertEqual "Nested if statement"
+               (IF (EQUBOOL (AEXPRBOOL (VAR "z")) FALS) (IF (LE (VAR "x") (INTVAL 10)) (ASSIGNINT "y" (INTVAL 1)) (ASSIGNINT "y" (INTVAL 2))) (ASSIGNINT "y" (INTVAL 3)))
+               (parseAndEvaluateStm "if z = False then if x <= 10 then y := 1; else y := 2; else y := 3;"),
+
+    TestCase $ assertEqual "If statement with complex boolean expression"
+               (IF (AND (NEG (EQUBOOL TRU FALS)) (LE (VAR "x") (VAR "y"))) (ASSIGNINT "z" (INTVAL 5)) (ASSIGNINT "z" (INTVAL 10)))
+               (parseAndEvaluateStm "if not (True = False) and x <= y then z := 5; else z := 10;"),
+
+    TestCase $ assertEqual "If statement with single then statement and multiple else statements"
+               (IF (EQUBOOL (AEXPRBOOL (VAR "x")) TRU) (ASSIGNINT "y" (INTVAL 100)) (SEQ [ASSIGNINT "y" (INTVAL 200), ASSIGNINT "z" (INTVAL 300)]))
+               (parseAndEvaluateStm "if x = True then y := 100; else (y := 200; z := 300;);"),
+
+    TestCase $ assertEqual "If statement with arithmetic comparison in condition"
+               (IF (LE (ADD (VAR "x") (VAR "y")) (INTVAL 50)) (ASSIGNINT "z" (INTVAL 5)) (ASSIGNINT "z" (INTVAL 10)))
+               (parseAndEvaluateStm "if x + y <= 50 then z := 5; else z := 10;"),
+
+    TestCase $ assertEqual "If statement with boolean expression in then and else"
+               (IF (LE (VAR "x") (VAR "y")) (ASSIGNBOOL "flag" TRU) (ASSIGNBOOL "flag" FALS))
+               (parseAndEvaluateStm "if x <= y then flag := True; else flag := False;"),
+
+    TestCase $ assertEqual "If statement with nested boolean expressions"
+               (IF (AND (LE (VAR "x") (VAR "y")) (NEG (EQUBOOL (AEXPRBOOL (VAR "z")) TRU))) (ASSIGNINT "result" (INTVAL 1)) (ASSIGNINT "result" (INTVAL 0)))
+               (parseAndEvaluateStm "if x <= y and not (z = True) then result := 1; else result := 0;")
+    ]
+-- tests for parser of while statements
+
+testWhileStatements :: Test
+testWhileStatements = TestList [
+    TestCase $ assertEqual "Simple while loop with arithmetic condition"
+               (WHILE (LE (VAR "count") (INTVAL 10)) (ASSIGNINT "count" (ADD (VAR "count") (INTVAL 1))))
+               (parseAndEvaluateStm "while (count <= 10) do count := count + 1;"),
+
+    TestCase $ assertEqual "While loop with boolean condition"
+               (WHILE TRU (ASSIGNINT "flag" (INTVAL 0)))
+               (parseAndEvaluateStm "while (True) do flag := 0;"),
+
+    TestCase $ assertEqual "Nested while loops"
+               (WHILE (NEG (EQUINT (VAR "x") (INTVAL 0)))
+                    (SEQ [WHILE (EQUINT (VAR "y") (INTVAL 0)) (ASSIGNINT "y" (INTVAL 10)), ASSIGNINT "x" (SUB (VAR "x") (INTVAL 1))]))
+               (parseAndEvaluateStm "while (not(x == 0)) do ( while (y == 0) do y := 10; x := x - 1; );"),
+
+    TestCase $ assertEqual "While loop with If-Else statement"
+               (WHILE (LE (VAR "i") (INTVAL 5))
+                    (IF (EQUINT (VAR "i") (INTVAL 3)) (ASSIGNINT "result" (INTVAL 1)) (ASSIGNINT "result" (INTVAL 0))))
+               (parseAndEvaluateStm "while (i <= 5) do if (i == 3) then result := 1; else result := 0;"),
+
+    TestCase $ assertEqual "Complex boolean expression in while loop"
+               (WHILE (AND (LE (VAR "a") (VAR "b")) (NEG (EQUINT (VAR "c") (INTVAL 0))))
+                    (ASSIGNINT "a" (ADD (VAR "a") (INTVAL 1))))
+               (parseAndEvaluateStm "while (a <= b and not(c == 0)) do a := a + 1;"),
+
+    TestCase $ assertEqual "While loop with multiple statements"
+               (WHILE (TRU)
+                    (SEQ [ASSIGNINT "x" (INTVAL 5), ASSIGNINT "y" (MULT (VAR "x") (INTVAL 2))]))
+               (parseAndEvaluateStm "while (True) do ( x := 5; y := x * 2; );"),
+
+    TestCase $ assertEqual "While loop with nested If and nested While"
+               (WHILE (EQUBOOL (AEXPRBOOL (VAR "x")) FALS)
+                    (IF (LE (VAR "y") (INTVAL 10))
+                       (SEQ [WHILE (EQUINT (VAR "z") (INTVAL 0)) (ASSIGNINT "z" (INTVAL 1)), ASSIGNINT "y" (ADD (VAR "y") (INTVAL 1))])
+                       (ASSIGNINT "y" (INTVAL 0))))
+               (parseAndEvaluateStm "while (x = False) do if (y <= 10) then ( while (z == 0) do z := 1; y := y + 1; ) else y := 0;"),
+
+   TestCase $ assertEqual "Parsing while loop with complex body"
+    (WHILE (NEG (EQUINT (VAR "a") (VAR "b")))
+        (SEQ [ASSIGNINT "a" (ADD (VAR "a") (INTVAL 1)), 
+              ASSIGNINT "b" (SUB (VAR "b") (INTVAL 1)), 
+              ASSIGNINT "result" (ADD (VAR "a") (VAR "b"))]))
+    (parseAndEvaluateStm "while (not(a == b)) do ( a := a + 1; b := b - 1; result := a + b; );"),
+
+    TestCase $ assertEqual "Parsing while loop with complex body"
+    (WHILE (NEG (EQUINT (VAR "a") (VAR "b")))
+        (SEQ [ASSIGNINT "a" (ADD (VAR "a") (INTVAL 1)),
+              ASSIGNINT "b" (SUB (VAR "b") (INTVAL 1)),
+              ASSIGNINT "result" (ADD (VAR "a") (VAR "b"))]))
+    (parseAndEvaluateStm "while (not(a == b)) do ( a := a + 1; b := b - 1; result := a + b; );"),
+
+    TestCase $ assertEqual "While loop with complex boolean expression and nested loops"
+               (WHILE (AND (NEG (EQUINT (VAR "x") (INTVAL 5))) (EQUBOOL (AEXPRBOOL (VAR "y")) TRU))
+                    (SEQ [WHILE (LE (VAR "z") (INTVAL 20)) (ASSIGNINT "z" (ADD (VAR "z") (INTVAL 1))), ASSIGNINT "x" (SUB (VAR "x") (INTVAL 1))]))
+               (parseAndEvaluateStm "while (not(x == 5) and y = True) do ( while (z <= 20) do z := z + 1; x := x - 1; );")
+
+    ]
+
+-- integration tests using final parser : parse
+parseTests :: Test
+parseTests = TestList [
+    TestCase $ assertEqual "Parsing multiple assignment statements"
+    [ASSIGNINT "x" (INTVAL 42), ASSIGNINT "y" (INTVAL 46)]
+    (parse "x := 42; y := 46;")
+
+
+
+
+    ]
+
+
 allStatmentsTests :: Test
-allStatmentsTests = TestList [TestLabel "testSAssigmentParsing" testAssigmentParsing]
+allStatmentsTests = TestList [TestLabel "testSAssigmentParsing" testAssigmentParsing,
+                         TestLabel "testSeqStatements" testSeqStatements, TestLabel "testIfStatements" testIfStatements, TestLabel "testWhileStatements" testWhileStatements]
+
+allParseTests:: Test
+allParseTests = TestList [TestLabel "parseTests" parseTests]
 
 main :: IO ()
 main = do
-    let allTests = TestList [ allNewBexpTests, allAexpTests, allFirstBexpTests, allStatmentsTests]
+    let allTests = TestList [ allNewBexpTests, allAexpTests, allFirstBexpTests, allStatmentsTests, allParseTests]
     runTestTTAndExit allTests
