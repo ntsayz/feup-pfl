@@ -26,7 +26,7 @@ import ImperativeLanguage
     ( Aexp(..), Bexp(..), Stm(..), CompExpr(..), Program )
 import MachineStructures
 
--- -- two mandatory auxiliary functions which compile arithmetic and boolean expressions
+-- The two mandatory auxiliary functions which compile arithmetic and boolean expressions
 compA :: Aexp -> Code
 compA (INTVAL  x) = [Push x]
 compA (VAR x) = [Fetch x]
@@ -45,7 +45,9 @@ compCompExpr (BEXPR x) = compB x
 compB :: Bexp -> Code
 compB TRU = [Tru]
 compB FALS = [Fals]
-compB (EQU x y) = compCompExpr y ++ compCompExpr x ++ [Equ]
+compB (EQUINT x y) = compA y ++ compA x ++ [Equ]
+compB (AEXPRBOOL x) = compA x
+compB (EQUBOOL x y) = compB y ++ compB x ++ [Equ]
 compB (LE x y) = compA y ++ compA x ++ [Le]
 compB (NEG x) = compB x ++ [Neg]
 compB (AND x y) = compB y ++ compB x ++ [And]

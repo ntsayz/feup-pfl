@@ -41,7 +41,9 @@ data Aexp = INTVAL !Integer --Terminal term
 
 data Bexp = TRU -- Terminal term
           | FALS -- Terminal term
-          | EQU !CompExpr !CompExpr  
+          | EQUINT !Aexp !Aexp
+          | EQUBOOL !Bexp !Bexp
+          | AEXPRBOOL !Aexp
           | LE !Aexp !Aexp
           | NEG !Bexp
           | AND !Bexp !Bexp
@@ -57,4 +59,3 @@ data Stm = ASSIGN !String !CompExpr -- Terminal terms from Aexp and Bexp
 
 type Program = [Stm] -- A program is a list of statements
 
---type Program = [Stm] -- A program is a list of statements

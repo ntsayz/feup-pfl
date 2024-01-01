@@ -22,7 +22,7 @@ data Token =
     | BoolLit !Bool
 
     -- Identifiers
-    | VarName !String
+    | VarName !String 
 
     -- Keywords
     | KWIf

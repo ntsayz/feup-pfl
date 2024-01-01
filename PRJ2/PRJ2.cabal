@@ -10,6 +10,7 @@ library
   exposed-modules:     Assembler
                        , MachineStructures
                        , Parser
+                       , ParserV2
                        , Lexer
                        , ImperativeLanguage
                        , Compiler
@@ -106,6 +107,6 @@ test-suite ParserTests
   hs-source-dirs:      src/Tests
   build-depends:       base
                         , containers >=0.6.5.1
-                       ,HUnit >=1.6
-                       , HUnit
+                       , PRJ2
+                       , HUnit >=1.6
   default-language:    Haskell2010
