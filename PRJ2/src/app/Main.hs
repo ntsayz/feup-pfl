@@ -49,21 +49,21 @@ pp = [
 
 part_one_example :: Code
 part_one_example = [
-    -- Stack: [], State: {}
-    Push 5,      -- Stack: [5], State: {}
-    Push 3,      -- Stack: [3, 5], State: {}
-    Add,         -- Stack: [8], State: {}   (3 + 5)
-    Store "x",   -- Stack: [], State: {"x": 8}  (store 8 in "x")
+    -- Stack: [], : {}
+    Push 5,      -- Stack: [5], {}
+    Push 3,      -- Stack: [3, 5], {}
+    Add,         -- Stack: [8], {}   (3 + 5)
+    Store "x",   -- Stack: [], {"x": 8} 
 
-    Push 10,     -- Stack: [10], State: {"x": 8}
-    Push 2,      -- Stack: [2, 10], State: {"x": 8}
-    Sub,         -- Stack: [8], State: {"x": 8} (10 - 2)
-    Push 2,      -- Stack: [2, 8], State: {"x": 8}
-    Push 3,      -- Stack: [3, 2, 8], State: {"x": 8}
-    Mult,        -- Stack: [6, 8], State: {"x": 8} (2 * 3)
-    Fetch "x",   -- Stack: [8, 6, 8], State: {"x": 8} (fetch value of "x")
-    Add,         -- Stack: [14, 8], State: {"x": 8} (8 + 6)
-    Push 7,      -- Stack: [7, 14, 8], State: {"x": 8}
+    Push 10,     -- Stack: [10],  {"x": 8}
+    Push 2,      -- Stack: [2, 10], {"x": 8}
+    Sub,         -- Stack: [8],  {"x": 8} (10 - 2)
+    Push 2,      -- Stack: [2, 8],  {"x": 8}
+    Push 3,      -- Stack: [3, 2, 8], {"x": 8}
+    Mult,        -- Stack: [6, 8],  {"x": 8} (2 * 3)
+    Fetch "x",   -- Stack: [8, 6, 8],  {"x": 8} 
+    Add,         -- Stack: [14, 8], {"x": 8} (8 + 6)
+    Push 7,      -- Stack: [7, 14, 8], {"x": 8}
     Le
     ]
 
