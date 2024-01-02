@@ -21,10 +21,11 @@ trd3 :: (a, b, c) -> c
 trd3 (_, _, z) = z
 testLE :: Test
 testLE = TestList [
-    TestCase (assertEqual "Testing LE with 2 < 3" expectedOutput1 output1),
-    TestCase (assertEqual "Testing LE with 4 < 4" expectedOutput2 output2),
-    TestCase (assertEqual "Testing LE with 5 < 4" expectedOutput3 output3),
-    TestCase (assertEqual "Testing LE with 0 < 0" expectedOutput4 output4)
+    TestCase (assertEqual "Testing LE with 2 <= 3" expectedOutput1 output1),
+    TestCase (assertEqual "Testing LE with 4 <= 4" expectedOutput2 output2),
+    TestCase (assertEqual "Testing LE with 5 <= 4" expectedOutput3 output3),
+    TestCase (assertEqual "Testing LE with 0 <= 0" expectedOutput4 output4),
+    TestCase (assertEqual "Testing LE with 0 - 1 <= 5" expectedOutput5 output5)
   ]
   where
     input1 = ([Push 3, Push 2, Le], createEmptyStack, createEmptyState)
@@ -33,7 +34,7 @@ testLE = TestList [
 
     input2 = ([Push 4, Push 4, Le], createEmptyStack, createEmptyState)
     output2 = snd3 $ run input2
-    expectedOutput2 = [FF]
+    expectedOutput2 = [TT]
 
     input3 = ([Push 4, Push 5, Le], createEmptyStack, createEmptyState)
     output3 = snd3 $ run input3
@@ -41,7 +42,11 @@ testLE = TestList [
 
     input4 = ([Push 0, Push 0, Le], createEmptyStack, createEmptyState)
     output4 = snd3 $ run input4
-    expectedOutput4 = [FF]
+    expectedOutput4 = [TT]
+
+    input5 = ([Push 5, Push 1,Push 0, Sub, Le], createEmptyStack, createEmptyState)
+    output5 = snd3 $ run input5
+    expectedOutput5 = [TT]
 
 
 testFetchLe :: Test
@@ -49,17 +54,17 @@ testFetchLe = TestCase $ do
     -- Test with x > 0
     let initialState1 = State (Map.fromList [("x", IntVal 5)])
     let finalResult1 = run ([Fetch "x", Push 0, Le], [], initialState1)
-    assertEqual "Testing Fetch x > 0, Push 0, Le" [FF] (snd3 finalResult1) 
+    assertEqual "Testing Fetch x > 0, Push 0, Le" [FF] (snd3 finalResult1)
 
     -- Test with x = 0
     let initialState2 = State (Map.fromList [("x", IntVal 0)])
     let finalResult2 = run ([Fetch "x", Push 0, Le], [], initialState2)
-    assertEqual "Testing Fetch x = 0, Push 0, Le" [TT] (snd3 finalResult2) 
+    assertEqual "Testing Fetch x = 0, Push 0, Le" [TT] (snd3 finalResult2)
 
     -- Test with x < 0
     let initialState3 = State (Map.fromList [("x", IntVal (-5))])
     let finalResult3 = run ([Fetch "x", Push 0, Le], [], initialState3)
-    assertEqual "Testing Fetch x < 0, Push 0, Le" [TT] (snd3 finalResult3) 
+    assertEqual "Testing Fetch x < 0, Push 0, Le" [TT] (snd3 finalResult3)
 
 
 testEQ :: Test
@@ -115,11 +120,11 @@ testStore = TestCase $ do
     let expectedState = State (Map.fromList [("x", IntVal 20)])
     let expectedStack = []
     case store "x" stack state of
-        Right (stackResult, stateResult) -> do 
+        Right (stackResult, stateResult) -> do
             assertEqual "store x" expectedState stateResult
             assertEqual "store x" expectedStack stackResult
         Left errorMsg -> assertFailure $ "Unexpected error during store: " ++ errorMsg
-    
+
 
 testAdd :: Test
 testAdd = TestCase $ do
@@ -247,7 +252,7 @@ testAssemblerExamples = TestList [
     TestLabel "Less Than or Equal To Test" $ TestCase (assertEqual "Testing less than or equal to" ("True","") (testAssembler [Push (-20),Push (-21), Le])),
     TestLabel "Arithmetic with Store and Fetch Test" $ TestCase (assertEqual "Testing arithmetic with store and fetch" ("","x=4") (testAssembler [Push 5,Store "x",Push 1,Fetch "x",Sub,Store "x"])),
     TestLabel "Loop for Factorial Calculation Test" $ TestCase (assertEqual "Testing loop for factorial calculation" ("","fact=3628800,i=1") (testAssembler [Push 10,Store "i",Push 1,Store "fact",Loop [Push 1,Fetch "i",Equ,Neg] [Fetch "i",Fetch "fact",Mult,Store "fact",Push 1,Fetch "i",Sub,Store "i"]]))
-    ]   
+    ]
 
 
 -- Function to test for runt-time error
@@ -255,10 +260,10 @@ assertErrorMessage :: String -> IO a -> Assertion
 assertErrorMessage expectedMessage action = do
     result <- try action
     case result of
-        Left ex -> 
+        Left ex ->
             let actualMessage = show (ex :: SomeException)
             in assertBool ("Expected error message not found: " ++ actualMessage) (expectedMessage `isInfixOf` actualMessage)
-        Right _ -> assertFailure $ "Expected an exception, but none was thrown."
+        Right _ -> assertFailure "Expected an exception, but none was thrown."
 
 
 -- Modified testAssemblerv2 function so we can also test for run-time errors and not just get a string with error
@@ -294,5 +299,5 @@ main = do
     let allTests = TestList [testLE, testEQ, testFetch ,testAnd, testNeg,testFetch, testStore, testAdd, testSub, testMult,testPushExec, testFetchStoreExec, testAddExec, testBranchExec, testNoopExec, testTruExec, testFalsExec, testAssemblerExamples, testSuiteRunTimeError]
     runTestTTAndExit allTests
 
-    
+
 
