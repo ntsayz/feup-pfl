@@ -8,7 +8,7 @@ Na segunda parte deste projeto, avançamos para a criação de um Compiler para 
 
 
 
-## IMPLEMENTAÇÃO - PARTE I
+## IMPLEMENTAÇÃO - PARTE 1
 
 `Inst`: Este é um tipo de dados algébrico que representa as instruções da máquina. Cada construtor no Inst encapsula uma operação ou comando distinto que a máquina pode executar.
 
@@ -156,4 +156,7 @@ compile [IF (EQUINT (VAR "x") (INTVAL 1))
 
 ~~~
 
+### Exemplo
 
+
+## Testes

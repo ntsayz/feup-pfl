@@ -84,7 +84,7 @@ factorialProgram :: String
 factorialProgram = unlines [
     "fact := 1;",
     "n := 5;", 
-    "while not (n = 1) do (",
+    "while not (n == 1) do (",
     "  fact := fact * n;",
     "  n := n - 1",
     ")"
@@ -92,20 +92,23 @@ factorialProgram = unlines [
 
 main :: IO ()
 main = do
-    -- Lexical analysis
-    let tokens = lexer factorialProgram
-
+    
     -- Parsing
-    let parsedProgram = case parse tokens of
-                          Just program -> program
-                          Nothing -> error "Parsing failed"
+    let parsedProgram = parse factorialProgram
+    putStrLn "PARSED PROGRAM: "
+    print parsedProgram
+
     -- Compilation
     let compiledCode = compile parsedProgram
+    putStrLn "COMPILED CODE: "
+    print compiledCode
+
 
     -- Execution
     let (_, finalStack, finalState) = run (compiledCode, createEmptyStack, createEmptyState)
 
-    -- Output the final state
+    putStrLn "Stack:"
+    print $ stack2Str finalStack
     putStrLn "Final State:"
     print $ state2Str finalState
 
