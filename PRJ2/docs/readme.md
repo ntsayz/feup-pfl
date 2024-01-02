@@ -1,6 +1,5 @@
 # INTRODUÇÃO
 
-
 Neste projeto temos como objectivo a implementação de um interpretador para uma linguagem de programação imperativa.
 
 O trabalho encontra-se dividido em duas partes. Na primeira parte, implementamos um pequeno assembler, que serve como base para o nosso interpretador. Este assembler processa uma série de instruções e interage com uma pilha de avaliação e um armazenamento para executar operações de baixo nível.
@@ -67,12 +66,11 @@ run (code, stack, state) =
 
 ## IMPLEMENTAÇÃO - PARTE 2
 
-A segunda parte deste projeto envolve a implementação de um compilador para uma linguagem de programação imperativa, que traduz programas de alto nível para uma sequência de instruções de máquina. Esta fase é subdividida em quatro componentes principais: a definição da linguagem imperativa (ImperativeLanguage), a análise léxica (Lexer), a análise sintática (Parser) e o processo de compilação propriamente dito (Compiler).
+A segunda parte deste projeto envolve a implementação de um compilador para uma linguagem de programação imperativa, que traduz programas de alto nível para uma sequência de instruções de máquina. Esta fase é subdividida em quatro componentes principais: a definição da linguagem imperativa (`ImperativeLanguage`), a análise léxica (`Lexer`), a análise sintática (`Parser`) e o o processo de compilação (`Compiler`).
 
 
-ImperativeLanguage: 
-
-
+### ImperativeLanguage
+Define uma Árvore Sintática Abstrata (AST) para a linguagem imperativa
 
 ~~~hs
 data Aexp = INTVAL !Integer | VAR !String | ADD !Aexp !Aexp | ... -- Expressões Aritméticas
@@ -81,7 +79,7 @@ data Stm = ASSIGN !String !CompExpr | SEQ ![Stm] | IF !Bexp !Stm !Stm | ... -- I
 
 ~~~
 
-Lexer: Análise Léxica
+### Lexer
 
 O Lexer é responsável por realizar a análise léxica do source code, transforma uma string de entrada em uma sequência de tokens. 
 
@@ -118,9 +116,9 @@ lexer "23 + 4 * 421"
 ~~~
 
 
-Parser
+### Parser
 
-Com base nos tokens fornecidos pelo Lexer, o Parser constrói uma Árvore Sintática Abstrata (AST). Esta AST reflete a estrutura gramatical do programa, organizando os tokens de forma hierárquica que facilita a compreensão do fluxo e da lógica do programa.
+Com base nos tokens fornecidos pelo Lexer, o Parser constrói uma  AST. Esta AST reflete a estrutura gramatical do programa, organizando os tokens de forma hierárquica que facilita a compreensão do fluxo e da lógica do programa.
 
 
 
@@ -133,15 +131,15 @@ parseAexp [IntLit 3, OpMult, OpenParen, IntLit 4, OpAdd, IntLit 5, CloseParen]
 ~~~
 
 
-Compiler
+### Compiler
 
-O  Compiler transforma um programa escrito na linguagem imperativa em uma sequência de instruções de máquina, conforme definido na Parte 1. O compilador utiliza funções auxiliares para lidar com expressões aritméticas e booleanas, convertendo-as em código executável pela máquina.
-
-
-- compA e compB são utilizadas para compilar expressões aritméticas e booleanas, respectivamente. Por exemplo, compA (ADD x y) gera uma sequência de instruções que somam os valores de x e y.
+O  Compiler transforma um programa escrito na linguagem imperativa em uma sequência de instruções de máquina, conforme definido na Parte I. O compilador utiliza funções auxiliares para lidar com expressões aritméticas e booleanas, convertendo-as em código executável pela máquina.
 
 
-- A função compile itera sobre uma lista de instruções (Stm), convertendo cada uma em código de máquina. Dependendo do tipo de instrução, diferentes funções auxiliares são chamadas.
+- `compA` e `compB` são utilizadas para compilar expressões aritméticas e booleanas, respectivamente. Por exemplo, compA (ADD x y) gera uma sequência de instruções que somam os valores de x e y.
+
+
+- A função `compile` itera sobre uma lista de instruções `(Stm)`, convertendo cada uma em código de máquina. 
 
 ~~~hs
 -- Instrução: if x == 1 then y := 10 else y := 20
@@ -149,6 +147,13 @@ compile [IF (EQUINT (VAR "x") (INTVAL 1))
              (ASSIGN "y" (AEXPR (INTVAL 10))) 
              (ASSIGN "y" (AEXPR (INTVAL 20)))]
 -- Resultado da Compilação:
-[Fetch "x", Push 1, Equ, Branch [Push 10, Store "y"] [Push 20, Store "y"]]
+[
+    Fetch "x",
+    Push 1,
+    Equ,
+    Branch [Push 10, Store "y"] [Push 20, Store "y"]
+]
 
 ~~~
+
+
