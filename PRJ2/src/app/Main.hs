@@ -3,7 +3,7 @@ module Main where
 
 import Assembler 
 import MachineStructures
-import Parser
+import ParserV2
 import Lexer
 import Compiler
 
@@ -66,8 +66,7 @@ part_one_example = [
     Push 7,      -- Stack: [7, 14, 8], {"x": 8}
     Le
     ]
-
-
+{--
 main :: IO ()
 main = do
     let (_, finalStack, finalState) = run (part_one_example, createEmptyStack, createEmptyState)
@@ -76,6 +75,37 @@ main = do
     print $ stack2Str finalStack
     putStrLn "State:"
     print $ state2Str finalState
+--}
+
+factorialProgram :: String
+factorialProgram = unlines [
+    "fact := 1;",
+    "n := 5;", 
+    "while not (n = 1) do (",
+    "  fact := fact * n;",
+    "  n := n - 1",
+    ")"
+    ]
+
+main :: IO ()
+main = do
+    -- Lexical analysis
+    let tokens = lexer factorialProgram
+
+    -- Parsing
+    let parsedProgram = case parse tokens of
+                          Just program -> program
+                          Nothing -> error "Parsing failed"
+    -- Compilation
+    let compiledCode = compile parsedProgram
+
+    -- Execution
+    let (_, finalStack, finalState) = run (compiledCode, createEmptyStack, createEmptyState)
+
+    -- Output the final state
+    putStrLn "Final State:"
+    print $ state2Str finalState
+
 
 
 
