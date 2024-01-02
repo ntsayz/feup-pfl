@@ -1,141 +1,60 @@
 Test suite ParserTests: RUNNING...
-Cases: 134  Tried: 0  Errors: 0  Failures: 0Cases: 134  Tried: 1  Errors: 0  Failures: 0Cases: 134  Tried: 2  Errors: 0  Failures: 0Cases: 134  Tried: 3  Errors: 0  Failures: 0Cases: 134  Tried: 4  Errors: 0  Failures: 0Cases: 134  Tried: 5  Errors: 0  Failures: 0Cases: 134  Tried: 6  Errors: 0  Failures: 0Cases: 134  Tried: 7  Errors: 0  Failures: 0Cases: 134  Tried: 8  Errors: 0  Failures: 0Cases: 134  Tried: 9  Errors: 0  Failures: 0Cases: 134  Tried: 10  Errors: 0  Failures: 0Cases: 134  Tried: 11  Errors: 0  Failures: 0Cases: 134  Tried: 12  Errors: 0  Failures: 0Cases: 134  Tried: 13  Errors: 0  Failures: 0Cases: 134  Tried: 14  Errors: 0  Failures: 0Cases: 134  Tried: 15  Errors: 0  Failures: 0Cases: 134  Tried: 16  Errors: 0  Failures: 0Cases: 134  Tried: 17  Errors: 0  Failures: 0Cases: 134  Tried: 18  Errors: 0  Failures: 0Cases: 134  Tried: 19  Errors: 0  Failures: 0Cases: 134  Tried: 20  Errors: 0  Failures: 0Cases: 134  Tried: 21  Errors: 0  Failures: 0Cases: 134  Tried: 22  Errors: 0  Failures: 0Cases: 134  Tried: 23  Errors: 0  Failures: 0Cases: 134  Tried: 24  Errors: 0  Failures: 0Cases: 134  Tried: 25  Errors: 0  Failures: 0Cases: 134  Tried: 26  Errors: 0  Failures: 0Cases: 134  Tried: 27  Errors: 0  Failures: 0Cases: 134  Tried: 28  Errors: 0  Failures: 0Cases: 134  Tried: 29  Errors: 0  Failures: 0Cases: 134  Tried: 30  Errors: 0  Failures: 0Cases: 134  Tried: 31  Errors: 0  Failures: 0Cases: 134  Tried: 32  Errors: 0  Failures: 0Cases: 134  Tried: 33  Errors: 0  Failures: 0Cases: 134  Tried: 34  Errors: 0  Failures: 0Cases: 134  Tried: 35  Errors: 0  Failures: 0Cases: 134  Tried: 36  Errors: 0  Failures: 0Cases: 134  Tried: 37  Errors: 0  Failures: 0Cases: 134  Tried: 38  Errors: 0  Failures: 0Cases: 134  Tried: 39  Errors: 0  Failures: 0Cases: 134  Tried: 40  Errors: 0  Failures: 0Cases: 134  Tried: 41  Errors: 0  Failures: 0Cases: 134  Tried: 42  Errors: 0  Failures: 0Cases: 134  Tried: 43  Errors: 0  Failures: 0Cases: 134  Tried: 44  Errors: 0  Failures: 0Cases: 134  Tried: 45  Errors: 0  Failures: 0Cases: 134  Tried: 46  Errors: 0  Failures: 0Cases: 134  Tried: 47  Errors: 0  Failures: 0Cases: 134  Tried: 48  Errors: 0  Failures: 0Cases: 134  Tried: 49  Errors: 0  Failures: 0Cases: 134  Tried: 50  Errors: 0  Failures: 0Cases: 134  Tried: 51  Errors: 0  Failures: 0Cases: 134  Tried: 52  Errors: 0  Failures: 0Cases: 134  Tried: 53  Errors: 0  Failures: 0Cases: 134  Tried: 54  Errors: 0  Failures: 0Cases: 134  Tried: 55  Errors: 0  Failures: 0Cases: 134  Tried: 56  Errors: 0  Failures: 0Cases: 134  Tried: 57  Errors: 0  Failures: 0Cases: 134  Tried: 58  Errors: 0  Failures: 0Cases: 134  Tried: 59  Errors: 0  Failures: 0Cases: 134  Tried: 60  Errors: 0  Failures: 0Cases: 134  Tried: 61  Errors: 0  Failures: 0Cases: 134  Tried: 62  Errors: 0  Failures: 0Cases: 134  Tried: 63  Errors: 0  Failures: 0Cases: 134  Tried: 64  Errors: 0  Failures: 0Cases: 134  Tried: 65  Errors: 0  Failures: 0Cases: 134  Tried: 66  Errors: 0  Failures: 0Cases: 134  Tried: 67  Errors: 0  Failures: 0Cases: 134  Tried: 68  Errors: 0  Failures: 0Cases: 134  Tried: 69  Errors: 0  Failures: 0Cases: 134  Tried: 70  Errors: 0  Failures: 0Cases: 134  Tried: 71  Errors: 0  Failures: 0Cases: 134  Tried: 72  Errors: 0  Failures: 0Cases: 134  Tried: 73  Errors: 0  Failures: 0Cases: 134  Tried: 74  Errors: 0  Failures: 0Cases: 134  Tried: 75  Errors: 0  Failures: 0Cases: 134  Tried: 76  Errors: 0  Failures: 0Cases: 134  Tried: 77  Errors: 0  Failures: 0Cases: 134  Tried: 78  Errors: 0  Failures: 0Cases: 134  Tried: 79  Errors: 0  Failures: 0Cases: 134  Tried: 80  Errors: 0  Failures: 0Cases: 134  Tried: 81  Errors: 0  Failures: 0Cases: 134  Tried: 82  Errors: 0  Failures: 0Cases: 134  Tried: 83  Errors: 0  Failures: 0Cases: 134  Tried: 84  Errors: 0  Failures: 0Cases: 134  Tried: 85  Errors: 0  Failures: 0Cases: 134  Tried: 86  Errors: 0  Failures: 0Cases: 134  Tried: 87  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 5,Semicolon]
-Cases: 134  Tried: 88  Errors: 0  Failures: 0parseStm: tokens: [VarName "y",OpAssign,IntLit 3,OpMult,IntLit 4,Semicolon]
-Cases: 134  Tried: 89  Errors: 0  Failures: 0parseStm: tokens: [VarName "z",OpAssign,IntLit 2,OpAdd,IntLit 3,OpSub,IntLit 1,Semicolon]
-Cases: 134  Tried: 90  Errors: 0  Failures: 0parseStm: tokens: [VarName "a",OpAssign,BoolLit True,Semicolon]
-Cases: 134  Tried: 91  Errors: 0  Failures: 0parseStm: tokens: [VarName "b",OpAssign,BoolLit False,Semicolon]
-Cases: 134  Tried: 92  Errors: 0  Failures: 0parseStm: tokens: [VarName "c",OpAssign,VarName "x",OpLe,VarName "y",Semicolon]
-Cases: 134  Tried: 93  Errors: 0  Failures: 0parseStm: tokens: [VarName "d",OpAssign,OpenParen,IntLit 5,OpAdd,IntLit 3,CloseParen,OpMult,IntLit 2,Semicolon]
-Cases: 134  Tried: 94  Errors: 0  Failures: 0parseStm: tokens: [VarName "e",OpAssign,OpNot,OpenParen,VarName "x",OpEqBool,VarName "y",CloseParen,Semicolon]
-Cases: 134  Tried: 95  Errors: 0  Failures: 0parseStm: tokens: [VarName "f",OpAssign,IntLit 1,OpAdd,IntLit 2,OpMult,IntLit 3,Semicolon]
-Cases: 134  Tried: 96  Errors: 0  Failures: 0parseStm: tokens: [VarName "g",OpAssign,OpenParen,BoolLit True,OpAnd,BoolLit False,CloseParen,OpAnd,VarName "x",OpEqBool,IntLit 5,Semicolon]
-Cases: 134  Tried: 97  Errors: 0  Failures: 0parseStm: tokens: [VarName "a",OpAssign,VarName "x",OpLe,IntLit 5,Semicolon]
-Cases: 134  Tried: 98  Errors: 0  Failures: 0parseStm: tokens: [VarName "b",OpAssign,VarName "y",OpEqInt,IntLit 7,Semicolon]
-Cases: 134  Tried: 99  Errors: 0  Failures: 0parseStm: tokens: [VarName "c",OpAssign,VarName "z",OpEqBool,BoolLit True,Semicolon]
-Cases: 134  Tried: 100  Errors: 0  Failures: 0parseStm: tokens: [VarName "d",OpAssign,OpenParen,VarName "x",OpLe,IntLit 5,CloseParen,OpEqBool,OpenParen,VarName "y",OpEqInt,IntLit 3,CloseParen,Semicolon]
-Cases: 134  Tried: 101  Errors: 0  Failures: 0parseStm: tokens: [VarName "e",OpAssign,OpenParen,VarName "w",OpLe,IntLit 2,CloseParen,OpEqBool,BoolLit False,Semicolon]
-Cases: 134  Tried: 102  Errors: 0  Failures: 0parseStm: tokens: [VarName "f",OpAssign,OpenParen,VarName "v",OpEqInt,IntLit 4,CloseParen,OpEqBool,BoolLit True,Semicolon]
-Cases: 134  Tried: 103  Errors: 0  Failures: 0parseStm: tokens: [VarName "g",OpAssign,OpenParen,VarName "u",OpLe,IntLit 6,CloseParen,OpEqBool,OpenParen,VarName "t",OpEqInt,IntLit 1,CloseParen,OpAnd,BoolLit False,Semicolon]
-Cases: 134  Tried: 104  Errors: 0  Failures: 0parseStm: tokens: [VarName "h",OpAssign,VarName "x",OpLe,IntLit 4,OpAnd,VarName "y",OpEqBool,BoolLit True,Semicolon]
-Cases: 134  Tried: 105  Errors: 0  Failures: 0parseStm: tokens: [VarName "i",OpAssign,OpNot,OpenParen,VarName "z",OpEqBool,BoolLit False,CloseParen,Semicolon]
-Cases: 134  Tried: 106  Errors: 0  Failures: 0parseStm: tokens: [VarName "k",OpAssign,OpenParen,VarName "u",OpLe,IntLit 2,CloseParen,OpAnd,OpNot,OpenParen,VarName "t",OpEqBool,BoolLit False,CloseParen,Semicolon]
-Cases: 134  Tried: 107  Errors: 0  Failures: 0parseStm: tokens: [VarName "l",OpAssign,OpNot,OpenParen,VarName "x",OpEqBool,VarName "y",CloseParen,OpAnd,OpenParen,VarName "z",OpLe,IntLit 5,CloseParen,OpEqBool,BoolLit True,Semicolon]
-Cases: 134  Tried: 108  Errors: 0  Failures: 0parseStm: tokens: [OpenParen,VarName "x",OpAssign,IntLit 5,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "x",OpAssign,IntLit 5,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "x",OpAssign,IntLit 5,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 109  Errors: 0  Failures: 0parseStm: tokens: [OpenParen,VarName "y",OpAssign,IntLit 10,Semicolon,VarName "z",OpAssign,VarName "y",OpAdd,IntLit 5,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "y",OpAssign,IntLit 10,Semicolon,VarName "z",OpAssign,VarName "y",OpAdd,IntLit 5,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 10,Semicolon,VarName "z",OpAssign,VarName "y",OpAdd,IntLit 5,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "z",OpAssign,VarName "y",OpAdd,IntLit 5,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 110  Errors: 0  Failures: 0parseStm: tokens: [OpenParen,VarName "a",OpAssign,BoolLit True,Semicolon,VarName "b",OpAssign,VarName "a",OpEqBool,BoolLit False,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "a",OpAssign,BoolLit True,Semicolon,VarName "b",OpAssign,VarName "a",OpEqBool,BoolLit False,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "a",OpAssign,BoolLit True,Semicolon,VarName "b",OpAssign,VarName "a",OpEqBool,BoolLit False,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "b",OpAssign,VarName "a",OpEqBool,BoolLit False,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 111  Errors: 0  Failures: 0parseStm: tokens: [OpenParen,VarName "c",OpAssign,VarName "x",OpLe,VarName "y",Semicolon,VarName "d",OpAssign,VarName "x",OpEqInt,IntLit 2,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "c",OpAssign,VarName "x",OpLe,VarName "y",Semicolon,VarName "d",OpAssign,VarName "x",OpEqInt,IntLit 2,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "c",OpAssign,VarName "x",OpLe,VarName "y",Semicolon,VarName "d",OpAssign,VarName "x",OpEqInt,IntLit 2,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "d",OpAssign,VarName "x",OpEqInt,IntLit 2,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 112  Errors: 0  Failures: 0parseStm: tokens: [OpenParen,VarName "e",OpAssign,OpNot,OpenParen,VarName "x",OpEqBool,VarName "y",CloseParen,Semicolon,VarName "f",OpAssign,BoolLit True,OpAnd,BoolLit False,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "e",OpAssign,OpNot,OpenParen,VarName "x",OpEqBool,VarName "y",CloseParen,Semicolon,VarName "f",OpAssign,BoolLit True,OpAnd,BoolLit False,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "e",OpAssign,OpNot,OpenParen,VarName "x",OpEqBool,VarName "y",CloseParen,Semicolon,VarName "f",OpAssign,BoolLit True,OpAnd,BoolLit False,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "f",OpAssign,BoolLit True,OpAnd,BoolLit False,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 113  Errors: 0  Failures: 0parseStm: tokens: [KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "y",OpAssign,IntLit 2,Semicolon]
+Cases: 12  Tried: 0  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 5,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon]
+Cases: 12  Tried: 1  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 0,OpSub,IntLit 2,Semicolon]
+Cases: 12  Tried: 2  Errors: 0  Failures: 0parseStm: tokens: [KWIf,OpenParen,OpNot,BoolLit True,OpAnd,IntLit 2,OpLe,IntLit 5,OpEqBool,IntLit 3,OpEqInt,IntLit 4,CloseParen,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "y",OpAssign,IntLit 2,Semicolon]
 parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "y",OpAssign,IntLit 2,Semicolon]
 parseStm: tokens: [VarName "y",OpAssign,IntLit 2,Semicolon]
-Cases: 134  Tried: 114  Errors: 0  Failures: 0parseStm: tokens: [KWIf,OpenParen,OpNot,BoolLit True,OpAnd,IntLit 2,OpLe,IntLit 5,OpEqBool,IntLit 3,OpEqInt,IntLit 4,CloseParen,KWThen,OpenParen,VarName "x",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,IntLit 2,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseStm: tokens: [OpenParen,VarName "x",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,IntLit 2,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseSeq: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,IntLit 2,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,IntLit 2,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 2,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseSeq': tokens: [KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 3,Semicolon]
-Cases: 134  Tried: 115  Errors: 0  Failures: 0parseStm: tokens: [KWIf,VarName "x",OpEqInt,IntLit 33,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "y",OpAssign,IntLit 2,Semicolon]
-parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "y",OpAssign,IntLit 2,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 2,Semicolon]
-Cases: 134  Tried: 116  Errors: 0  Failures: 0parseStm: tokens: [KWIf,OpenParen,VarName "y",OpEqBool,BoolLit True,CloseParen,KWThen,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseSeq': tokens: [KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
+Cases: 12  Tried: 3  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 42,Semicolon,KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
+parseStm: tokens: [KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
 parseStm: tokens: [OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
 parseSeq: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
 parseStm: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
 parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 117  Errors: 0  Failures: 0parseStm: tokens: [KWIf,VarName "z",OpEqBool,BoolLit False,KWThen,KWIf,VarName "x",OpLe,IntLit 10,KWThen,VarName "y",OpAssign,IntLit 1,Semicolon,KWElse,VarName "y",OpAssign,IntLit 2,Semicolon,KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseStm: tokens: [KWIf,VarName "x",OpLe,IntLit 10,KWThen,VarName "y",OpAssign,IntLit 1,Semicolon,KWElse,VarName "y",OpAssign,IntLit 2,Semicolon,KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 1,Semicolon,KWElse,VarName "y",OpAssign,IntLit 2,Semicolon,KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 2,Semicolon,KWElse,VarName "y",OpAssign,IntLit 3,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 3,Semicolon]
-Cases: 134  Tried: 118  Errors: 0  Failures: 0parseStm: tokens: [KWIf,OpNot,OpenParen,BoolLit True,OpEqBool,BoolLit False,CloseParen,OpAnd,VarName "x",OpLe,VarName "y",KWThen,VarName "z",OpAssign,IntLit 5,Semicolon,KWElse,VarName "z",OpAssign,IntLit 10,Semicolon]
-parseStm: tokens: [VarName "z",OpAssign,IntLit 5,Semicolon,KWElse,VarName "z",OpAssign,IntLit 10,Semicolon]
-parseStm: tokens: [VarName "z",OpAssign,IntLit 10,Semicolon]
-Cases: 134  Tried: 119  Errors: 0  Failures: 0parseStm: tokens: [KWIf,VarName "x",OpEqBool,BoolLit True,KWThen,VarName "y",OpAssign,IntLit 100,Semicolon,KWElse,OpenParen,VarName "y",OpAssign,IntLit 200,Semicolon,VarName "z",OpAssign,IntLit 300,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 100,Semicolon,KWElse,OpenParen,VarName "y",OpAssign,IntLit 200,Semicolon,VarName "z",OpAssign,IntLit 300,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [OpenParen,VarName "y",OpAssign,IntLit 200,Semicolon,VarName "z",OpAssign,IntLit 300,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "y",OpAssign,IntLit 200,Semicolon,VarName "z",OpAssign,IntLit 300,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 200,Semicolon,VarName "z",OpAssign,IntLit 300,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "z",OpAssign,IntLit 300,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 120  Errors: 0  Failures: 0parseStm: tokens: [KWIf,VarName "x",OpAdd,VarName "y",OpLe,IntLit 50,KWThen,VarName "z",OpAssign,IntLit 5,Semicolon,KWElse,VarName "z",OpAssign,IntLit 10,Semicolon]
-parseStm: tokens: [VarName "z",OpAssign,IntLit 5,Semicolon,KWElse,VarName "z",OpAssign,IntLit 10,Semicolon]
-parseStm: tokens: [VarName "z",OpAssign,IntLit 10,Semicolon]
-Cases: 134  Tried: 121  Errors: 0  Failures: 0parseStm: tokens: [KWIf,VarName "x",OpLe,VarName "y",KWThen,VarName "flag",OpAssign,BoolLit True,Semicolon,KWElse,VarName "flag",OpAssign,BoolLit False,Semicolon]
-parseStm: tokens: [VarName "flag",OpAssign,BoolLit True,Semicolon,KWElse,VarName "flag",OpAssign,BoolLit False,Semicolon]
-parseStm: tokens: [VarName "flag",OpAssign,BoolLit False,Semicolon]
-Cases: 134  Tried: 122  Errors: 0  Failures: 0parseStm: tokens: [KWIf,VarName "x",OpLe,VarName "y",OpAnd,OpNot,OpenParen,VarName "z",OpEqBool,BoolLit True,CloseParen,KWThen,VarName "result",OpAssign,IntLit 1,Semicolon,KWElse,VarName "result",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [VarName "result",OpAssign,IntLit 1,Semicolon,KWElse,VarName "result",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [VarName "result",OpAssign,IntLit 0,Semicolon]
-Cases: 134  Tried: 123  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,VarName "count",OpLe,IntLit 10,CloseParen,KWDo,VarName "count",OpAssign,VarName "count",OpAdd,IntLit 1,Semicolon]
-parseStm: tokens: [VarName "count",OpAssign,VarName "count",OpAdd,IntLit 1,Semicolon]
-Cases: 134  Tried: 124  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,BoolLit True,CloseParen,KWDo,VarName "flag",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [VarName "flag",OpAssign,IntLit 0,Semicolon]
-Cases: 134  Tried: 125  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,OpNot,OpenParen,VarName "x",OpEqInt,IntLit 0,CloseParen,CloseParen,KWDo,OpenParen,KWWhile,OpenParen,VarName "y",OpEqInt,IntLit 0,CloseParen,KWDo,VarName "y",OpAssign,IntLit 10,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [OpenParen,KWWhile,OpenParen,VarName "y",OpEqInt,IntLit 0,CloseParen,KWDo,VarName "y",OpAssign,IntLit 10,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [KWWhile,OpenParen,VarName "y",OpEqInt,IntLit 0,CloseParen,KWDo,VarName "y",OpAssign,IntLit 10,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [KWWhile,OpenParen,VarName "y",OpEqInt,IntLit 0,CloseParen,KWDo,VarName "y",OpAssign,IntLit 10,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 10,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 126  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,VarName "i",OpLe,IntLit 5,CloseParen,KWDo,KWIf,OpenParen,VarName "i",OpEqInt,IntLit 3,CloseParen,KWThen,VarName "result",OpAssign,IntLit 1,Semicolon,KWElse,VarName "result",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [KWIf,OpenParen,VarName "i",OpEqInt,IntLit 3,CloseParen,KWThen,VarName "result",OpAssign,IntLit 1,Semicolon,KWElse,VarName "result",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [VarName "result",OpAssign,IntLit 1,Semicolon,KWElse,VarName "result",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [VarName "result",OpAssign,IntLit 0,Semicolon]
-Cases: 134  Tried: 127  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,VarName "a",OpLe,VarName "b",OpAnd,OpNot,OpenParen,VarName "c",OpEqInt,IntLit 0,CloseParen,CloseParen,KWDo,VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon]
-parseStm: tokens: [VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon]
-Cases: 134  Tried: 128  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,BoolLit True,CloseParen,KWDo,OpenParen,VarName "x",OpAssign,IntLit 5,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [OpenParen,VarName "x",OpAssign,IntLit 5,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "x",OpAssign,IntLit 5,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "x",OpAssign,IntLit 5,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 129  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,VarName "x",OpEqBool,BoolLit False,CloseParen,KWDo,KWIf,OpenParen,VarName "y",OpLe,IntLit 10,CloseParen,KWThen,OpenParen,KWWhile,OpenParen,VarName "z",OpEqInt,IntLit 0,CloseParen,KWDo,VarName "z",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,VarName "y",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [KWIf,OpenParen,VarName "y",OpLe,IntLit 10,CloseParen,KWThen,OpenParen,KWWhile,OpenParen,VarName "z",OpEqInt,IntLit 0,CloseParen,KWDo,VarName "z",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,VarName "y",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [OpenParen,KWWhile,OpenParen,VarName "z",OpEqInt,IntLit 0,CloseParen,KWDo,VarName "z",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,VarName "y",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 0,Semicolon]
-parseSeq: tokens: [KWWhile,OpenParen,VarName "z",OpEqInt,IntLit 0,CloseParen,KWDo,VarName "z",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,VarName "y",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [KWWhile,OpenParen,VarName "z",OpEqInt,IntLit 0,CloseParen,KWDo,VarName "z",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,VarName "y",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [VarName "z",OpAssign,IntLit 1,Semicolon,VarName "y",OpAssign,VarName "y",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,VarName "y",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "y",OpAssign,IntLit 0,Semicolon]
-parseSeq': tokens: [KWElse,VarName "y",OpAssign,IntLit 0,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 0,Semicolon]
-Cases: 134  Tried: 130  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,OpNot,OpenParen,VarName "a",OpEqInt,VarName "b",CloseParen,CloseParen,KWDo,OpenParen,VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon,VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [OpenParen,VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon,VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon,VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon,VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 131  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,OpNot,OpenParen,VarName "a",OpEqInt,VarName "b",CloseParen,CloseParen,KWDo,OpenParen,VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon,VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [OpenParen,VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon,VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon,VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "a",OpAssign,VarName "a",OpAdd,IntLit 1,Semicolon,VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "b",OpAssign,VarName "b",OpSub,IntLit 1,Semicolon,VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "result",OpAssign,VarName "a",OpAdd,VarName "b",Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 132  Errors: 0  Failures: 0parseStm: tokens: [KWWhile,OpenParen,OpNot,OpenParen,VarName "x",OpEqInt,IntLit 5,CloseParen,OpAnd,VarName "y",OpEqBool,BoolLit True,CloseParen,KWDo,OpenParen,KWWhile,OpenParen,VarName "z",OpLe,IntLit 20,CloseParen,KWDo,VarName "z",OpAssign,VarName "z",OpAdd,IntLit 1,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [OpenParen,KWWhile,OpenParen,VarName "z",OpLe,IntLit 20,CloseParen,KWDo,VarName "z",OpAssign,VarName "z",OpAdd,IntLit 1,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseSeq: tokens: [KWWhile,OpenParen,VarName "z",OpLe,IntLit 20,CloseParen,KWDo,VarName "z",OpAssign,VarName "z",OpAdd,IntLit 1,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [KWWhile,OpenParen,VarName "z",OpLe,IntLit 20,CloseParen,KWDo,VarName "z",OpAssign,VarName "z",OpAdd,IntLit 1,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "z",OpAssign,VarName "z",OpAdd,IntLit 1,Semicolon,VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
-Cases: 134  Tried: 133  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 42,Semicolon,VarName "y",OpAssign,IntLit 46,Semicolon]
-parseStm: tokens: [VarName "y",OpAssign,IntLit 46,Semicolon]
-                                              Cases: 134  Tried: 134  Errors: 0  Failures: 0
+Cases: 12  Tried: 4  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 42,Semicolon,KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon]
+parseStm: tokens: [KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon]
+Cases: 12  Tried: 5  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 42,Semicolon,KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",Semicolon]
+parseStm: tokens: [KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",Semicolon]
+parseStm: tokens: [VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",Semicolon]
+Cases: 12  Tried: 6  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 44,Semicolon,KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon]
+parseStm: tokens: [KWIf,VarName "x",OpLe,IntLit 43,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon]
+parseStm: tokens: [OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon]
+parseSeq: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,Semicolon,VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon]
+parseStm: tokens: [VarName "y",OpAssign,VarName "x",OpMult,IntLit 2,Semicolon]
+Cases: 12  Tried: 7  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 42,Semicolon,KWIf,VarName "x",OpLe,IntLit 43,KWThen,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "x",OpAssign,IntLit 1,Semicolon]
+parseStm: tokens: [KWIf,VarName "x",OpLe,IntLit 43,KWThen,OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "x",OpAssign,IntLit 1,Semicolon]
+parseStm: tokens: [OpenParen,VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "x",OpAssign,IntLit 1,Semicolon]
+parseSeq: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "x",OpAssign,IntLit 1,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 33,Semicolon,VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "x",OpAssign,IntLit 1,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,VarName "x",OpAdd,IntLit 1,Semicolon,CloseParen,KWElse,VarName "x",OpAssign,IntLit 1,Semicolon]
+parseSeq': tokens: [KWElse,VarName "x",OpAssign,IntLit 1,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon]
+Cases: 12  Tried: 8  Errors: 0  Failures: 0parseStm: tokens: [KWIf,OpenParen,IntLit 1,OpEqInt,IntLit 0,OpAdd,IntLit 1,OpEqBool,IntLit 2,OpAdd,IntLit 1,OpEqInt,IntLit 3,CloseParen,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 2,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 2,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 2,Semicolon]
+Cases: 12  Tried: 9  Errors: 0  Failures: 0parseStm: tokens: [KWIf,OpenParen,IntLit 1,OpEqInt,IntLit 0,OpAdd,IntLit 1,OpEqBool,OpenParen,IntLit 2,OpAdd,IntLit 1,OpEqInt,IntLit 4,CloseParen,CloseParen,KWThen,VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 2,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 1,Semicolon,KWElse,VarName "x",OpAssign,IntLit 2,Semicolon]
+parseStm: tokens: [VarName "x",OpAssign,IntLit 2,Semicolon]
+Cases: 12  Tried: 10  Errors: 0  Failures: 0parseStm: tokens: [VarName "x",OpAssign,IntLit 2,Semicolon,VarName "y",OpAssign,OpenParen,VarName "x",OpSub,IntLit 3,CloseParen,OpMult,OpenParen,IntLit 4,OpAdd,IntLit 2,OpMult,IntLit 3,CloseParen,Semicolon,VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",OpMult,OpenParen,IntLit 2,CloseParen,Semicolon]
+parseStm: tokens: [VarName "y",OpAssign,OpenParen,VarName "x",OpSub,IntLit 3,CloseParen,OpMult,OpenParen,IntLit 4,OpAdd,IntLit 2,OpMult,IntLit 3,CloseParen,Semicolon,VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",OpMult,OpenParen,IntLit 2,CloseParen,Semicolon]
+parseStm: tokens: [VarName "z",OpAssign,VarName "x",OpAdd,VarName "x",OpMult,OpenParen,IntLit 2,CloseParen,Semicolon]
+Cases: 12  Tried: 11  Errors: 0  Failures: 0parseStm: tokens: [VarName "i",OpAssign,IntLit 10,Semicolon,VarName "fact",OpAssign,IntLit 1,Semicolon,KWWhile,OpenParen,OpNot,OpenParen,VarName "i",OpEqInt,IntLit 1,CloseParen,CloseParen,KWDo,OpenParen,VarName "fact",OpAssign,VarName "fact",OpMult,VarName "i",Semicolon,VarName "i",OpAssign,VarName "i",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
+parseStm: tokens: [VarName "fact",OpAssign,IntLit 1,Semicolon,KWWhile,OpenParen,OpNot,OpenParen,VarName "i",OpEqInt,IntLit 1,CloseParen,CloseParen,KWDo,OpenParen,VarName "fact",OpAssign,VarName "fact",OpMult,VarName "i",Semicolon,VarName "i",OpAssign,VarName "i",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
+parseStm: tokens: [KWWhile,OpenParen,OpNot,OpenParen,VarName "i",OpEqInt,IntLit 1,CloseParen,CloseParen,KWDo,OpenParen,VarName "fact",OpAssign,VarName "fact",OpMult,VarName "i",Semicolon,VarName "i",OpAssign,VarName "i",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
+parseStm: tokens: [OpenParen,VarName "fact",OpAssign,VarName "fact",OpMult,VarName "i",Semicolon,VarName "i",OpAssign,VarName "i",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
+parseSeq: tokens: [VarName "fact",OpAssign,VarName "fact",OpMult,VarName "i",Semicolon,VarName "i",OpAssign,VarName "i",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
+parseStm: tokens: [VarName "fact",OpAssign,VarName "fact",OpMult,VarName "i",Semicolon,VarName "i",OpAssign,VarName "i",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
+parseStm: tokens: [VarName "i",OpAssign,VarName "i",OpSub,IntLit 1,Semicolon,CloseParen,Semicolon]
+                                            Cases: 12  Tried: 12  Errors: 0  Failures: 0
 Test suite ParserTests: PASS
 Test suite logged to: /home/wolfcuanhamarws/Desktop/Faculdade/2024/PFL/Project/feup-pfl/PRJ2/dist-newstyle/build/x86_64-linux/ghc-9.2.5/PRJ2-0.1.0.0/t/ParserTests/test/PRJ2-0.1.0.0-ParserTests.log

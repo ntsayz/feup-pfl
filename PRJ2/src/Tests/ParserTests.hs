@@ -1,13 +1,11 @@
 module Main where
 
-import ParserV2
 import Assembler
 import ImperativeLanguage
 import Lexer
 import Test.HUnit hiding (State)
 import Test.HUnit.Text (runTestTTAndExit,runTestTT)
-import Parser (parseAnd, parseWhile)
-
+import Parser
 --Test functions for the Parser module
 
 -- testParser :: String -> (String, String)
