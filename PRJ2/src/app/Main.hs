@@ -92,16 +92,22 @@ factorialProgram = unlines [
 
 main :: IO ()
 main = do
+    let tokens = lexer factorialProgram
+    putStrLn "TOKENS:"
+    print tokens
+    putStrLn "\n\n"
     
     -- Parsing
     let parsedProgram = parse factorialProgram
-    putStrLn "PARSED PROGRAM: "
+    putStrLn "PARSED PROGRAM:"
     print parsedProgram
+    putStrLn "\n\n"
 
     -- Compilation
     let compiledCode = compile parsedProgram
-    putStrLn "COMPILED CODE: "
+    putStrLn "COMPILED CODE:"
     print compiledCode
+    putStrLn "\n\n"
 
 
     -- Execution

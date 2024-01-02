@@ -133,11 +133,21 @@ parseAexp [IntLit 3, OpMult, OpenParen, IntLit 4, OpAdd, IntLit 5, CloseParen]
 
 ### Compiler
 
-O  Compiler transforma um programa escrito na linguagem imperativa em uma sequência de instruções de máquina, conforme definido na Parte I. O compilador utiliza funções auxiliares para lidar com expressões aritméticas e booleanas, convertendo-as em código executável pela máquina.
+O  Compiler transforma um programa escrito na linguagem imperativa em uma sequência de instruções de máquina, conforme definido na Parte I.
 
 
 - `compA` e `compB` são utilizadas para compilar expressões aritméticas e booleanas, respectivamente. Por exemplo, compA (ADD x y) gera uma sequência de instruções que somam os valores de x e y.
 
+~~~hs
+compA :: Aexp -> Code
+compA (ADD x y) = compA y ++ compA x ++ [Add]
+compA (SUB x y ) = compA y ++ compA x ++ [Sub]
+
+
+compB :: Bexp -> Code
+compB (EQUINT x y) = compA y ++ compA x ++ [Equ]
+compB (LE x y) = compA y ++ compA x ++ [Le]
+~~~
 
 - A função `compile` itera sobre uma lista de instruções `(Stm)`, convertendo cada uma em código de máquina. 
 
@@ -156,7 +166,81 @@ compile [IF (EQUINT (VAR "x") (INTVAL 1))
 
 ~~~
 
-### Exemplo
+## Exemplo 
 
+~~~hs
+sourceCode :: String
+sourceCode = "if x == 1 then y := 10 else y := 20"
+
+
+-- Análise Léxica: Transformação da string em tokens
+
+tokens :: [Token]
+tokens = lexer sourceCode 
+-- [KWIf, VarName "x", OpEqInt, IntLit 1, KWThen, VarName "y", OpAssign, IntLit 10, KWElse, VarName "y", OpAssign, IntLit 20]
+
+
+
+-- Análise Sintática: Construção da AST
+
+ast :: Stm
+ast = parseStms tokens
+-- IF (EQUINT (VAR "x") (INTVAL 1)) (ASSIGN "y" (AEXPR (INTVAL 10))) (ASSIGN "y" (AEXPR (INTVAL 20)))
+
+
+-- Compilação: Conversão da AST em instruções de máquina
+
+machineCode :: Code
+machineCode = compile [ast]
+-- [Fetch "x", Push 1, Equ, Branch [Push 10, Store "y"] [Push 20, Store "y"]]
+
+~~~
 
 ## Testes
+No desenvolvimento deste projeto, adotámos a metodologia Test Driven Development (TDD), realizando testes rigorosos antes mesmo de desenvolver as funcionalidades. Esta abordagem permitiu-nos identificar e corrigir falhas precocemente, garantindo o funcionamento adequado de todas as partes do interpretador. A implementação do TDD revelou-se uma estratégia eficaz, contribuindo significativamente para a robustez e confiabilidade do sistema final. 
+
+
+
+#### Exemplos
+
+~~~hs
+--  =========     TESTES UNITÁRIOS     =========
+
+-- verifica a tokenização de números inteiros 
+...
+testLexerIntLit :: Test
+testLexerIntLit = TestCase $ do
+    assertEqual "Tokenização de '123'" [IntLit 123] (lexer "123")
+    assertEqual "Tokenização de '456'" [IntLit 456] (lexer "456")
+...
+
+-- verifica a tokenização de operadores
+testLexerOperators :: Test
+testLexerOperators = TestCase $ do
+    assertEqual "Tokenização de '+'" [OpAdd] (lexer "+")
+    assertEqual "Tokenização de '*'" [OpMult] (lexer "*")
+
+--  =========     TESTES DE INTEGRAÇÃO     =========
+
+testParse :: Test
+testParse = TestList [
+    ...
+    TestCase $ assertEqual "Operações booleanas nested na condição if" ("", "x=2") (testParserV2 "if (1 == 0+1 = (2+1 == 4)) then x := 1; else x := 2;"),
+TestCase $ assertEqual "Atribuições com operações aritméticas" ("", "x=2,y=-10,z=6") (testParserV2 "x := 2; y := (x - 3)*(4 + 2*3); z := x +x*(2);"),
+TestCase $ assertEqual "Laço while para cálculo de fatorial" ("", "fact=3628800,i=1") (testParserV2 "i := 10; fact := 1; while (not(i == 1)) do (fact := fact * i; i := i - 1;);")
+
+]
+
+
+--  =========     TESTES DE EXCEÇÃO     =========
+
+-- testa lançamento de erros de execução quando ações inválidas são realizadas
+testAssemblerExceptions :: Test
+testAssemblerExceptions = TestList [
+    TestCase $ assertThrows (evaluate $ testAssemblerV2 [Push 1, Push 2, And]) "Run-time error",
+    TestCase $ assertThrows (evaluate $ testAssemblerV2 [Tru, Tru, Store "y", Fetch "x", Tru]) "Run-time error"
+    ]
+
+~~~
+
+
