@@ -84,6 +84,8 @@ testAssembler = TestList [
     TestCase $ assertEqual "Loop with factorial calculation"
         ("", "fact=3628800,i=1")
         (testAssemblerV2 [Push 10, Store "i", Push 1, Store "fact", Loop [Push 1, Fetch "i", Equ, Neg] [Fetch "i", Fetch "fact", Mult, Store "fact", Push 1, Fetch "i", Sub, Store "i"]])
+    
+    
     ]
 
 testAssemblerExceptions :: Test
