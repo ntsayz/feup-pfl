@@ -56,22 +56,7 @@ testState2Str = TestList [
 
 
 
+main :: IO ()
 main = do
-    resultsStackValueShow <- runTestTT testStackValueShow
-    print resultsStackValueShow
-
-    resultsStateShow <- runTestTT testStateShow
-    print resultsStateShow
-
-    resultsCreateEmptyStack <- runTestTT testCreateEmptyStack
-    print resultsCreateEmptyStack
-
-    resultsCreateEmptyState <- runTestTT testCreateEmptyState
-    print resultsCreateEmptyState
-
-    resultsStack2Str <- runTestTT testStack2Str
-    print resultsStack2Str
-
-    resultsState2Str <- runTestTT testState2Str
-    print resultsState2Str
-
+    let allTests = TestList [testStackValueShow, testStateShow, testCreateEmptyStack, testCreateEmptyState, testStack2Str, testState2Str]
+    runTestTTAndExit allTests

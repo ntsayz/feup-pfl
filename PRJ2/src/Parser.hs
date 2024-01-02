@@ -16,7 +16,7 @@ parseTerm :: [Token] -> Maybe (Aexp, [Token])
 parseTerm (OpenParen : restTokensAfterOpenParen) =
     case parseAexp restTokensAfterOpenParen of
         Just (expr, CloseParen : restAfterCloseParen) -> Just (expr, restAfterCloseParen)
-        _ -> Nothing  -- Handle error, incomplete parse, or missing CloseParen
+        _noAexp -> Nothing  -- Handle error, incomplete parse, or missing CloseParen
 parseTerm (IntLit n : restAfterIntList) = Just (INTVAL n, restAfterIntList)
 parseTerm (VarName v : restAfterVarName) = Just (VAR v, restAfterVarName)
 parseTerm _ = Nothing  -- Handle error for unexpected token
@@ -67,7 +67,7 @@ parseAexp tokens =
 
 
 
--- parser for Bexp expressions for our Imperative Language
+-- parsers for Bexp expressions for our Imperative Language
 
 
 parseBoolLiteral :: [Token] -> Maybe (Bexp, [Token])
@@ -183,7 +183,7 @@ parseBexp tokens =
 
 
 
--- parser for Stm expressions for our Imperative Language
+-- parsers for Stm expressions for our Imperative Language
 
 
 
@@ -200,12 +200,12 @@ parseAssignment _ = Nothing
 
 -- parser for Sequence of assigments ( more then one inside parenthesis)
 parseSeq :: [Token] -> Maybe (Stm, [Token])
-parseSeq (OpenParen : tokens) = trace ("parseSeq: tokens: " ++ show tokens) $ parseSeq' [] tokens
+parseSeq (OpenParen : tokens) = parseSeq' [] tokens
 parseSeq _ = Nothing
 
 parseSeq' :: [Stm] -> [Token] -> Maybe (Stm, [Token])
 parseSeq' acc (CloseParen : Semicolon : restTokens) =  Just (SEQ (reverse acc), restTokens)
-parseSeq' acc (CloseParen : KWElse: restTokens) = trace ("parseSeq': tokens: " ++ show (KWElse: restTokens)) $ Just (SEQ (reverse acc), KWElse: restTokens) -- for ) with no ; after then
+parseSeq' acc (CloseParen : KWElse: restTokens) = Just (SEQ (reverse acc), KWElse: restTokens) -- for ) with no ; after then
 parseSeq' acc tokens = 
     case parseStm tokens of
         Just (stm, restAfterStm) -> parseSeq' (stm : acc) restAfterStm
@@ -242,9 +242,9 @@ parseWhile _ = Nothing
 
 
 parseStm :: [Token] -> Maybe (Stm, [Token])
-parseStm tokens = trace ("parseStm: tokens: " ++ show tokens) $
+parseStm tokens =
     parseSeq tokens  <|> parseIf tokens <|> parseWhile tokens <|> parseAssignment tokens 
-    -- Continue to add other parsers like parseWhile as needed
+    
 
 
 buildData :: [Token] -> Program
@@ -257,16 +257,11 @@ parseStms tokens =
         Just (stm, restTokens) -> 
             let (stms, remaining) = parseStms restTokens
             in (stm : stms, remaining)
-        Nothing -> ([], tokens)  -- If no statement can be parsed, return the remaining tokens
+        Nothing -> ([], tokens)  
 
 
 
 
 parse :: String -> Program
-parse = buildData . lexer -- parse will be the composition of builData and lexer
--- buildData :: [Token] -> Maybe (Aexp, [Token])
--- buildData tokens =
---         case parseExpression tokens of
---             Just (aexp, []) -> Just (aexp, [])
---             _errorParsingTokens ->  Nothing
+parse = buildData . lexer -- parse is the composition of builData and lexer has we have on project instructions
 

@@ -25,12 +25,6 @@ module ImperativeLanguage where
 import MachineStructures
 
 
--- We use this  new data type because of Equ on Bexp can used on Aexp ( IntaVal) or Bexp ( TT or FF)
-data CompExpr = 
-    AEXPR !Aexp 
-    | BEXPR !Bexp 
-    deriving (Eq, Show)
-
 
 data Aexp = INTVAL !Integer --Terminal term
           | VAR !String -- Terminal term: when we have a variable we need to fetch it from the stack

@@ -1,0 +1,4 @@
+Test suite MachineStructuresTests: RUNNING...
+Cases: 8  Tried: 0  Errors: 0  Failures: 0Cases: 8  Tried: 1  Errors: 0  Failures: 0Cases: 8  Tried: 2  Errors: 0  Failures: 0Cases: 8  Tried: 3  Errors: 0  Failures: 0Cases: 8  Tried: 4  Errors: 0  Failures: 0Cases: 8  Tried: 5  Errors: 0  Failures: 0Cases: 8  Tried: 6  Errors: 0  Failures: 0Cases: 8  Tried: 7  Errors: 0  Failures: 0                                          Cases: 8  Tried: 8  Errors: 0  Failures: 0
+Test suite MachineStructuresTests: PASS
+Test suite logged to: /home/wolfcuanhamarws/Desktop/Faculdade/2024/PFL/Project/feup-pfl/PRJ2/src/dist-newstyle/build/x86_64-linux/ghc-9.2.5/PRJ2-0.1.0.0/t/MachineStructuresTests/test/PRJ2-0.1.0.0-MachineStructuresTests.log

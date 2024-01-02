@@ -8,7 +8,16 @@ import Test.HUnit hiding (State)
 import Test.HUnit.Text (runTestTTAndExit,runTestTT)
 import Parser
 import Compiler
+import Control.Exception (evaluate, try, ErrorCall(..), SomeException(..), handleJust  )
 
+assertThrows :: IO a -> String -> Assertion
+assertThrows action errorMsg = 
+    handleJust isWanted (const $ return ()) $ do
+        _ <- action
+        assertFailure $ "Expected exception: " ++ errorMsg
+  where
+    isWanted :: SomeException -> Maybe ()
+    isWanted _ = Just ()
 
 
 -- integration tests
@@ -37,11 +46,64 @@ testParse = TestList [
     TestCase $ assertEqual "While loop for factorial calculation" ("", "fact=3628800,i=1") (testParserV2 "i := 10; fact := 1; while (not(i == 1)) do (fact := fact * i; i := i - 1;);")
     ]
 
-allParseTests:: Test
-allParseTests = TestList [TestLabel "parseTests" testParse ]
+
+testAssembler :: Test
+testAssembler = TestList [
+    TestCase $ assertEqual "Push and arithmetic operations"
+        ("-10", "")
+        (testAssemblerV2 [Push 10, Push 4, Push 3, Sub, Mult]),
+
+    TestCase $ assertEqual "Boolean and store operations"
+        ("", "a=3,someVar=False,var=True")
+        (testAssemblerV2 [Fals, Push 3, Tru, Store "var", Store "a", Store "someVar"]),
+
+    TestCase $ assertEqual "Fetch operation"
+        ("False", "var=False")
+        (testAssemblerV2 [Fals, Store "var", Fetch "var"]),
+
+    TestCase $ assertEqual "Push and Boolean operations"
+        ("False,True,-20", "")
+        (testAssemblerV2 [Push (-20), Tru, Fals]),
+
+    TestCase $ assertEqual "Negation operation"
+        ("False,True,-20", "")
+        (testAssemblerV2 [Push (-20), Tru, Tru, Neg]),
+
+    TestCase $ assertEqual "Equality operation"
+        ("False,-20", "")
+        (testAssemblerV2 [Push (-20), Tru, Tru, Neg, Equ]),
+
+    TestCase $ assertEqual "Less or equal operation"
+        ("True", "")
+        (testAssemblerV2 [Push (-20), Push (-21), Le]),
+
+    TestCase $ assertEqual "Subtract and store operation"
+        ("", "x=4")
+        (testAssemblerV2 [Push 5, Store "x", Push 1, Fetch "x", Sub, Store "x"]),
+
+    TestCase $ assertEqual "Loop with factorial calculation"
+        ("", "fact=3628800,i=1")
+        (testAssemblerV2 [Push 10, Store "i", Push 1, Store "fact", Loop [Push 1, Fetch "i", Equ, Neg] [Fetch "i", Fetch "fact", Mult, Store "fact", Push 1, Fetch "i", Sub, Store "i"]])
+    ]
+
+testAssemblerExceptions :: Test
+testAssemblerExceptions = TestList [
+    TestCase $ assertThrows (evaluate $ testAssemblerV2 [Push 1, Push 2, And]) "Run-time error",
+    TestCase $ assertThrows (evaluate $ testAssemblerV2 [Tru, Tru, Store "y", Fetch "x", Tru]) "Run-time error"
+    ]
+
+
+
+allIntegrationTests:: Test
+allIntegrationTests = TestList [TestLabel "parseTests" testParse, TestLabel "assemblerTests" testAssembler, TestLabel "assemblerExceptions" testAssemblerExceptions ]
 
 
 main :: IO ()
 main = do
-    let allTests = TestList [allParseTests]
+    let allTests = TestList [allIntegrationTests]
     runTestTTAndExit allTests
+    -- counts <- runTestTT allTests
+    -- putStrLn $ "Total Tests: " ++ show (cases counts)
+    -- putStrLn $ "Tried: " ++ show (tried counts)
+    -- putStrLn $ "Errors: " ++ show (errors counts)
+    -- putStrLn $ "Failures: " ++ show (failures counts)
