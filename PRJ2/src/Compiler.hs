@@ -23,7 +23,7 @@ da pilha.
 module Compiler where
 
 import ImperativeLanguage
-    ( Aexp(..), Bexp(..), Stm(..), CompExpr(..), Program )
+    ( Aexp(..), Bexp(..), Stm(..), Program )
 import MachineStructures
 
 -- The two mandatory auxiliary functions which compile arithmetic and boolean expressions
@@ -35,11 +35,6 @@ compA (SUB x y ) = compA y ++ compA x ++ [Sub] -- in the correct order to have t
 compA (MULT x y) = compA y ++ compA x ++ [Mult]
 
 
-
--- We use this auxiliary function to help deal with the two types of expressions ( Aexp and Bexp)
-compCompExpr :: CompExpr -> Code
-compCompExpr (AEXPR x) = compA x
-compCompExpr (BEXPR x) = compB x
 
 
 compB :: Bexp -> Code
@@ -59,7 +54,8 @@ compile :: Program -> Code
 compile [] = [] --base case
 compile (stm:xs) =
     case stm of
-        ASSIGN var compExpr -> compCompExpr compExpr ++ [Store var] ++ compile xs
+        ASSIGNBOOL var bexp -> compB bexp ++ [Store var] ++ compile xs
+        ASSIGNINT var aexp -> compA aexp ++ [Store var] ++ compile xs
         SEQ [] -> compile xs -- Handle empty sequence
         SEQ (stm1:restOfStms) -> compile [stm1]  ++ compile restOfStms ++compile xs
         IF bexp stm1 stm2 -> compB bexp ++ [Branch (compile [stm1]) (compile [stm2])] ++ compile xs -- stm1 or stm1 can be SEQ

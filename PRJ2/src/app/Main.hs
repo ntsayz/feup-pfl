@@ -1,9 +1,11 @@
 module Main where
+
+
 -- PFL 2023/24 - Haskell practical assignment quickstart
 
 import Assembler 
 import MachineStructures
-import ParserV2
+import Parser
 import Lexer
 import Compiler
 
@@ -20,6 +22,7 @@ import Compiler
 {--
 main :: IO ()
 main = do
+    putStrLn "Haskell practical assignment "
     putStrLn $ "Final Stack: " 
     putStrLn $ "Final State: " 
 
