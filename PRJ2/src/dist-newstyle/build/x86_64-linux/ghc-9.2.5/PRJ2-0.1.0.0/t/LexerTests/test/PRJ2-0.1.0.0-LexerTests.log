@@ -1,0 +1,24 @@
+Test suite LexerTests: RUNNING...
+Cases: 32  Tried: 0  Errors: 0  Failures: 0Cases: 32  Tried: 1  Errors: 0  Failures: 0Cases: 32  Tried: 2  Errors: 0  Failures: 0Cases: 32  Tried: 3  Errors: 0  Failures: 0Cases: 32  Tried: 4  Errors: 0  Failures: 0Cases: 32  Tried: 5  Errors: 0  Failures: 0Cases: 32  Tried: 6  Errors: 0  Failures: 0Cases: 32  Tried: 7  Errors: 0  Failures: 0Cases: 32  Tried: 8  Errors: 0  Failures: 0Cases: 32  Tried: 9  Errors: 0  Failures: 0Cases: 32  Tried: 10  Errors: 0  Failures: 0Cases: 32  Tried: 11  Errors: 0  Failures: 0Cases: 32  Tried: 12  Errors: 0  Failures: 0Cases: 32  Tried: 13  Errors: 0  Failures: 0Cases: 32  Tried: 14  Errors: 0  Failures: 0                                            ### Error in:   0:14
+lexer: unexpected character or string out of our imperative language
+CallStack (from HasCallStack):
+  error, called at Lexer.hs:105:19 in PRJ2-0.1.0.0-inplace:Lexer
+Cases: 32  Tried: 15  Errors: 1  Failures: 0                                            ### Error in:   0:15
+lexer: unexpected character or string out of our imperative language
+CallStack (from HasCallStack):
+  error, called at Lexer.hs:105:19 in PRJ2-0.1.0.0-inplace:Lexer
+Cases: 32  Tried: 16  Errors: 2  Failures: 0                                            ### Error in:   0:16
+lexer: unexpected character or string out of our imperative language
+CallStack (from HasCallStack):
+  error, called at Lexer.hs:105:19 in PRJ2-0.1.0.0-inplace:Lexer
+Cases: 32  Tried: 17  Errors: 3  Failures: 0                                            ### Error in:   0:17
+lexer: unexpected character or string out of our imperative language
+CallStack (from HasCallStack):
+  error, called at Lexer.hs:105:19 in PRJ2-0.1.0.0-inplace:Lexer
+Cases: 32  Tried: 18  Errors: 4  Failures: 0Cases: 32  Tried: 19  Errors: 4  Failures: 0Cases: 32  Tried: 20  Errors: 4  Failures: 0Cases: 32  Tried: 21  Errors: 4  Failures: 0Cases: 32  Tried: 22  Errors: 4  Failures: 0Cases: 32  Tried: 23  Errors: 4  Failures: 0Cases: 32  Tried: 24  Errors: 4  Failures: 0Cases: 32  Tried: 25  Errors: 4  Failures: 0Cases: 32  Tried: 26  Errors: 4  Failures: 0                                            ### Error in:   3:1
+lexer: unexpected character or string out of our imperative language
+CallStack (from HasCallStack):
+  error, called at Lexer.hs:105:19 in PRJ2-0.1.0.0-inplace:Lexer
+Cases: 32  Tried: 27  Errors: 5  Failures: 0Cases: 32  Tried: 28  Errors: 5  Failures: 0Cases: 32  Tried: 29  Errors: 5  Failures: 0Cases: 32  Tried: 30  Errors: 5  Failures: 0Cases: 32  Tried: 31  Errors: 5  Failures: 0                                            Cases: 32  Tried: 32  Errors: 5  Failures: 0
+Test suite LexerTests: FAIL
+Test suite logged to: /home/wolfcuanhamarws/Desktop/Faculdade/2024/PFL/Project/feup-pfl/PRJ2/src/dist-newstyle/build/x86_64-linux/ghc-9.2.5/PRJ2-0.1.0.0/t/LexerTests/test/PRJ2-0.1.0.0-LexerTests.log

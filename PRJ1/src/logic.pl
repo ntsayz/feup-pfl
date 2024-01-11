@@ -2,12 +2,15 @@
 :- use_module(library(lists)).
 :- use_module(library(between)).
 :- use_module(library(aggregate)).
+:- use_module(library(random)).
+%      PIECE OWNERSHIP
 
-
+% PVP
 player_pieces(player1, w_square).
 player_pieces(player1, w_round).
 player_pieces(player2, b_square).
 player_pieces(player2, b_round).
+
 
 change_player(player1,player2).
 change_player(player2,player1).
@@ -15,16 +18,18 @@ change_player(player2,player1).
 
 
 
+
+:- dynamic size_row/1.
+:- dynamic size_col/1.
+:- dynamic anchor_piece/2 .
+:- dynamic number_pieces/1 .
+
 %anchor_piece(+Player,+Board,+CellPiece)/3
 %Determinar que peça do Player no Board em CellPiece:Row-Col fica com âncora
 %anchor_piece(Player,Board,Row-Col):-
 
 %Size of Board/Matrix will always be quadratic axb ( different number of rows and Cols and every row have the same number of Col)
 %size of the board maybe can change by options ?
-:- dynamic size_row/1.
-:- dynamic size_col/1.
-:- dynamic anchor_piece/2 .
-:- dynamic number_pieces/1 .
 
 anchor_piece(null-null, noplayer).
 change_anchor_piece(NewRow-NewCol, Player):-
@@ -43,7 +48,7 @@ change_size_board(SizeRow, SizeCol):-
     retract(size_col(_)),
     assertz(size_col(SizeCol)).
 
-number_pieces_player(6). % default game number of Pieces a Player need to have to continue playing
+number_pieces_player(5). % default game number of Pieces a Player need to have to continue playing
 
 %change_number_pieces(+NumberOfPieces)
 %Change the Number Of pieces that player must have in order to play again
@@ -53,9 +58,7 @@ change_number_pieces(NumberOfPieces):-
 
 
 
-%set_anchor(+Cell,+Player,+Board)
-%Determina que peça de um Player no Board localizada em Cell:Row-Coll é marcada com a âncora 
-%Aqui teremos de usar assert/assertz?
+
 
 %cell_belongs_board(+Cell)
 %Verificar se coordenadas de uma determinada célula estão dentro dos limites do tabuleiro
@@ -149,6 +152,10 @@ possible_move(Board, CurrRow-CurrCol,NewRow-NewCol, right):- %right move
 %valid_move(+Board,+CurrentPosition,+DestPosition,?Visited)
 %Verifica se mover uma possível peça em CurrentPosition para DestPosition(destination position) é um movimento válido
 
+
+
+
+
 %base case Current Position = DestPosition
 
 valid_move(_Board, _Player, CurrRow-CurrCol, CurrRow-CurrCol, _Visited).
@@ -169,36 +176,7 @@ valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol) :-
     cell_has_player_piece(Board, Player,CurrRow-CurrCol,_Piece), %célula de onde movimento parte, tem de ter uma peça de um Player
     %Chamada recursiva utilizando acumulador, para evitar recursão infinita / evitar voltar a tentar células já tentadas anteriormente
     empty_cell(Board, DestRow-DestCol), %DestinationPosition needs to be an empty cell
-    valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, []).
-
-
-
-
-count_pieces(_, _, [], Count, Count).
-%Predicate to count pieces from a list of positions of possible Player pieces
-count_pieces(Board, Player, [Row-Col | RestCells], CurrentCount, FinalCount):-
-    (cell_has_player_piece(Board, Player, Row-Col,_Piece) ->
-        NewCount is CurrentCount +1;
-        NewCount is CurrentCount
-    ),
-    count_pieces(Board, Player, RestCells, NewCount, FinalCount).
-    
-
-count_player_pieces(Board, Player,  Count):-
-
-    findall(Row-Col, cell_belongs_to_playable_board(Board, Row-Col), PlayablePositions),
-    count_pieces(Board, Player, PlayablePositions, 0, Count).
-
-
-
-
-check_win(Board, CurrentPlayer):-
-    change_player(CurrentPlayer, Opponent),
-    count_player_pieces(Board, Opponent, NumbPieces), NumbPieces < 6.
-    
-
-check_trapped(Board, Player):-
-    \+cant_push(Board, Player).
+    once(valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, [])).
 
 
 % Check that none of the cells in ResultCells are anchor pieces for Opponent
@@ -206,11 +184,6 @@ check_no_anchor_pieces(ResultCells, Opponent) :-
   
     forall(member(Cell, ResultCells), \+ anchor_piece(Cell, Opponent)).
    
-
-
-
-   
-    
 
 
 % make_move(+Board, +Player, +PiecePosition, +DestinationPosition, -NewGameState)/5
@@ -295,10 +268,10 @@ make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, FinalPushGameState)
 % Iterate over each row and column of the board
 iterate_over_board(Board, Row, Col) :-
     length(Board, NumRows),
-    between(1, NumRows, Row),
+    between(0, NumRows, Row),
     nth1(Row, Board, CurrentRow),
     length(CurrentRow, NumCols),
-    between(1, NumCols, Col).
+    between(0, NumCols, Col).
 
 
 
@@ -319,38 +292,123 @@ player_lost_game(Board, Player):-
 
 find_valid_push_moves(Board, Player, ValidPushMoves) :-
     get_player_pieces_lists(Board, Player, ListOfPlayerSquares, _ListOfPlayerRounds),
-    findall(
-        [CurrRow-CurrCol, PushRow-PushCol, ResultPushCells],
+
+    setof(
+        [PieceRow-PieceCol, PushRow-PushCol, ResultPushCells],
         (
-            member(CurrRow-CurrCol, ListOfPlayerSquares),
-            valid_push(Board, Player, CurrRow-CurrCol, PushRow-PushCol, ResultPushCells)
+            member(PieceRow-PieceCol, ListOfPlayerSquares),
+            valid_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, ResultPushCells)
         ),
         ValidPushMoves
-    ).
+    ) .
 
+%Auxilliar predicate to unify List of Pieces
+get_all_player_pieces(Board, Player,ListOfPlayerPositionsPieces ):-
+    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, ListOfPlayerRounds),
+    append(ListOfPlayerSquares, ListOfPlayerRounds, ListOfPlayerPositionsPieces).
+
+%get_all_empty_cells(+Board, -EmptyCellCoordinates)
+%This function returns list with coordinates of all empty cells in the board
+get_all_empty_cells(Board, EmptyCellCoordinates):-
+    findall(Row-Col, (iterate_over_board(Board, Row, Col), empty_cell(Board,Row-Col)), EmptyCellCoordinates).
+
+%
 find_valid_moves(Board, Player, ValidMoves):-
 
-    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, ListOfPlayerRounds),
-    append(ListOfPlayerSquares, ListOfPlayerRounds, ListOfPlayerPieces),
+    get_all_player_pieces(Board, Player,ListOfPlayerPositionsPieces ),
+    get_all_empty_cells(Board, ListOfEmpty),
 
     findall(CurrRow-CurrCol-DestRow-DestCol,
     (   
-        iterate_over_board(Board, DestRow, DestCol),
-        member(CurrRow-CurrCol, ListOfPlayerPieces),
+        member(CurrRow-CurrCol, ListOfPlayerPositionsPieces),
+        member(DestRow-DestCol, ListOfEmpty),
         valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol)
+
 
 
     ), ValidMoves
     ) .
 
+find_valid_round_moves(Board, Player, ValidRoundMoves):-
 
-find_new_game_states(Board, Player, ListOfNewGameStates):-
+    get_player_pieces_lists(Board, Player, _ListOfPlayerSquares, ListOfPlayersRounds),
+    get_all_empty_cells(Board, ListOfEmpty),
+    findall(CurrRow-CurrCol-DestRow-DestCol,
+    (   
+        member(CurrRow-CurrCol, ListOfPlayersRounds),
+        member(DestRow-DestCol, ListOfEmpty),
+        valid_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol)
+
+
+
+    ), ValidRoundMoves
+    ) .
+
+%find_move_game_states(+Board, +Player, +ListOfNewGameStates)
+%Predicado para obter todos os GameStates resultantes para todos os ValidMoves possíves
+find_move_game_states(Board, Player, ListOfNewGameStates):-
+    find_valid_moves(Board, Player, ValidMoves),
+    findall(BoardGameState,
+    (
+        member(CurrRow-CurrCol-DestRow-DestCol, ValidMoves),
+        make_move(Board, Player, CurrRow-CurrCol, DestRow-DestCol, BoardGameState),
+        \+player_cant_push(BoardGameState-Player) % assegurar que não são escolhidos valid_moves que levam a BoardGameState
+
+    ), ListOfNewGameStates
+    
+    
+    ).
+
+
+%find_push_game_states(+Board, +Player, +ListOfNewGameStates)
+%Predicado para obter todos os GameStates resultantes para todos os ValidPushMoves possíves
+find_push_game_states(Board, Player, ListOfNewGameStates):-
+    
+    find_valid_push_moves(Board, Player, ValidPushMoves),
+    findall(BoardGameState-PushRow-PushCol,
+    
+    (
+        member([PieceRow-PieceCol, PushRow-PushCol, _ResultPushCells], ValidPushMoves),
+        once(make_push(Board, Player, PieceRow-PieceCol, PushRow-PushCol, BoardGameState)),
+        \+ player_lost_game(BoardGameState, Player) %AI will not choose moves after push , the player push his own piece out of the board
+    ), ListOfNewGameStates
+
+    ).
+
     
 %player_trapped(Board,Player) 
-%Predicate that checks if a player is trapped and has no way out for every piece
-% players_trapped(Board,Player):-
-%     get_player_pieces_lists(Board, Player, ListOfPlayerSquares, ListOfPlayerRounds),
+%Predicate that checks if all players are trapped ( cant push ) and has no way out for every piece
+%Este predicado não é utilizado no jogo, já que mesmo que o Player atual a jogar esteja trapped e o Oponnent também, o Oponnent ainda teria 2 moves possíveis para ficar em posição de fazer push
+players_cant_push_draw(Board,Player):-
+    find_valid_push_moves(Board, Player, []), % No possible push
+    change_player(Player, Opponent),
+    find_valid_push_moves(Board, Opponent, []). %No possible push
 
+%predicate to check, after move phase, if before push phase, Player cant push, if not he lose the game
+player_cant_push(Board-Player):-
+    find_valid_push_moves(Board, Player, []).
+
+% game_over(+GameState, -Winner)
+
+game_over(Board-Player, Winner):-
+    player_lost_game(Board, Player),
+    change_player(Player, Winner).
+
+game_over(Board-Player, Winner):-
+    player_lost_game(Board, Player),
+    player_cant_push(Board-Player),
+ 
+    change_player(Player, Winner).
+    
+
+%case when Player push a piece out of the Opponent of the Board, the winner is Player !
+game_over(Board-Player, Winner):- 
+    change_player(Player, Opponent),
+    player_lost_game(Board, Opponent),
+    change_player(Opponent, Winner).
+   
+   
+   
 
 
 % TODO
@@ -371,17 +429,67 @@ find_new_game_states(Board, Player, ListOfNewGameStates):-
         per turn, the problem becomes polynomially solvable again.
 */
 
-%predicate/heuristics to evaluate values of moves, gameStates etc. 
-% predicate to evaluate the Value of a given gameState w.r.t. a given Player1/2 . For GameStates with same value, use real random choose algorithm to avoid Players detect any pattern on the choosen moves
-%Heuristic algorithm: predicate to do an AI that chooses the "best" 0, 1 or 2 moves + push move from a set of possible moves
+%
 
-% give different weights for different heuristic evaluation above ?
-%number of possible push moves: less possible push moves for the opponent, less value The GameState has, better for Player
-%Write more from: https://www.abstractgames.org/pushfight.html
-% For a given, GameState, if opponent squares have less possible push_moves, Val is less
-%For given GameState, if opponent round_pieces, have less valid_moves, this gives less pontuation to this GameState then others
-%Rounde_pieces cant push, so they are more vulnerable to be pushing out
-%More Round_pieces next to edge locations, GameState has less points
+evaluate_push_mobility(GameState, Player, Value):-
+    find_valid_push_moves(GameState, Player, ValidPushMoves),
+    length(ValidPushMoves, LengthOfValidPushMoves), number_pieces_player(N),
+    Value is 4*(LengthOfValidPushMoves // (N // 2 +1) ) .
 
-% Heuristic algorithm predicate to do an AI that simulates n (We chooses this) "Optimal" GameStates for a given Player(Him)
-% where he also simulate the responses for every simulated "Optimal " GameState from 1... n
+
+evaluate_move_mobility(GameState, Player, Value):-
+    find_valid_moves(GameState, Player, ValidMoves),
+    length(ValidMoves, LengthOfValidPushMoves), number_pieces_player(N),
+    Value is LengthOfValidPushMoves // N .
+
+
+evaluate_round_pieces_mobility(GameState, Player, Value):-
+    find_valid_round_moves(GameState, Player, ValidRoundMoves),
+    length(ValidRoundMoves, LengthOfValidRoundMoves), number_pieces_player(N),
+    Value is 3* (LengthOfValidRoundMoves // N ) .
+
+
+%Mais  mobility evaluations
+
+evaluate_mobility(GameState, Player, Value):-
+    
+    evaluate_push_mobility(GameState, Player, Value1),
+    evaluate_move_mobility(GameState, Player, Value2),
+    evaluate_round_pieces_mobility(GameState, Player, Value3),
+    %add more
+    Value is Value1 + Value2 + Value3.
+
+
+% Predicados para contabilizar se jogador se mantém no centro do tabuleiro, pois tem vantagens
+is_middle_square(Row, Col) :-
+    between(2, 4, Row), % Assuming rows 2 to 5 are considered the middle
+    between(3, 6, Col). % Assuming columns 3 to 6 are considered the middle
+
+
+count_player_middle_pieces(Board, Player, Count) :-
+    get_player_pieces_lists(Board, Player, ListOfPlayerSquares, _ListOfPlayersRounds),
+    include(is_middle_piece(Board), ListOfPlayerSquares, MiddlePlayerSquares),
+    length(MiddlePlayerSquares, Count).
+
+
+is_middle_piece(Board, Row-Col) :-
+    is_middle_square(Row, Col),
+    (player_square_piece(Board, _, Row-Col) ; 
+    player_round_piece(Board, _, Row-Col) ).
+
+
+
+%value(+GameState, +Player, -Value):-
+value(GameState, Player, Result):-
+   evaluate_mobility(GameState,Player,Value),
+   count_player_middle_pieces(GameState, Player, MiddlePiecesCount),
+   Result is Value + (MiddlePiecesCount * 2).
+
+
+evaluate_game_state_list(ListGameStates, Player, SortedListGameStateValue):-
+    findall(Value-GameState,(
+        member(GameState, ListGameStates),
+        value(GameState, Player, Value)
+    ),ListGameStateValue
+    ), keysort(ListGameStateValue, SortedListGameStateValue).
+    

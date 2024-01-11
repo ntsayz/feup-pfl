@@ -14,11 +14,36 @@ board_logic_test(logic1,
 board_logic_test(standard_initial_positions, [
     [out,out,out,sr,sr,sr,sr,sr,out,out],
     [out,out,out,w_round,b_round,b_square,empty,empty,out,out],
-    [out,b_round,b_square,b_round,b_square,w_square,empty,empty,empty,out],
+    [out,empty,b_square,b_round,b_square,w_square,empty,empty,empty,out],
     [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
     [out,out,out,empty,w_square,w_round,empty,empty,out,out],
     [out,out,sr,sr,sr,sr,sr,out,out,out] ]
 ).
+board_logic_test(standard_initial_positions2, [
+    [out,out,out,sr,sr,sr,sr,sr,out,out],
+    [out,out,out,w_round,b_round,b_square,empty,empty,out,out],
+    [out,empty,b_square,b_round,b_square,w_square,empty,empty,empty,out],
+    [out,empty,empty,empty,w_square,empty,empty,empty,empty,out],
+    [out,out,out,empty,w_square,w_round,empty,empty,out,out],
+    [out,out,sr,sr,sr,sr,sr,out,out,out] ]
+).
+board_logic_test(trapped_players_draw, [
+    [out, out, out, sr, sr, sr, sr, sr, out, out],
+    [out, out, out, w_round, b_round, b_square, empty, empty, out, out],
+    [out, b_round, b_square, b_round, b_square, w_square, empty, empty, empty, out],
+    [out, empty, empty, w_round, w_square, b_square, empty, empty, empty, out],
+    [out, out, out, empty, w_square, w_round, b_round, empty, out, out],
+    [out, out, sr, sr, sr, sr, sr, out, out, out]
+]).
+
+board_logic_test(game_over,
+    [[out,out,out,sr,sr,sr,sr,sr,out,out],
+    [out,out,out,b_square,b_square,b_square,b_round,b_round,out,out],
+    [out,empty, empty, empty,empty,empty,empty,empty,empty,out],
+    [out,empty, empty, empty,empty,empty,empty,empty,empty,out],
+    [out, out, w_square,w_square,w_square,empty,w_round,out,out,out],
+    [out,out,sr,sr,sr,sr,sr,out,out,out]]).
+
 %newstate after move on test board logic1: 1-3 -> 2-3
 board_logic_test(make_move_state1,[[out,out,out,sr,sr,sr,sr,sr,out,out],
     [out,out,out,empty,b_square,b_square,b_round,b_round,out,out],
@@ -66,6 +91,17 @@ board_logic_test(possible_push_positionsNewStatePush2, [
     [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
     [out,out,out,empty,w_square,w_round,empty,empty,out,out],
     [out,out,sr,sr,sr,sr,sr,out,out,out] ]
+).
+
+board_logic_test(cant_push_board, [
+    [out, out, out, sr, sr, sr, sr, sr, out, out],
+    [out, out, out, w_round, b_round, b_square, empty, empty, out, out],
+    [out, empty, b_square, b_round, b_square, empty, empty, w_square, empty, out],
+    [out, w_round, empty, empty, w_square, empty, empty, empty, empty, out],
+    [out, out, out, empty, w_square, empty, empty, empty, out, out],
+    [out, out, sr, sr, sr, sr, sr, out, out, out]
+]
+
 ).
 
 
@@ -180,15 +216,28 @@ test_player_make_push_predicates:-
 
 
 test_aux_predicates_game_ai:-
+    board_logic_test(game_over, BoardGameOver),
     board_logic_test(standard_initial_positions, BoardAi),
-    board_logic_test(logic1, Board),
+    board_logic_test(possible_push_positions, BoardPush), 
+    % % board_logic_test(logic1, Board),
+    board_logic_test(cant_push_board, BoardCantPush),
+    board_logic_test(standard_initial_positions2,NoGameOver),
     run_test(get_player_pieces_lists(BoardAi, player1, _ListOfPlayerSquares, _ListOfPlayerRounds)),
     run_test(get_player_pieces_lists(BoardAi, player2, _ListOfPlayerSquares2, _ListOfPlayerRounds2)),
-    run_test(player_lost_game(Board, player1)), % 6 is the default game number of Pieces a Player need to have to continue playing
+    run_test(player_lost_game(BoardGameOver, player1)), % 6 is the default game number of Pieces a Player need to have to continue playing
     run_test(find_valid_push_moves(BoardAi, player1, _ValidPushMoves)), 
-    run_test(find_valid_moves(BoardAi, player1, _ValidMoves)).
-    
-
+    run_test(find_valid_moves(BoardAi, player1, _ValidMoves)),
+    run_test(find_move_game_states(BoardAi, player1, _ListOfNewGameStates)),
+    run_test(find_push_game_states(BoardAi, player1, _ListOfNewGameStates2)),
+    run_test(game_over(BoardGameOver-player1, player2)), %BoardGameOver have 5 pieces for player1 , to test this quickly
+    run_test(\+ player_cant_push(BoardAi-player1)),
+    run_test(player_cant_push(BoardCantPush-player1)),
+    run_test(game_over(BoardCantPush-player1, player2)), % check if game_over, also checks if player cant push
+    run_test(\+game_over(NoGameOver-player1, player2)),
+    run_test(player_lost_game(BoardGameOver, player1)),
+    run_test(player_cant_push(BoardCantPush-player1)),
+    run_test(\+ player_cant_push(BoardPush-player1)),
+    run_test(ai_move_game_state(NoGameOver, player1, _Elem)).
 
 run_all_tests:-
     

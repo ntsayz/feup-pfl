@@ -2,33 +2,25 @@
 % ============================= BOARD States to use ============================
 
 
-initial_board2([
+initial_board1([
     [out,out,out,sr,sr,sr,sr,sr,out,out],
     [out,out,out,w_round,b_round,b_square,empty,empty,out,out],
-    [out,b_round,b_square,b_round,b_square,w_square,empty,empty,empty,out],
+    [out,empty,b_square,b_round,b_square,w_square,empty,empty,empty,out],
     [out,empty,empty,w_round,w_square,empty,empty,empty,empty,out],
-    [out,out,out,empty,w_square,w_round,empty,empty,out,out],
+    [out,out,out,empty,w_square,empty,empty,empty,out,out],
     [out,out,sr,sr,sr,sr,sr,out,out,out] ] ).
+
+initial_board2([
+    [out,out,out,sr,sr,sr,sr,sr,out,out],
+    [out,out,out,empty,b_square,w_square,empty,empty,out,out],
+    [out,empty,empty,b_round,empty,b_square,w_round,w_square,empty,out],
+    [out,empty,empty,empty,b_square,w_square,empty,empty,empty,out],
+    [out,out,out,empty,b_round,w_round,empty,empty,out,out],
+    [out,out,sr,sr,sr,sr,sr,out,out,out] ] ).  
 
 % ============================= Predicates to manipulate and create different Boards with different sizes, number of Pieces etc ============================
 %Predicate to create board with given SizeRow and SizeCol
 
-
-%Predicate to fill board of  given SizeRow and SizeCol with out, sr, empty, b_round,b_square w_round,w_square
-% Choose simple rules to add more or less pieces type of lines and number of sr to given board of Size SizeRows x SizeCols
-%Rules: For NewSizeRow X NewSizeCol -> NewNumbOfPieces = (NewSizeRow X NewSizeCol X 12 )/ 60 
-% 12 = DefaultNumbOfPieces e 60 = 8 X 4 ( lines * max playable Cols ) ( default board size) -> 
-% Change change_size_board and number_pieces : -> Para board com 8 x 16, teremos (16*8*12 )/ 24 = 128*12 / 24 = 64 pieces for the new board
-% Decide how the lines with sr, and the shorter and longer lines will be
-% sr : NumbOfSr= ((NewCol/DefaultCol)*5 ), NumbOfShortLinesEmptyCells = ((NewCol/DefaultCol)*5 ) andNumberOfLargeLinesEmptyCells= ((NewCol/DefaultCol)*8 )
-% 5 is the number of sr and empty cells in the shorter lines , 8 number of empty on larger lines in default game board of 6 X 10, lines wir sr with equal number of sr then shortlines
-% Use always On default values of board game: + 4 of 6 Row and + 8 of 10 Col  -> Eg: 6+4 X 10+8 = NewBoard = 10 X 18 etc ...
-% From 10 Rows, only 8 are playable = 4 short lines and 4 long lines, short lines with 10 empty cells ( 5*2) and long lines with ( 8*2) empty cells
-% The lines with sr will have: 5*2 side rails (rl)  
-% Number of short lines = NewSizeRow * 2 / 6, Long lines = NewSizeRow * 2 / 6
-% Eg: 12 X 20 -> ShorLines = 4, LongLines = 4, two lines with sr
-%Allign sr lines with shor lines, and the longlines also aliggned, then out cells will fill untill: we have a board with 20 Col ( with 16 playable collumns max)
-% And the number of Rows will be 4 * n + 2 always, in this example: 6+4 = 4*2 + 2
 
 %  ============================= BOARD DISPLAY =================================
 
@@ -67,8 +59,16 @@ display_columns(Size, Code) :- Size > 0,
   put_code(Code), write('   '),
   S is Size-1, C is Code+1,
   display_columns(S, C).
+% display_columns(+Size, +Code)
+% Computação e visualização das colunas do tabuleiro de acordo com o seu tamanho.
+display_columns(0, _):-!.
+display_columns(Size, Code) :- Size > 0,
+  put_code(Code), write('   '),
+  S is Size-1, C is Code+1,
+  display_columns(S, C).
 
-%second version
+
+
 
 % display_board_lines(+Board, +LineNumber)
 % Visualização das linhas que compõe o tabuleiro.
@@ -108,94 +108,3 @@ display_line([Cell | T], RowNumber, ColNumber) :-
     NextColNumber is ColNumber + 1,
     display_line(T, RowNumber, NextColNumber).
 
-
-%draw banner for the game 
-
-
-
-
-% Predicate to draw a square banner with a title and two stick figures.
-draw_banner(Columns) :-
-    Title = "Push-Fight Game !  ",
-    BannerHeight is Columns,  % Calculate the height of the banner
-    StickManHeight is BannerHeight // 2,  % Calculate the height of the
-    Middle is Columns // 2 + 6,
-    % Calculate padding for title and stick figures
-    length(Title, TitleLength),
-    TitlePad is (Columns - TitleLength) // 2,
-    % Draw the banner
-    draw_top_bottom(Columns),
-    draw_centered_text(Title, Columns, TitlePad),
-    draw_empty_line(Columns),
-    print_stick_man_line(Middle, Columns,StickManHeight),
-    draw_top_bottom(Columns).
-
-% Helper predicate to draw the top and bottom border of the banner.
-draw_top_bottom(Columns) :-
-    fill_line(':', Columns),
-    nl.
-
-% Helper predicate to draw an empty line with colons on the sides.
-draw_empty_line(Columns) :-
-    write(':'),
-    fill_line(' ', Columns - 2),
-    write(':'),
-    nl.
-
-% Helper predicate to draw centered text within the banner.
-draw_centered_text(Text, Columns, _Pad) :-
-    length(Text, TextLength),
-    SidePad is (Columns - TextLength) // 2 - 1,
-    write(':'),
-    fill_line(' ', SidePad), 
-    format('~s~n', [Text]), 
-    fill_line(' ', SidePad), 
-    write(':'), 
-    nl.
-
-% Helper predicate to fill a line with a specific character.
-fill_line(Char, Length) :-
-    ( Length > 0 ->
-        write(Char),
-        NewLength is Length - 1,
-        fill_line(Char, NewLength)
-    ; true
-    ).
-
-% print_stick_men(Columns, StickManHeight) :-
-%     Middle is Columns // 2,
-%     print_stick_man_line(Middle, StickManHeight), nl,
-%     print_push_fight_game(Middle), nl,
-%     print_stick_man_line(Middle, StickManHeight), nl.
-
-print_stick_man_line(_Middle, _Collumns,0).
-print_stick_man_line(Middle, Collumns,StickManHeight) :-
-    StickManHeight > 0,
-    Spaces is Middle - 3,  % Adjust for stick figure width
-    print_row(' ', Spaces),
-    write('O  O'),
-    print_row(' ', Spaces), nl,
-    print_row(' ', Spaces),
-    write('/|\\/|\\'),
-    print_row(' ', Spaces), nl,
-    print_row(' ', Spaces),
-    write('/ \\/ \\'),
-    print_row(' ', Spaces), nl,
-    draw_top_bottom(Collumns), nl,
-    NewStickManHeight is StickManHeight - 3,
-    NewMidle is Middle -3,
-    print_stick_man_line(NewMidle, Collumns,NewStickManHeight).
-
-
-
-
-
-
-print_row(Char, 0) :- 
-write(Char).
-
-print_row(Char, Length) :-
-    Length > 0,
-    write(Char),
-    NewLength is Length - 1,
-    print_row(' ', NewLength).
